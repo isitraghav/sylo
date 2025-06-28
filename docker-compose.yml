@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    ports:
+      - "1211:1211"
+    environment:
+      - MONGO_CONNECTION=${MONGO_CONNECTION}
+      - bucket_name=${bucket_name}
+      - s3_prefix=${s3_prefix}
+      - aws_access_key_id=${aws_access_key_id}
+      - aws_secret_access_key=${aws_secret_access_key}
+      - region_name=${region_name}
+    volumes:
+      - ./uploads_data:/app/uploads_data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:1211/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Local Raster Tiles with Color Filtering</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .controls-panel {
+            width: 350px;
+            background: white;
+            padding: 20px;
+            overflow-y: auto;
+            box-shadow: -2px 0 5px rgba(0,0,0,0.1);
+        }
+
+        .control-section {
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        .control-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .file-upload {
+            border: 2px dashed #ccc;
+            border-radius: 5px;
+            padding: 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: border-color 0.3s;
+        }
+
+        .file-upload:hover {
+            border-color: #007cba;
+        }
+
+        .file-upload.dragover {
+            border-color: #007cba;
+            background-color: #f0f8ff;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .color-filter {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .tolerance-slider {
+            flex: 1;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background: #007cba;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px 0;
+        }
+
+        button:hover {
+            background: #005a87;
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .tile-info {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            font-size: 12px;
+        }
+
+        .color-results {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 10px;
+        }
+
+        .color-match {
+            padding: 5px;
+            margin: 2px 0;
+            border-radius: 3px;
+            font-size: 11px;
+        }
+
+        .canvas-container {
+            margin: 10px 0;
+            text-align: center;
+        }
+
+        .preview-canvas {
+            border: 1px solid #ddd;
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="map-container">
+            <div id="map"></div>
+        </div>
+
+        <div class="controls-panel">
+            <h2>Local Raster Tiles</h2>
+
+            <!-- File Upload Section -->
+            <div class="control-section">
+                <h3>Upload Tile Images</h3>
+                <div class="file-upload" id="fileUpload">
+                    <p>📁 Click or drag tile images here</p>
+                    <p style="font-size: 12px; color: #666;">Supports: PNG, JPG, GIF</p>
+                    <input type="file" id="fileInput" multiple accept="image/*">
+                </div>
+                <div id="uploadStatus"></div>
+            </div>
+
+            <!-- Color Filtering Section -->
+            <div class="control-section">
+                <h3>Color Filtering</h3>
+                <div class="color-filter">
+                    <label>Target Color:</label>
+                    <input type="color" id="colorPicker" class="color-picker" value="#ff0000">
+                    <span id="colorValue">#ff0000</span>
+                </div>
+
+                <div class="color-filter">
+                    <label>Tolerance:</label>
+                    <input type="range" id="tolerance" class="tolerance-slider" min="0" max="100" value="20">
+                    <span id="toleranceValue">20</span>
+                </div>
+
+                <button id="analyzeColor" disabled>Analyze Color in Tiles</button>
+                <button id="filterColor" disabled>Create Filtered Layer</button>
+                <button id="extractColor" disabled>Extract Color Areas</button>
+            </div>
+
+            <!-- Tile Management -->
+            <div class="control-section">
+                <h3>Tile Management</h3>
+                <button id="clearTiles">Clear All Tiles</button>
+                <button id="generateSample">Generate Sample Tiles</button>
+                <div class="tile-info">
+                    <strong>Loaded Tiles:</strong> <span id="tileCount">0</span><br>
+                    <strong>Filtered Areas:</strong> <span id="filteredCount">0</span>
+                </div>
+            </div>
+
+            <!-- Results Section -->
+            <div class="control-section">
+                <h3>Analysis Results</h3>
+                <div id="colorResults" class="color-results">
+                    <p>Upload tiles and select a color to analyze</p>
+                </div>
+            </div>
+
+            <!-- Preview Canvas -->
+            <div class="control-section">
+                <h3>Tile Preview</h3>
+                <div class="canvas-container">
+                    <canvas id="previewCanvas" class="preview-canvas" width="256" height="256"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+    <script>
+        // Initialize map
+        let map = L.map('map').setView([40.7128, -74.0060], 10);
+        let uploadedTiles = [];
+        let currentTileLayer = null;
+        let filteredLayer = null;
+
+        // Add base layer
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // File upload handling
+        const fileUpload = document.getElementById('fileUpload');
+        const fileInput = document.getElementById('fileInput');
+        const uploadStatus = document.getElementById('uploadStatus');
+
+        fileUpload.addEventListener('click', () => fileInput.click());
+        fileUpload.addEventListener('dragover', handleDragOver);
+        fileUpload.addEventListener('drop', handleDrop);
+        fileInput.addEventListener('change', handleFiles);
+
+        function handleDragOver(e) {
+            e.preventDefault();
+            fileUpload.classList.add('dragover');
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            fileUpload.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            processFiles(files);
+        }
+
+        function handleFiles(e) {
+            processFiles(e.target.files);
+        }
+
+        function processFiles(files) {
+            uploadStatus.innerHTML = `<p>Processing ${files.length} files...</p>`;
+
+            Array.from(files).forEach((file, index) => {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        const img = new Image();
+                        img.onload = function() {
+                            uploadedTiles.push({
+                                name: file.name,
+                                data: e.target.result,
+                                image: img,
+                                x: index % 4,  // Simple grid arrangement
+                                y: Math.floor(index / 4),
+                                z: 10
+                            });
+                            updateTileCount();
+                            if (index === 0) showPreview(img);
+                        };
+                        img.src = e.target.result;
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+
+            setTimeout(() => {
+                uploadStatus.innerHTML = `<p style="color: green;">✓ Uploaded ${files.length} tiles</p>`;
+                enableControls();
+                displayTilesOnMap();
+            }, 1000);
+        }
+
+        function enableControls() {
+            document.getElementById('analyzeColor').disabled = false;
+            document.getElementById('filterColor').disabled = false;
+            document.getElementById('extractColor').disabled = false;
+        }
+
+        function updateTileCount() {
+            document.getElementById('tileCount').textContent = uploadedTiles.length;
+        }
+
+        function showPreview(img) {
+            const canvas = document.getElementById('previewCanvas');
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, 256, 256);
+            ctx.drawImage(img, 0, 0, 256, 256);
+        }
+
+        // Display tiles on map
+        function displayTilesOnMap() {
+            if (currentTileLayer) {
+                map.removeLayer(currentTileLayer);
+            }
+
+            // Create custom tile layer from uploaded images
+            const LocalTileLayer = L.TileLayer.extend({
+                getTileUrl: function(coords) {
+                    const tile = uploadedTiles.find(t =>
+                        t.x === coords.x && t.y === coords.y && t.z === coords.z
+                    );
+                    return tile ? tile.data : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+                }
+            });
+
+            currentTileLayer = new LocalTileLayer('', {
+                attribution: 'Local Tiles'
+            });
+            currentTileLayer.addTo(map);
+        }
+
+        // Color analysis functions
+        function hexToRgb(hex) {
+            const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? {
+                r: parseInt(result[1], 16),
+                g: parseInt(result[2], 16),
+                b: parseInt(result[3], 16)
+            } : null;
+        }
+
+        function colorDistance(c1, c2) {
+            return Math.sqrt(
+                Math.pow(c1.r - c2.r, 2) +
+                Math.pow(c1.g - c2.g, 2) +
+                Math.pow(c1.b - c2.b, 2)
+            );
+        }
+
+        // Analyze color in tiles
+        document.getElementById('analyzeColor').addEventListener('click', function() {
+            const targetColor = hexToRgb(document.getElementById('colorPicker').value);
+            const tolerance = parseInt(document.getElementById('tolerance').value);
+            const results = [];
+
+            uploadedTiles.forEach(tile => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = tile.image.width;
+                canvas.height = tile.image.height;
+
+                ctx.drawImage(tile.image, 0, 0);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const pixels = imageData.data;
+
+                let matchingPixels = 0;
+                let totalPixels = pixels.length / 4;
+
+                for (let i = 0; i < pixels.length; i += 4) {
+                    const pixelColor = {
+                        r: pixels[i],
+                        g: pixels[i + 1],
+                        b: pixels[i + 2]
+                    };
+
+                    if (colorDistance(targetColor, pixelColor) <= tolerance * 2.55) {
+                        matchingPixels++;
+                    }
+                }
+
+                const percentage = (matchingPixels / totalPixels * 100).toFixed(2);
+                results.push({
+                    name: tile.name,
+                    percentage: percentage,
+                    matches: matchingPixels
+                });
+            });
+
+            displayColorResults(results, targetColor);
+        });
+
+        function displayColorResults(results, targetColor) {
+            const resultsDiv = document.getElementById('colorResults');
+            let html = `<strong>Color Analysis for RGB(${targetColor.r}, ${targetColor.g}, ${targetColor.b})</strong><br><br>`;
+
+            results.forEach(result => {
+                const color = result.percentage > 5 ? '#d4edda' : '#f8d7da';
+                html += `<div class="color-match" style="background-color: ${color}">
+                    <strong>${result.name}</strong><br>
+                    ${result.percentage}% match (${result.matches} pixels)
+                </div>`;
+            });
+
+            resultsDiv.innerHTML = html;
+            document.getElementById('filteredCount').textContent = results.filter(r => r.percentage > 5).length;
+        }
+
+        // Filter color function
+        document.getElementById('filterColor').addEventListener('click', function() {
+            const targetColor = hexToRgb(document.getElementById('colorPicker').value);
+            const tolerance = parseInt(document.getElementById('tolerance').value);
+
+            // Create filtered tiles
+            const filteredTiles = uploadedTiles.map(tile => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = tile.image.width;
+                canvas.height = tile.image.height;
+
+                ctx.drawImage(tile.image, 0, 0);
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                const pixels = imageData.data;
+
+                // Filter pixels - keep only matching colors
+                for (let i = 0; i < pixels.length; i += 4) {
+                    const pixelColor = {
+                        r: pixels[i],
+                        g: pixels[i + 1],
+                        b: pixels[i + 2]
+                    };
+
+                    if (colorDistance(targetColor, pixelColor) > tolerance * 2.55) {
+                        pixels[i + 3] = 0; // Make non-matching pixels transparent
+                    }
+                }
+
+                ctx.putImageData(imageData, 0, 0);
+                return {
+                    ...tile,
+                    data: canvas.toDataURL(),
+                    filtered: true
+                };
+            });
+
+            // Create filtered layer
+            if (filteredLayer) {
+                map.removeLayer(filteredLayer);
+            }
+
+            const FilteredTileLayer = L.TileLayer.extend({
+                getTileUrl: function(coords) {
+                    const tile = filteredTiles.find(t =>
+                        t.x === coords.x && t.y === coords.y && t.z === coords.z
+                    );
+                    return tile ? tile.data : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+                }
+            });
+
+            filteredLayer = new FilteredTileLayer('', {
+                attribution: 'Filtered Tiles'
+            });
+            filteredLayer.addTo(map);
+        });
+
+        // Generate sample tiles
+        document.getElementById('generateSample').addEventListener('click', function() {
+            uploadedTiles = [];
+
+            // Create sample tiles with different colors
+            for (let i = 0; i < 9; i++) {
+                const canvas = document.createElement('canvas');
+                canvas.width = 256;
+                canvas.height = 256;
+                const ctx = canvas.getContext('2d');
+
+                // Fill with base color
+                ctx.fillStyle = '#f0f0f0';
+                ctx.fillRect(0, 0, 256, 256);
+
+                // Add colored shapes
+                const colors = ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff'];
+
+                for (let j = 0; j < 20; j++) {
+                    ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+                    const x = Math.random() * 200;
+                    const y = Math.random() * 200;
+                    const size = Math.random() * 30 + 10;
+                    ctx.fillRect(x, y, size, size);
+                }
+
+                // Create image
+                const img = new Image();
+                img.src = canvas.toDataURL();
+
+                uploadedTiles.push({
+                    name: `sample_${i}.png`,
+                    data: canvas.toDataURL(),
+                    image: img,
+                    x: i % 3,
+                    y: Math.floor(i / 3),
+                    z: 10
+                });
+            }
+
+            updateTileCount();
+            enableControls();
+            displayTilesOnMap();
+            uploadStatus.innerHTML = '<p style="color: green;">✓ Generated 9 sample tiles</p>';
+        });
+
+        // Clear tiles
+        document.getElementById('clearTiles').addEventListener('click', function() {
+            uploadedTiles = [];
+            if (currentTileLayer) map.removeLayer(currentTileLayer);
+            if (filteredLayer) map.removeLayer(filteredLayer);
+            updateTileCount();
+            document.getElementById('filteredCount').textContent = '0';
+            document.getElementById('colorResults').innerHTML = '<p>Upload tiles and select a color to analyze</p>';
+        });
+
+        // Color picker updates
+        document.getElementById('colorPicker').addEventListener('change', function(e) {
+            document.getElementById('colorValue').textContent = e.target.value;
+        });
+
+        document.getElementById('tolerance').addEventListener('input', function(e) {
+            document.getElementById('toleranceValue').textContent = e.target.value;
+        });
+
+        console.log('Local raster tiles with color filtering loaded!');
+    </script>
+</body>
+</html>

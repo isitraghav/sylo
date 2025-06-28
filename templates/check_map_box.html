@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Map - No API Key Required</title>
+
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        #map {
+            height: 100vh;
+            width: 100%;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            z-index: 1000;
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        .control-group {
+            margin-bottom: 10px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+
+        select, button {
+            width: 100%;
+            padding: 5px;
+            margin-bottom: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            font-size: 12px;
+        }
+
+        button {
+            background: #007cba;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #005a87;
+        }
+
+        .info-panel {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+
+    <div class="map-controls">
+        <div class="control-group">
+            <label for="mapStyle">Map Style:</label>
+            <select id="mapStyle">
+                <option value="osm">OpenStreetMap</option>
+                <option value="satellite">Satellite</option>
+                <option value="topo">Topographic</option>
+                <option value="dark">Dark Theme</option>
+            </select>
+        </div>
+
+        <div class="control-group">
+            <button onclick="getCurrentLocation()">Find My Location</button>
+            <button onclick="addRandomMarker()">Add Random Marker</button>
+            <button onclick="clearMarkers()">Clear Markers</button>
+        </div>
+    </div>
+
+    <div class="info-panel">
+        <div><strong>Coordinates:</strong> <span id="coordinates">Click on map</span></div>
+        <div><strong>Zoom:</strong> <span id="zoomLevel">10</span></div>
+    </div>
+
+    <!-- Leaflet JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+
+    <script>
+        // Initialize the map
+        let map = L.map('map').setView([40.7128, -74.0060], 10); // NYC coordinates
+        let markers = [];
+
+        // Define tile layers
+        const tileLayers = {
+            osm: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }),
+            satellite: L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: '© Esri'
+            }),
+            topo: L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenTopoMap contributors'
+            }),
+            dark: L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                attribution: '© CartoDB'
+            })
+        };
+
+        // Add default layer
+        tileLayers.osm.addTo(map);
+
+        // Handle style changes
+        document.getElementById('mapStyle').addEventListener('change', function(e) {
+            map.eachLayer(function(layer) {
+                if (layer._url) { // Remove tile layers
+                    map.removeLayer(layer);
+                }
+            });
+            tileLayers[e.target.value].addTo(map);
+        });
+
+        // Update coordinates and zoom level display
+        map.on('click', function(e) {
+            const lat = e.latlng.lat.toFixed(6);
+            const lng = e.latlng.lng.toFixed(6);
+            document.getElementById('coordinates').textContent = `${lat}, ${lng}`;
+
+            // Add a marker at clicked location
+            const marker = L.marker([lat, lng])
+                .addTo(map)
+                .bindPopup(`<b>Clicked Location</b><br>Lat: ${lat}<br>Lng: ${lng}`)
+                .openPopup();
+
+            markers.push(marker);
+        });
+
+        map.on('zoomend', function() {
+            document.getElementById('zoomLevel').textContent = map.getZoom();
+        });
+
+        // Get user's current location
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+
+                    map.setView([lat, lng], 15);
+
+                    const marker = L.marker([lat, lng])
+                        .addTo(map)
+                        .bindPopup('<b>Your Location</b>')
+                        .openPopup();
+
+                    markers.push(marker);
+                }, function(error) {
+                    alert('Error getting location: ' + error.message);
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+
+        // Add a random marker
+        function addRandomMarker() {
+            const center = map.getCenter();
+            const bounds = map.getBounds();
+
+            const lat = bounds.getSouth() + Math.random() * (bounds.getNorth() - bounds.getSouth());
+            const lng = bounds.getWest() + Math.random() * (bounds.getEast() - bounds.getWest());
+
+            const marker = L.marker([lat, lng])
+                .addTo(map)
+                .bindPopup(`<b>Random Marker</b><br>Lat: ${lat.toFixed(6)}<br>Lng: ${lng.toFixed(6)}`);
+
+            markers.push(marker);
+        }
+
+        // Clear all markers
+        function clearMarkers() {
+            markers.forEach(marker => map.removeLayer(marker));
+            markers = [];
+        }
+
+        // Add a sample marker
+        const sampleMarker = L.marker([40.7128, -74.0060])
+            .addTo(map)
+            .bindPopup('<b>New York City</b><br>Welcome to NYC!')
+            .openPopup();
+
+        markers.push(sampleMarker);
+
+        console.log('Map loaded successfully!');
+    </script>
+</body>
+</html>

@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Login Page</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body, html {
+      height: 100%;
+    }
+
+    .container {
+      display: flex;
+      height: 100vh;
+    }
+
+    .login-side {
+      width: 30%;
+      background-color: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .login-box {
+      width: 90%;
+      max-width: 450px;
+      padding: 30px;
+      background-color: #fff;
+      border-radius: 12px;
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+    }
+
+    .logo {
+      width: 250px;
+      /* margin: 0 auto 20px; */
+      display: block;
+    }
+
+    .login-box h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    .login-box p {
+      text-align: center;
+      color: #666;
+      margin-bottom: 20px;
+    }
+
+    .login-box label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    .login-box input[type="email"],
+    .login-box input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 16px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.9rem;
+      margin-bottom: 16px;
+    }
+
+    .actions a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+
+    .login-box button {
+      background-color: #2e7d32;
+      color: white;
+      padding: 10px;
+      width: 100%;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 10px;
+    }
+
+    p {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #6b7280;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="password"] {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .form-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 14px;
+      margin-bottom: 20px;
+    }
+
+    .form-footer a {
+      color: #3b82f6;
+      text-decoration: none;
+    }
+
+    button {
+      width: 100%;
+      background-color: #1d4ed8;
+      color: white;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .message {
+      font-size: 14px;
+      text-align: center;
+      margin-top: 10px;
+      display: none;
+    }
+    .image-side {
+      width: 70%;
+      background-image: url('{{url_for("static", filename="/images/login_back.jpeg")}}' ); /* update path as needed */
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Right Side with Full Background Image -->
+    <div class="image-side"></div>
+    <!-- Left Side -->
+    <div class="login-side">
+      <img src='{{url_for("static", filename="/images/logo/logo.png")}}' alt="Logo" class="logo" />
+      <h3>Renewable Energy & Analytics Platform</h3><br/>
+      <div class="login-box">
+        <h2>Sign in</h2>
+        <p>Enter your details to login</p>
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="loginId">Email</label>
+            <input type="text" id="loginId" placeholder="Enter email" required>
+          </div>
+    
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input type="password" id="password" placeholder="Enter password" required>
+          </div>
+    
+          <div class="form-footer">
+            <label><input type="checkbox"> Remember me</label>
+            <a href="#">Forgot password?</a>
+          </div>
+    
+          <button id="loginBtn" type="submit">
+            <span id="loginText">Sign In</span>
+          </button>
+    
+          <div id="successMessage" class="message"></div>
+          <div id="errorMessage" class="message"></div>
+        </form>
+      </div>
+    </div>
+
+    
+  </div>
+
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+        e.preventDefault();
+
+        const loginBtn = document.getElementById('loginBtn');
+        const loginText = document.getElementById('loginText');
+        const errorMessage = document.getElementById('errorMessage');
+        const successMessage = document.getElementById('successMessage');
+
+        const loginId = document.getElementById('loginId').value;
+        const password = document.getElementById('password').value;
+
+        // Reset messages
+        errorMessage.style.display = 'none';
+        successMessage.style.display = 'none';
+
+        // Show loading state
+        loginBtn.disabled = true;
+        loginText.innerHTML = '<span class="loading"></span>Signing in...';
+
+        try {
+            const response = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    loginId: loginId,
+                    password: password
+                })
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                successMessage.textContent = 'Login successful! Redirecting...';
+                successMessage.style.display = 'block';
+
+                // Redirect to homepage
+                setTimeout(() => {
+                    window.location.href = data.redirect || '/homepage';
+                }, 1000);
+            } else {
+                errorMessage.textContent = data.message || 'Login failed. Please try again.';
+                errorMessage.style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Login error:', error);
+            errorMessage.textContent = 'Network error. Please try again.';
+            errorMessage.style.display = 'block';
+        } finally {
+            // Reset button state
+            loginBtn.disabled = false;
+            loginText.textContent = 'Sign In';
+        }
+    });
+
+</script>
+</body>
+</html>

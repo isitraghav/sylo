@@ -1,0 +1,7 @@
+Sl No,ID,Panel,Defect,Hotspot Tepm,Action,"Lat,Lon",y,x,image name,irrad,block,inverter,scb,string
+1,"Row - 1 , Col - 4",U - 20,cell,91,Remediation Recommended,"18.06542730409023,76.50276817272128",76.50276817,18.0654273,1 (186)_1.JPG,618,2,1,1,1
+2,"Row - 1 , Col - 4",U - 22,multicell,85,Remediation Recommended,"18.065426554869934,76.50279064933011",76.50279065,18.06542655,1 (186)_2.JPG,700,3,2,2,2
+3,"Row - 1 , Col - 4",U - 23,bypass diod,87,Remediation Recommended,"18.065427211941945,76.50280140289345",76.5028014,18.06542721,1 (187)_2.JPG,718,4,4,5,4
+4,"Row - 1 , Col - 4",U - 24,module offlinre,90,Remediation Recommended,"18.065426877266326,76.50281261452662",76.50281261,18.06542688,1 (188)_1.JPG,720,5,3,7,5
+5,"Row - 1 , Col - 4",U - 25,short cuircit,81,Remediation Recommended,"18.065425705901667,76.502824495511",76.5028245,18.06542571,1 (188)_2.JPG,724,1,4,9,6
+6,"Row - 1 , Col - 4",U - 28,plant found ,89,Remediation Recommended,"18.06542553856386,76.50285612235679",76.50285612,18.06542554,1 (188)_3.JPG,725,5,1,10,3

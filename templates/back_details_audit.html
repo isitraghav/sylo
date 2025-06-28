@@ -1,0 +1,1870 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ audit.name }} - Audit Details</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #0EA5E9;
+            --secondary-color: #F97316;
+            --accent-color: #06B6D4;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --error-color: #EF4444;
+            --background-color: #F8FAFC;
+            --surface-color: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .main-app {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 250px;
+            background: var(--surface-color);
+            border-right: 1px solid var(--border-color);
+            padding: 20px 0;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 60px;
+        }
+
+        .sidebar.collapsed .sidebar-logo h2,
+        .sidebar.collapsed .sidebar-menu span {
+            display: none;
+        }
+
+        .sidebar.collapsed .sidebar-menu a {
+            padding: 12px;
+            justify-content: center;
+        }
+
+        .sidebar.collapsed .sidebar-menu svg {
+            margin-right: 0;
+        }
+
+        .toggle-sidebar {
+            position: absolute;
+            right: -12px;
+            top: 20px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .toggle-sidebar:hover {
+            background: var(--background-color);
+        }
+
+        .sidebar-logo {
+            padding: 0 20px 20px;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 20px;
+        }
+
+        .sidebar-logo h2 {
+            color: var(--primary-color);
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: linear-gradient(90deg, var(--primary-color), transparent);
+            color: var(--primary-color);
+            border-right: 3px solid var(--primary-color);
+        }
+
+        .sidebar-menu svg {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 250px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 60px;
+        }
+
+        /* Header */
+        .header {
+            background: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #0284C7;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background: #CBD5E1;
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            /* padding: 30px; */
+            overflow-y: auto;
+        }
+
+        /* Audit Header */
+        .audit-header {
+            background: linear-gradient(135deg, var(--secondary-color), var(--warning-color));
+            color: white;
+            padding: 40px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .audit-header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            transform: translate(25px, -25px);
+        }
+
+        .audit-title {
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .audit-subtitle {
+            font-size: 18px;
+            opacity: 0.9;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .audit-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .meta-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .meta-label {
+            font-size: 14px;
+            opacity: 0.8;
+            margin-bottom: 5px;
+        }
+
+        .meta-value {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Top Menu Bar */
+        .top-menu {
+            background: var(--surface-color);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+            padding: 0 20px;
+        }
+
+        .menu-nav {
+            display: flex;
+            gap: 0;
+        }
+
+        .menu-btn {
+            padding: 15px 25px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+            color: var(--text-secondary);
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .menu-btn.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+        }
+
+        .menu-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Content Sections */
+        .content-section {
+            background: var(--surface-color);
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            padding: 25px 30px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* .section-content {
+            padding: 30px;
+        } */
+
+        /* Filters */
+        .filters {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .filter-label {
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 14px;
+        }
+
+        .filter-select {
+            padding: 10px 15px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            min-width: 200px;
+        }
+
+        /* Data Table */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .data-table th {
+            background: var(--background-color);
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .data-table tr:hover {
+            background: var(--background-color);
+        }
+
+        /* Anomaly Cards */
+        .anomaly-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .anomaly-card {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .anomaly-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .anomaly-type {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .anomaly-severity {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .severity-high {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+        }
+
+        .severity-medium {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .severity-low {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .anomaly-details {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .anomaly-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-toggle {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .status-toggle.resolved {
+            background: var(--success-color);
+        }
+
+        .status-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .status-toggle.resolved::after {
+            transform: translateX(26px);
+        }
+
+        .status-label {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        /* Charts */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+        }
+
+        .chart-container {
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: var(--text-color);
+        }
+
+        .chart-placeholder {
+            width: 100%;
+            height: 250px;
+            background: var(--background-color);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-secondary);
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .audit-meta {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filter-select {
+                min-width: auto;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .anomaly-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .left-panel {
+            width: 200px;
+            background: white;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .tab {
+            padding: 15px 20px;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            font-size: 14px;
+        }
+
+        .tab.active {
+            border-bottom-color: #4285f4;
+            color: #4285f4;
+        }
+
+        .search-bar {
+            padding: 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .anomalies-btn {
+            background: #ea4335;
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            margin-top: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            width: 100%;
+        }
+
+        .results-count {
+            padding: 8px 12px;
+            font-size: 12px;
+            color: #666;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .inspection-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .inspection-item {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            position: relative;
+            transition: background-color 0.3s ease;
+        }
+
+        .inspection-item:hover {
+            background: #f8f9fa;
+        }
+
+        .inspection-item.selected {
+            background: #e3f2fd;
+            border-left: 3px solid #4285f4;
+        }
+
+        .inspection-title {
+            font-weight: 500;
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .inspection-subtitle {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 8px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-red {
+            background: #ea4335;
+        }
+
+        .status-orange {
+            background: #ff9800;
+        }
+
+        .status-green {
+            background: #34a853;
+        }
+
+        .map-panel {
+            flex: 1;
+            position: relative;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin: 0 15px;
+            overflow: hidden;
+        }
+
+        .map-container {
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 600"><rect fill="%23d4b896" width="1000" height="600"/><g fill="%23c4a886"><rect x="0" y="0" width="50" height="30"/><rect x="100" y="50" width="80" height="40"/><rect x="200" y="100" width="60" height="35"/><rect x="300" y="20" width="70" height="45"/></g></svg>') center/cover;
+            position: relative;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .map-btn {
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .fullscreen-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 30px;
+            height: 30px;
+            background: white;
+            border: 1px solid #ccc;
+            cursor: pointer;
+        }
+
+        /* .anomaly-marker {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            background: #ea4335;
+            border-radius: 50%;
+            cursor: pointer;
+        } */
+
+        .heatmap-container {
+            height: 25%;
+            display: flex;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        .heatmap {
+            flex: 1;
+            background: linear-gradient(45deg, #ff4444, #ffaa00, #ffff00);
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .heatmap-label {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            background: rgba(255, 255, 255, 0.8);
+            padding: 2px 6px;
+            font-size: 12px;
+            border-radius: 2px;
+        }
+
+        .right-panel {
+            /* width: 300px; */
+            background: white;
+            border-left: 1px solid #e0e0e0;
+            padding: 5px;
+            overflow-y: auto;
+        }
+
+        .date-selector {
+            background: #f8f9fa;
+            padding: 6px 10px;
+            border-radius: 4px;
+            margin-bottom: 12px;
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 20px;
+            font-weight: 600;
+            color: #4285f4;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            color: #666;
+            margin-top: 2px;
+        }
+
+        .detail-section {
+            margin-bottom: 15px;
+        }
+
+        .detail-title {
+            font-weight: 600;
+            margin-bottom: 6px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 3px;
+            font-size: 13px;
+        }
+
+        .detail-label {
+            color: #666;
+        }
+
+        .detail-value {
+            font-weight: 500;
+        }
+
+        .download-btn {
+            width: 100%;
+            padding: 8px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 12px;
+        }
+
+        .container {
+            display: flex;
+            height: calc(124vh - 300px);
+            /* margin: 20px 0; */
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            background: white;
+        }
+
+        #map {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            width: 100%;
+        }
+
+        /* full size */
+        .ctl {
+            padding: 2px 10px 2px 10px;
+            background: white;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            text-align: right;
+        }
+
+        .title {
+            font-size: 18pt;
+            font-weight: bold;
+        }
+
+        .src {
+            font-size: 10pt;
+        }
+
+        .selected-data-section {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .selected-data-section-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        .upper-section {
+            width: 100%;
+            height: 30% !important;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .lower-section {
+            flex: 1;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .detail-title {
+            margin: 0 0 15px 0;
+            color: #333;
+            font-size: 18px;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader-container {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .loader-text {
+            margin-top: 10px;
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Active/Selected state */
+        .inspection-item.selected {
+            background-color: #e3f2fd;
+            border-color: #2196f3;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-app">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="toggle-sidebar" onclick="toggleSidebar()">
+                <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </div>
+            <div class="sidebar-logo">
+                <h2>Solar Plant Manager</h2>
+            </div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="/homepage">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                            </path>
+                        </svg>
+                        <span>Home</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/audit" class="active">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                            </path>
+                        </svg>
+                        <span>Audit</span>
+                    </a>
+                </li>
+                <li>
+                    <a href="/data">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4">
+                            </path>
+                        </svg>
+                        <span>Data</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="breadcrumb">
+                    <a href="/homepage">Plants</a>
+                    <span>›</span>
+                    <a href="/plant/{{ plant._id }}">{{ plant.name }}</a>
+                    <span>›</span>
+                    <span>{{ audit.name }}</span>
+                </div>
+                <div class="header-actions">
+                    <a href="/plant/{{ plant._id }}" class="btn btn-secondary">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Back to Plant
+                    </a>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Audit Header -->
+                <!--                <div class="audit-header">-->
+                <!--                    <h1 class="audit-title">{{ audit.name }}</h1>-->
+                <!--                    <p class="audit-subtitle">{{ plant.name }} • Project Code: {{ audit.project_code }}</p>-->
+
+                <!--                    <div class="audit-meta">-->
+                <!--                        <div class="meta-item">-->
+                <!--                            <div class="meta-label">Start Date</div>-->
+                <!--                            <div class="meta-value">{{ audit.start_date.strftime('%B %d, %Y') }}</div>-->
+                <!--                        </div>-->
+                <!--                        <div class="meta-item">-->
+                <!--                            <div class="meta-label">Completion Date</div>-->
+                <!--                            <div class="meta-value">{{ audit.completion_date.strftime('%B %d, %Y') }}</div>-->
+                <!--                        </div>-->
+                <!--                        <div class="meta-item">-->
+                <!--                            <div class="meta-label">Duration</div>-->
+                <!--                            <div class="meta-value">{{ (audit.completion_date - audit.start_date).days }} days</div>-->
+                <!--                        </div>-->
+                <!--                        <div class="meta-item">-->
+                <!--                            <div class="meta-label">Status</div>-->
+                <!--                            <div class="meta-value">{{ audit.status.title() }}</div>-->
+                <!--                        </div>-->
+                <!--                    </div>-->
+                <!--                </div>-->
+
+                <!-- Top Menu -->
+                <!-- <div class="top-menu">
+                    <div class="menu-nav">
+                        <button class="menu-btn active" onclick="showSection('drone')" id="droneBtn">
+                            Drone Thermography
+                        </button>
+                        <button class="menu-btn" onclick="showSection('iv')" id="ivBtn" disabled>
+                            IV Testing
+                        </button>
+                        <button class="menu-btn" onclick="showSection('el')" id="elBtn" disabled>
+                            EL Testing
+                        </button>
+                        <button class="menu-btn" onclick="showSection('transmission')" id="transmissionBtn" disabled>
+                            Transmission Line
+                        </button>
+                    </div>
+                </div> -->
+
+                <!-- Drone Thermography Section -->
+                <div id="droneSection" class="content-section">
+                    <!-- <div class="section-header">
+                        <div class="section-title">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                </path>
+                            </svg>
+                            Drone Thermography Analysis
+                        </div>
+                    </div> -->
+
+                    <div class="section-content">
+
+
+
+
+                        <div class="container">
+
+
+                            <!-- Left Panel -->
+                            <div class="left-panel">
+                                <div class="filter-group">
+                                    <label class="filter-label">Block Filter </label>
+                                    <select class="filter-select" id="anomalyFilter" onchange="filterData()">
+                                        <option value="">All Blocks</option>
+                                        <option value="Cell">Cell Fault</option>
+                                        <option value="Bypass Diode">Bypass Diode</option>
+                                        <option value="Shading">Shading</option>
+                                        <option value="Multi Cell">Multi Cell</option>
+                                        <option value="Module Power Mismatch">Module Power Mismatch</option>
+                                    </select>
+                                </div>
+                                <div class="filter-group">
+                                    <label class="filter-label">Anomaly Filter </label>
+                                    <select class="filter-select" id="anomalyFilter" onchange="filterData()">
+                                        <option value="">All Anomalies</option>
+                                        <option value="Cell">Cell Fault</option>
+                                        <option value="Bypass Diode">Bypass Diode</option>
+                                        <option value="Shading">Shading</option>
+                                        <option value="Multi Cell">Multi Cell</option>
+                                        <option value="Module Power Mismatch">Module Power Mismatch</option>
+                                    </select>
+                                </div>
+                                <div class="search-bar">
+                                    <input type="text" class="search-input" placeholder="Search...">
+                                    <button class="anomalies-btn">🔍 Anomalies</button>
+
+                                </div>
+
+                                <div class="results-count">
+                                    Showing <strong> {{ anomalies|length }} </strong> anomalies
+                                </div>
+
+                                <div class="inspection-list">
+
+                                    {% for anomaly in anomalies %}
+                                    <!-- INSERT_YOUR_CODE -->
+                                    <div class="inspection-item">
+                                        <div class="inspection-title" data-anomaly='{{ anomaly }}'
+                                            onclick="handleAnomalyClick(this)">
+
+                                            # {{ anomaly.properties['image name'].split('.')[0] }} (Block-{{
+                                            anomaly.properties.block }} Inverter-{{ anomaly.properties.inverter }}
+                                            SCB-{{ anomaly.properties.scb }} String-{{ anomaly.properties.string }}
+                                            Module-{{ anomaly.properties.panel }})
+                                        </div>
+                                        <div class="inspection-subtitle">
+                                            <span class="status-dot status-red"></span>{{ anomaly.properties.defect }}
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+
+
+
+                                </div>
+                            </div>
+
+                            <!-- Map Panel -->
+                            <div class="map-panel">
+                                <!-- <div class="map-container"> -->
+
+                                <div id="map"></div>
+
+
+                                <!-- </div> -->
+
+
+                            </div>
+
+                            <!-- Right Panel -->
+                            <div class="right-panel">
+
+                                <div id="divATop" class="main_right">
+                                    <div class="date-selector">{{ audit.name }}</div>
+
+                                    <div class="stats-grid">
+                                        <div class="stat-item">
+                                            <div class="stat-number">{{ anomalies|length }} </div>
+                                            <div class="stat-label">Anomalies</div>
+                                        </div>
+                                        <div class="stat-item">
+
+                                            <div class="stat-number">{{ plant.total_modules_inspected }}</div>
+                                            <div class="stat-label">Modules Inspected</div>
+
+                                        </div>
+                                    </div>
+
+
+                                    <div class="detail-section">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Healthy</span>
+                                            <div class="detail-value">{{ plant.total_modules_inspected -
+                                                anomalies|length }}</div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="detail-section">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Client</span>
+                                            <div class="detail-value">{{ plant.name }}</div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="detail-section">
+                                        <div class="detail-item">
+                                            <span class="detail-label">AC Capacity</span>
+                                            <span class="detail-value">{{ plant.ac_capacity }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="detail-section">
+                                        <div class="detail-item">
+                                            <span class="detail-label">DC Capacity</span>
+                                            <span class="detail-value">{{ plant.dc_capacity }}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="detail-section">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Start Date</span>
+                                            <span class="detail-value">{{audit.start_date.strftime('%d %b %Y')}}</span>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Completion Date</span>
+                                            <span class="detail-value">{{audit.completion_date.strftime('%d %b
+                                                %Y')}}</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="detail-section">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Weather</span>
+                                            <span class="detail-value">Clear, Sunny</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="detail-section">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Location</span>
+                                            <span class="detail-value">Khetakhali, Gujarat 364001</span>
+                                        </div>
+                                    </div>
+
+                                    <div class="detail-section">
+                                        <div class="detail-item">
+                                            <span class="detail-label">Plant Coordinates</span>
+                                            <span class="detail-value">{{ plant.latitude }}, {{ plant.longitude
+                                                }}</span>
+
+                                        </div>
+                                        <div style="font-size: 12px; color: #666; margin-top: 4px;">
+                                        </div>
+                                    </div>
+
+
+                                </div>
+
+                                <div id="divABottom" class="selected-data-section hidden">
+                                    <div class="selected-data-section-content">
+                                        <img class="upper-section"
+                                            src="{{url_for('static', filename='images/data_check.png')}}"
+                                            alt="Data Check" />
+                                        <div id="anomalyDetails" class="lower-section">
+                                            <!-- <h3 class="detail-title">Selected Data Details</h3>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Data ID</span>
+                                            <span class="detail-value">mdnn</span>
+                                        </div> -->
+                                        </div>
+                                    </div>
+                                </div>
+
+
+
+
+
+                            </div>
+                        </div>
+                    </div>
+
+
+                    <!-- Charts Grid -->
+                    <!-- <div class="charts-grid">
+                        <div class="chart-container">
+                            <div class="chart-title">Anomaly Types Distribution</div>
+                            <div class="chart-placeholder">
+                                Pie chart showing anomaly distribution will be displayed here
+                            </div>
+                        </div>
+
+                        <div class="chart-container">
+                            <div class="chart-title">Block-wise Anomaly Count</div>
+                            <div class="chart-placeholder">
+                                Bar chart showing block-wise anomaly count will be displayed here
+                            </div>
+                        </div>
+                    </div> -->
+
+                    <!-- Anomalies List -->
+                    <!-- <div style="margin-top: 40px;"> -->
+                    <!-- <h3 style="margin-bottom: 20px; font-size: 18px; font-weight: 600;">Detected Anomalies</h3> -->
+
+                    <!-- {% if anomalies %}
+                        <div class="anomaly-grid" id="anomaliesGrid">
+                            {% for anomaly in anomalies %}
+                            <div class="anomaly-card" data-block="{{ anomaly.block }}" data-type="{{ anomaly.type }}">
+                                <div class="anomaly-type">
+                                    {{ anomaly.properties }}
+                                    <span class="anomaly-severity severity-{{ anomaly.severity }}">{{ anomaly.severity
+                                        }}</span>
+                                </div>
+                                <div class="anomaly-details">
+                                    <div><strong>Block:</strong> {{ anomaly.block }}</div>
+
+                                </div>
+                            </div>
+                            <div class="anomaly-status">
+                                <div class="status-toggle {{ 'resolved' if anomaly.status == 'resolved' else '' }}"
+                                    onclick="toggleAnomalyStatus('{{ anomaly._id }}', this)">
+                                </div>
+                                <span class="status-label">{{ 'Resolved' if anomaly.status == 'resolved' else
+                                    'Pending' }}</span>
+                            </div>
+                        </div>
+                        {% endfor %} -->
+                    <!-- </div> -->
+                    <!-- {% else %}
+                    <div class="empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                            </path>
+                        </svg>
+                        <h3>No anomalies detected</h3>
+                        <p>No anomalies have been detected for this audit yet.</p>
+                    </div>
+                    {% endif %} -->
+                </div>
+            </div>
+        </div>
+
+
+        <!-- Other Sections (Placeholder for future implementation) -->
+        <div id="ivSection" class="content-section hidden">
+            <div class="section-header">
+                <div class="section-title">IV Testing Analysis</div>
+            </div>
+            <div class="section-content">
+                <div class="empty-state">
+                    <h3>IV Testing Coming Soon</h3>
+                    <p>This feature will be enabled after the website goes live.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="elSection" class="content-section hidden">
+            <div class="section-header">
+                <div class="section-title">EL Testing Analysis</div>
+            </div>
+            <div class="section-content">
+                <div class="empty-state">
+                    <h3>EL Testing Coming Soon</h3>
+                    <p>This feature will be enabled after the website goes live.</p>
+                </div>
+            </div>
+        </div>
+
+        <div id="transmissionSection" class="content-section hidden">
+            <div class="section-header">
+                <div class="section-title">Transmission Line Analysis</div>
+            </div>
+            <div class="section-content">
+                <div class="empty-state">
+                    <h3>Transmission Line Testing Coming Soon</h3>
+                    <p>This feature will be enabled after the website goes live.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    </div>
+
+
+
+    <script>
+        // Add this at the beginning of your script section
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const toggleBtn = document.querySelector('.toggle-sidebar svg');
+
+            if (sidebar && mainContent && toggleBtn) {
+                // Collapse sidebar by default
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+
+                // Update toggle button icon
+                toggleBtn.style.transform = 'rotate(180deg)';
+            }
+        });
+
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const toggleBtn = document.querySelector('.toggle-sidebar svg');
+
+            if (sidebar && mainContent && toggleBtn) {
+                sidebar.classList.toggle('collapsed');
+                mainContent.classList.toggle('expanded');
+
+                // Rotate the arrow icon
+                if (sidebar.classList.contains('collapsed')) {
+                    toggleBtn.style.transform = 'rotate(180deg)';
+                } else {
+                    toggleBtn.style.transform = 'rotate(0deg)';
+                }
+            }
+        }
+
+        // Section switching functionality
+        function showSection(sectionId) {
+            const sections = ['map-section', 'anomalies-section', 'reports-section'];
+            const section = document.getElementById(sectionId);
+
+            if (!section) return; // Exit if section doesn't exist
+
+            sections.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.classList.remove('active');
+                }
+            });
+
+            section.classList.add('active');
+        }
+
+        // Initialize sections
+        document.addEventListener('DOMContentLoaded', function () {
+            // Show map section by default
+            const mapSection = document.getElementById('map-section');
+            if (mapSection) {
+                mapSection.classList.add('active');
+            }
+
+            // Add click handlers for section buttons
+            const sectionButtons = document.querySelectorAll('.section-btn');
+            sectionButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const sectionId = this.getAttribute('data-section');
+                    if (sectionId) {
+                        showSection(sectionId);
+                    }
+                });
+            });
+        });
+
+        // Filter functionality
+        function filterData() {
+            const blockFilter = document.getElementById('blockFilter').value;
+            const anomalyFilter = document.getElementById('anomalyFilter').value;
+            const anomalyCards = document.querySelectorAll('.anomaly-card');
+
+            anomalyCards.forEach(card => {
+                const cardBlock = card.dataset.block;
+                const cardType = card.dataset.type;
+
+                let showCard = true;
+
+                if (blockFilter && cardBlock !== blockFilter) {
+                    showCard = false;
+                }
+
+                if (anomalyFilter && !cardType.includes(anomalyFilter)) {
+                    showCard = false;
+                }
+
+                card.style.display = showCard ? 'block' : 'none';
+            });
+        }
+
+        // Toggle anomaly status
+        async function toggleAnomalyStatus(anomalyId, toggleElement) {
+            const isResolved = toggleElement.classList.contains('resolved');
+            const newStatus = isResolved ? 'pending' : 'resolved';
+
+            try {
+                const response = await fetch(`/api/anomalies/${anomalyId}/status`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        status: newStatus
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    // Update UI
+                    toggleElement.classList.toggle('resolved');
+                    const statusLabel = toggleElement.nextElementSibling;
+                    statusLabel.textContent = newStatus === 'resolved' ? 'Resolved' : 'Pending';
+                } else {
+                    alert('Failed to update status: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error updating anomaly status:', error);
+                alert('Error updating status. Please try again.');
+            }
+        }
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', function () {
+            // Show drone section by default
+            showSection('drone');
+
+            // // Add click event listeners to inspection items
+            // const inspectionItems = document.querySelectorAll('.inspection-item');
+            // console.log("---inspectionItems",inspectionItems)
+            // inspectionItems.forEach(item => {
+            //     item.addEventListener('click', handleInspectionItemClick);
+            // });
+        });
+
+        // Function to handle inspection item clicks
+        function handleInspectionItemClick(event) {
+            // Remove selected class from all items
+            document.querySelectorAll('.inspection-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            // Add selected class to clicked item
+            this.classList.add('selected');
+
+            const title = this.querySelector('.inspection-title').textContent.trim();
+            const subtitle = this.querySelector('.inspection-subtitle').textContent.trim();
+            const alertMessage = `Title: ${title}\nType: ${subtitle}`;
+            alert("som" + alertMessage);
+        }
+
+        //  .. White background
+        var white = L.tileLayer("data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAQAAAAEAAQMAAABmvDolAAAAA1BMVEX///+nxBvIAAAAH0lEQVQYGe3BAQ0AAADCIPunfg43YAAAAAAAAAAA5wIhAAAB9aK9BAAAAABJRU5ErkJggg==", { minZoom: 15, maxZoom: 20 });
+
+        // Overlay layers (TMS)
+        // var lyr = L.tileLayer('{{ url_for("static", filename="/tiles/{z}/{x}/{y}.png") }}', {
+
+        //     tms: 1, 
+        //     opacity: 1, 
+        //     attribution: "", 
+        //     minZoom: 15, 
+        //     maxZoom: 20 
+        // });
+        // var lyr = L.tileLayer('/static/tiles/{z}/{x}/{y}.png', { tms: 1, opacity: 1, attribution: "", minZoom: 15, maxZoom: 20 });
+        //
+        var lyr = L.tileLayer('https://plantdata2025.s3.eu-north-1.amazonaws.com/audits/684078e22cf86e843774d3f1/68407aee2cf86e843774d3f2/tiles/{z}/{x}/{y}.png', { tms: 1, opacity: 1, attribution: "", minZoom: 15, maxZoom: 20 });
+
+        // Map
+        var map = L.map('map', {
+            center: [21.9130935, 72.1065148],
+            zoom: 10,
+            minZoom: 15,
+            maxZoom: 25,
+            layers: [white, lyr],
+            zoomControl: true
+        });
+        // Custom fullscreen control for Leaflet
+        L.Control.CustomFullscreen = L.Control.extend({
+            options: {
+                position: 'topleft',
+                title: 'Toggle fullscreen'
+            },
+
+            onAdd: function (map) {
+                const container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom-fullscreen');
+
+                this.link = L.DomUtil.create('a', 'leaflet-control-fullscreen-button', container);
+                this.link.href = '#';
+                this.link.title = this.options.title;
+                this.link.innerHTML = '⛶'; // fullscreen icon
+
+                this.link.style.fontSize = '18px';
+                this.link.style.lineHeight = '30px';
+                this.link.style.textAlign = 'center';
+                this.link.style.textDecoration = 'none';
+                this.link.style.color = '#000';
+
+                L.DomEvent.on(this.link, 'click', this._click, this);
+                L.DomEvent.disableClickPropagation(container);
+
+                return container;
+            },
+
+            _click: function (e) {
+                L.DomEvent.preventDefault(e);
+                this._toggleFullscreen();
+            },
+
+            _toggleFullscreen: function () {
+                const mapContainer = this._map.getContainer();
+
+                if (!document.fullscreenElement) {
+                    // Enter fullscreen
+                    if (mapContainer.requestFullscreen) {
+                        mapContainer.requestFullscreen();
+                    } else if (mapContainer.webkitRequestFullscreen) {
+                        mapContainer.webkitRequestFullscreen();
+                    } else if (mapContainer.msRequestFullscreen) {
+                        mapContainer.msRequestFullscreen();
+                    }
+                    this.link.innerHTML = '⛷'; // exit fullscreen icon
+                    this.link.title = 'Exit fullscreen';
+                } else {
+                    // Exit fullscreen
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen();
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    } else if (document.msExitFullscreen) {
+                        document.msExitFullscreen();
+                    }
+                    this.link.innerHTML = '⛶'; // fullscreen icon
+                    this.link.title = 'Toggle fullscreen';
+                }
+
+                // Invalidate map size after fullscreen change
+                setTimeout(() => {
+                    this._map.invalidateSize();
+                }, 100);
+            }
+        });
+
+        // Factory function
+        L.control.customFullscreen = function (options) {
+            return new L.Control.CustomFullscreen(options);
+        };
+
+        // Usage: Add this control to your map
+        L.control.customFullscreen({
+            position: 'topleft'
+        }).addTo(map);
+
+        // Optional: Listen for fullscreen changes to update the map
+        document.addEventListener('fullscreenchange', function () {
+            setTimeout(() => {
+                map.invalidateSize();
+            }, 100);
+        });
+
+        map.on('enterFullscreen', function () {
+            if (window.console) window.console.log('enterFullscreen');
+        });
+
+        map.on('exitFullscreen', function () {
+            if (window.console) window.console.log('exitFullscreen');
+        });
+
+        // <!--        var basemaps = {"OpenStreetMap": white, "CartoDB Positron": cartodb, "Without background": white}-->
+        // var overlaymaps = { "Layer": lyr }
+
+        // Title
+        var title = L.control();
+        title.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'ctl title');
+            this.update();
+            return this._div;
+        };
+        title.update = function (props) {
+            // < !--this._div.innerHTML = "b12 (1).tif"; -->
+        };
+        title.addTo(map);
+
+        // Note
+        var src = ''//'Generated by <a href="https://gdal.org/programs/gdal2tiles.html">GDAL2Tiles</a>, Copyright &copy; 2008 <a href="http://www.klokan.cz/">Klokan Petr Pridal</a>,  <a href="https://gdal.org">GDAL</a> &amp; <a href="https://www.osgeo.org/">OSGeo</a> <a href="https://summerofcode.withgoogle.com/">GSoC</a>';
+        var title = L.control({ position: 'bottomleft' });
+        title.onAdd = function (map) {
+            this._div = L.DomUtil.create('div', 'ctl src');
+            this.update();
+            return this._div;
+        };
+        title.update = function (props) {
+            this._div.innerHTML = src;
+        };
+        title.addTo(map);
+
+
+        // Add base layers
+        // < !--L.control.layers(basemaps, overlaymaps, { collapsed: false }).addTo(map); -->
+
+        // Fit to overlay bounds (SW and NE points with (lat, lon))
+        map.fitBounds([[14.24157509200145, 77.42999543088094], [14.246709772793778, 77.4198781600263]]);
+
+
+        // Your GeoJSON from Flask (injected)
+        var geojson = {{ geojson | tojson | safe }};
+        console.log(geojson); // Add this to debug
+
+        // Add GeoJSON grid layer
+        var gridLayer = L.geoJSON(geojson, {
+            style: function (feature) {
+                return {
+                    color: "#000",
+                    weight: 5, // show more higlight
+                    fillColor: "#2e281e",
+                    fillOpacity: 1
+                };
+            },
+            onEachFeature: function (feature, layer) {
+                layer.on('click', function () {
+                    const props = feature.properties;
+                    alert("You clicked on grid cell:\n" + JSON.stringify(props, null, 2));
+                });
+            }
+        }).addTo(map);
+
+        // Fit map to grid bounds with padding
+        if (gridLayer.getBounds().isValid()) {
+            map.fitBounds(gridLayer.getBounds(), {
+                padding: [100, 100], // Add padding around the bounds
+                maxZoom: 40 // Limit maximum zoom when fitting bounds
+            });
+        }
+
+        // Ensure the map is properly centered after loading
+        map.once('load', function () {
+            map.invalidateSize();
+        });
+
+        // Add this function at the beginning of your script section
+        function showAnomalyDetails(anomaly) {
+            const details = {
+                'Image Name': anomaly.properties['image name'].split('.')[0],
+                'Block': anomaly.properties.block,
+                'Inverter': anomaly.properties.inverter,
+                'SCB': anomaly.properties.scb,
+                'String': anomaly.properties.string,
+                'Module': anomaly.properties.panel,
+                'Anomaly Type': anomaly.properties.anomaly_type,
+                'Confidence': anomaly.properties.confidence
+            };
+
+            let message = 'Anomaly Details:\n\n';
+            for (const [key, value] of Object.entries(details)) {
+                message += `${key}: ${value}\n`;
+            }
+
+            // Add complete anomaly object for debugging
+            console.log('Complete Anomaly Object:', anomaly);
+            alert("Anomaly Details:\n" + message + "\nComplete object logged to console");
+        }
+
+        function loadAnomalies() {
+            fetch('/get_anomalies/{{audit.id}}')
+                .then(response => response.json())
+                .then(data => {
+                    anomalyData = data;
+                    anomalyMarkers = data.map(anomaly => {
+                        const marker = L.marker([anomaly.geometry.coordinates[1], anomaly.geometry.coordinates[0]], {
+                            icon: L.divIcon({
+                                className: 'anomaly-marker',
+                                html: `<div class="marker-content">${anomaly.properties.anomaly_type}</div>`
+                            })
+                        });
+
+                        // Add click handler here where marker is created
+                        marker.on('click', function (e) {
+                            showAnomalyDetails(anomaly);
+                        });
+
+                        return marker;
+                    });
+                    anomalyMarkers.forEach(marker => marker.addTo(map));
+                });
+        }
+
+        function handleAnomalyClick(element) {
+
+            // Remove 'selected' class from all items
+            document.querySelectorAll('.inspection-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+
+            // Add 'selected' class to the clicked item's parent
+            element.closest('.inspection-item').classList.add('selected');
+
+            // Get the anomaly data from the data attribute
+            const anomalyDataString = element.getAttribute('data-anomaly');
+
+            // Now you have access to the full anomaly object
+            console.log('Clicked anomaly:', anomalyDataString);
+
+            const divA = document.getElementById('divATop');
+            const divB = document.getElementById('divABottom');
+            divA.classList.add('hidden');
+            divB.classList.remove('hidden');
+            const validJsonString = anomalyDataString.replace(/'/g, '"');
+            console.log("---validJsonString", validJsonString.type, typeof validJsonString)
+            const anomalyData = JSON.parse(validJsonString);
+            showLoader();
+            // Add small delay to show loader, then process data
+            setTimeout(() => {
+                displayAnomalyData(anomalyData);
+            }, 500);
+
+        }
+
+        function displayAnomalyData(anomalyData) {
+            let properties = anomalyData.properties
+            const detailsContainer = document.getElementById('anomalyDetails');
+            console.log("de", anomalyData, typeof anomalyData)
+            // Create HTML to display the anomaly data
+            const detailsHTML = `
+             <h3 class="detail-title">Selected Data Details</h3>
+                                        <div class="detail-item">
+                                            <span class="detail-label">Anomaly Type</span>
+                                            <span class="detail-value">${properties.defect}</span>
+                </div>
+
+                <div class="detail-item">
+                <span class="detail-label">Rack:</span>
+                <span class="detail-value">${properties.rack}</span>
+                </div>
+
+              
+                 <div class="detail-item">
+                <span class="detail-label">severity:</span>
+                <span class="detail-value">${properties.severity}</span>
+                </div>
+                  <div class="detail-item">
+                <span class="detail-label">severity:</span>
+                <span class="detail-value">${properties.severity}</span>
+                </div>
+                   <div class="detail-item">
+                <span class="detail-label">Lat, Long:</span>
+                <span class="detail-value">${properties['lat long']}</span>
+                </div>
+               
+            `;
+
+            detailsContainer.innerHTML = detailsHTML;
+        }
+
+        function showLoader() {
+
+            const detailsContainer = document.getElementById('anomalyDetails');
+
+
+
+            // Show loader in the details container
+            detailsContainer.innerHTML = `
+                <div class="loader-container">
+                    <div class="loader"></div>
+                    <div class="loader-text">Loading anomaly details...</div>
+                </div>
+            `;
+        }
+
+    </script>
+</body>
+
+</html>

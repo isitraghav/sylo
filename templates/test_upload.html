@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Large File Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+
+        .upload-container {
+            border: 2px dashed #ccc;
+            border-radius: 10px;
+            padding: 30px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="file"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            background-color: #f0f0f0;
+            border-radius: 25px;
+            overflow: hidden;
+            height: 30px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .upload-info {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+
+        .status-message {
+            padding: 10px;
+            margin-top: 15px;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+    </style>
+</head>
+<body>
+    <div class="upload-container">
+        <h2>Large File Upload (Up to 50GB)</h2>
+
+        <form id="uploadForm" method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="audit_type">Audit Type:</label>
+                <input type="text" id="audit_type" name="audit_type" required>
+            </div>
+
+            <div class="form-group">
+                <label for="plant_id">Plant ID:</label>
+                <input type="text" id="plant_id" name="plant_id" required>
+            </div>
+
+            <div class="form-group">
+                <label for="audit_id">Audit ID:</label>
+                <input type="text" id="audit_id" name="audit_id" required>
+            </div>
+
+            <div class="form-group">
+                <label for="tif_file_name">Select TIF File:</label>
+                <input type="file" id="tif_file_name" name="tif_file_name" accept=".tif,.tiff" required>
+            </div>
+
+            <button type="submit" id="uploadBtn">Upload File</button>
+        </form>
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill">0%</div>
+            </div>
+            <div class="upload-info" id="uploadInfo">
+                <div>Speed: <span id="uploadSpeed">--</span> MB/s</div>
+                <div>Time: <span id="uploadTime">--</span>s</div>
+                <div>Size: <span id="uploadSize">--</span> MB</div>
+            </div>
+        </div>
+
+        <div id="statusMessage"></div>
+    </div>
+
+    <script>
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+            const fileInput = document.getElementById('tif_file_name');
+            const file = fileInput.files[0];
+
+            if (!file) {
+                showMessage('Please select a file', 'error');
+                return;
+            }
+
+            // Show file size
+            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(1);
+            document.getElementById('uploadSize').textContent = fileSizeMB;
+
+            // Disable form and show progress
+            document.getElementById('uploadBtn').disabled = true;
+            document.getElementById('progressContainer').style.display = 'block';
+            showMessage('Starting upload...', 'info');
+
+            // Start async upload
+            fetch('/audi_tif/async_upload', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.upload_id) {
+                    // Start monitoring progress
+                    monitorProgress(data.upload_id);
+                } else {
+                    throw new Error(data.error || 'Upload failed');
+                }
+            })
+            .catch(error => {
+                console.error('Upload error:', error);
+                showMessage('Upload failed: ' + error.message, 'error');
+                resetForm();
+            });
+        });
+
+        function monitorProgress(uploadId) {
+            const progressFill = document.getElementById('progressFill');
+            const uploadSpeed = document.getElementById('uploadSpeed');
+            const uploadTime = document.getElementById('uploadTime');
+
+            const interval = setInterval(() => {
+                fetch(`/upload_progress/${uploadId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'uploading') {
+                        // Update progress (estimate based on average file size)
+                        const sizeMB = parseFloat(document.getElementById('uploadSize').textContent);
+                        const uploadedMB = (data.bytes_written / (1024 * 1024)).toFixed(1);
+                        const percentage = Math.min(95, (uploadedMB / sizeMB) * 100).toFixed(1);
+
+                        progressFill.style.width = percentage + '%';
+                        progressFill.textContent = percentage + '%';
+
+                        if (data.speed_mbps) {
+                            uploadSpeed.textContent = data.speed_mbps;
+                        }
+                        if (data.elapsed_time) {
+                            uploadTime.textContent = data.elapsed_time;
+                        }
+
+                    } else if (data.status === 'completed') {
+                        clearInterval(interval);
+                        progressFill.style.width = '100%';
+                        progressFill.textContent = '100%';
+                        showMessage('Upload completed successfully!', 'success');
+                        resetForm();
+
+                    } else if (data.status === 'failed') {
+                        clearInterval(interval);
+                        showMessage('Upload failed: ' + (data.error || 'Unknown error'), 'error');
+                        resetForm();
+
+                    } else if (data.status === 'not_found') {
+                        clearInterval(interval);
+                        showMessage('Upload session not found', 'error');
+                        resetForm();
+                    }
+                })
+                .catch(error => {
+                    console.error('Progress check error:', error);
+                });
+            }, 2000); // Check every 2 seconds
+
+            // Timeout after 2 hours
+            setTimeout(() => {
+                clearInterval(interval);
+                showMessage('Upload timeout - please try again', 'error');
+                resetForm();
+            }, 2 * 60 * 60 * 1000);
+        }
+
+        function showMessage(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            statusDiv.textContent = message;
+            statusDiv.className = `status-message ${type}`;
+        }
+
+        function resetForm() {
+            document.getElementById('uploadBtn').disabled = false;
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('progressFill').style.width = '0%';
+            document.getElementById('progressFill').textContent = '0%';
+            document.getElementById('uploadSpeed').textContent = '--';
+            document.getElementById('uploadTime').textContent = '--';
+        }
+
+        // File size validation
+        document.getElementById('tif_file_name').addEventListener('change', function() {
+            const file = this.files[0];
+            if (file) {
+                const maxSize = 50 * 1024 * 1024 * 1024; // 50GB
+                if (file.size > maxSize) {
+                    showMessage('File size exceeds 50GB limit', 'error');
+                    this.value = '';
+                } else {
+                    const sizeMB = (file.size / (1024 * 1024)).toFixed(1);
+                    const sizeGB = (file.size / (1024 * 1024 * 1024)).toFixed(2);
+                    const displaySize = sizeGB >= 1 ? `${sizeGB} GB` : `${sizeMB} MB`;
+                    showMessage(`File selected: ${file.name} (${displaySize})`, 'info');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

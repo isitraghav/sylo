@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      color: #0551ff;
+    }
+
+    .admin-container {
+      max-width: 800px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    input, button {
+      padding: 10px;
+      margin: 5px 0;
+      width: 100%;
+      border-radius: 4px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background-color: #0551ff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #033ecc;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th, td {
+      padding: 10px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .status {
+      padding: 5px 10px;
+      border-radius: 4px;
+      color: white;
+    }
+
+    .active {
+      background-color: green;
+    }
+
+    .inactive {
+      background-color: gray;
+    }
+
+    .action-btn {
+      font-size: 0.9rem;
+      padding: 6px 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="admin-container">
+    <h1>Admin Panel</h1>
+
+    <h3>Create Client</h3>
+    <input type="email" id="loginId" placeholder="Email" />
+    <input type="password" id="password" placeholder="Password" />
+    <button onclick="createClient()">Create</button>
+
+    <h3>Client List</h3>
+    <table>
+      <thead>
+        <tr>
+            <th>User Id</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Created At</th>
+          <th>Actions</th> <!-- New Actions Column -->
+
+        </tr>
+      </thead>
+      <tbody id="clientList">
+        <!-- Clients will be added here -->
+      {% for client in client_list %}
+      <tr>
+        <td>{{ client._id }}</td>
+
+        <td>{{ client.login_id }}</td>
+        <td>{{ client.role }}</td>
+        <td>{{ client.created_at }}</td>
+        <td>
+            <button 
+              class="{{ 'inactive-btn' if client.status else 'active-btn' }}" 
+              onclick="updateClientStatus('{{ client._id }}', {{ client.status }})">
+              {% if client.status %}
+                Deactivate
+              {% else %}
+                Activate
+              {% endif %}
+            </button>
+            <button onclick="changePassword('{{ client._id }}')">Change Password</button>
+        </td>
+      </tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <script>
+    let clients = {{client_list | safe}};
+
+    function createClient() {
+      const loginId = document.getElementById("loginId").value;
+      const password = document.getElementById("password").value;
+
+      if (!loginId || !password) {
+        alert("Both email and password are required.");
+        return;
+      }
+
+      const client = { loginId, password, active: true };
+    //   clients.push(client);
+      fetch('/api/v1.0/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ loginId, password }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Success:', data.success==false, data.message );
+        if (data.success){
+            alert("Client registered successfully: "+ data.message)
+
+        }else{
+            alert("Registration Failed:" + data.message)
+
+        }
+      })
+      .catch((error) => {
+        alert("Registration Failed:", error)
+
+      });
+    //   renderClients();
+
+      document.getElementById("loginId").value = "";
+      document.getElementById("password").value = "";
+    }
+
+    function toggleClient(index) {
+      clients[index].active = !clients[index].active;
+      renderClients();
+    }
+
+    function renderClients() {
+      const list = document.getElementById("clientList");
+      list.innerHTML = "";
+
+      clients.forEach((client, index) => {
+        const row = document.createElement("tr");
+
+        row.innerHTML = `
+          <td>${client.loginId}</td>
+          <td><span class="status ${client.active ? 'active' : 'inactive'}">${client.active ? 'Active' : 'Inactive'}</span></td>
+          <td><button class="action-btn" onclick="toggleClient(${index})">${client.active ? 'Deactivate' : 'Activate'}</button></td>
+        `;
+
+        list.appendChild(row);
+      });
+    }
+    function updateClientStatus(clientId, currentStatus) {
+    
+      const newStatus = currentStatus == true ? 0: 1// Toggle status
+      
+      fetch('/api/v1.0/user_status_update', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ clientId, status: newStatus }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+            alert("Client status updated successfully.");
+            // Optionally, refresh the client list or update the UI accordingly
+            location.reload(); // Reload the page to see changes
+        } else {
+            alert("Failed to update status: " + data.message);
+        }
+      })
+      .catch((error) => {
+        alert("Error updating status: " + error);
+      });
+    }
+    function changePassword(clientId) {
+      const newPassword = prompt("Enter new password for client ID " + clientId);
+      if (newPassword) {
+        fetch('/api/v1.0/user_status_update', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ clientId, password: newPassword }),
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+              alert("Password changed successfully.");
+          } else {
+              alert("Failed to change password: " + data.message);
+          }
+        })
+        .catch((error) => {
+          alert("Error changing password: " + error);
+        });
+      }
+    }
+  </script>
+</body>
+</html>

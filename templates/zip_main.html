@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Custom Vector Tileset</title>
+  <meta name="viewport" content="initial-scale=1,maximum-scale=1,user-scalable=no">
+  <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+  <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+  <style>
+    body { margin: 0; padding: 0; }
+    #map { position: absolute; top: 0; bottom: 0; width: 100%; }
+  </style>
+</head>
+<body>
+<div id="map"></div>
+
+<script>
+  mapboxgl.accessToken = 'pk.eyJ1IjoiYml0dHViaWR5dXQ2NiIsImEiOiJjbWF4b2I2OXUwMGQ5MmtxdXJqYmhoOXBiIn0.sfoWAeusghvDfz2Led6ZUg'; // Replace with your actual token
+
+  const map = new mapboxgl.Map({
+    container: 'map',
+    style: 'mapbox://styles/mapbox/dark-v11', // or any other Mapbox style
+    center: [72.104441, 21.915173], // Your coordinates from screenshot
+    zoom: 16.2
+  });
+
+  map.on('load', () => {
+    map.addSource('custom-vector', {
+      type: 'vector',
+      url: 'mapbox://bittubidyut66.final_1'
+    });
+
+    map.addLayer({
+      id: 'custom-layer',
+      type: 'fill', // or 'line' or 'circle' depending on your geometry
+      source: 'custom-vector',
+      'source-layer': 'final_1', // must match the layer name exactly
+       'minzoom': 0,
+  'maxzoom': 22, // Add this line if not present
+      paint: {
+        'fill-color': '#ffaa00',
+        'fill-opacity': 0.6
+      }
+    });
+    map.addLayer({
+  id: 'layer-A',
+  type: 'fill',
+  source: 'custom-vector',
+  'source-layer': 'final_1',
+  minzoom: 0,
+  maxzoom: 15.99,
+  filter: ['==', ['get', 'mod'], 'A'],
+  paint: { 'fill-color': '#ffff00', 'fill-opacity': 0.5 }
+});
+
+map.addLayer({
+  id: 'layer-B',
+  type: 'fill',
+  source: 'custom-vector',
+  'source-layer': 'final_1',
+  minzoom: 16,
+  maxzoom: 17.99,
+  filter: ['==', ['get', 'mod'], 'B'],
+  paint: { 'fill-color': '#ffaa00', 'fill-opacity': 0.6 }
+});
+
+map.addLayer({
+  id: 'layer-C',
+  type: 'fill',
+  source: 'custom-vector',
+  'source-layer': 'final_1',
+  minzoom: 18,
+  filter: ['==', ['get', 'mod'], 'C'],
+  paint: { 'fill-color': '#ff0000', 'fill-opacity': 0.7 }
+});
+
+  });
+</script>
+
+</body>
+</html>
