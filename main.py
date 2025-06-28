@@ -30,12 +30,35 @@ from logging.handlers import RotatingFileHandler
 
 
 
-load_dotenv()  # take environment variables
-sec_config = dotenv_values(".env")  # config = {"USER": "foo", "EMAIL": "foo@example.org"}
+load_dotenv()  # Load environment variables from .env file (if exists)
+
+# Get configuration from environment variables with fallbacks
+def get_config(key, default=None):
+    """Get configuration from environment variables or .env file"""
+    # First try environment variables (for production)
+    value = os.environ.get(key)
+    if value:
+        return value
+    
+    # Then try .env file (for local development)
+    try:
+        sec_config = dotenv_values(".env")
+        return sec_config.get(key, default)
+    except:
+        return default
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'vdvhvgh8764767363868'
-app.config['MONGO_URI'] =sec_config['MONGO_CONNECTION']
+
+# Configure MongoDB URI with fallback handling
+mongo_uri = get_config('MONGO_CONNECTION')
+if not mongo_uri:
+    print("❌ ERROR: MONGO_CONNECTION not found in environment variables or .env file")
+    print("🔧 Please set MONGO_CONNECTION in Render dashboard environment variables")
+    # Use a default for testing (will fail gracefully)
+    mongo_uri = "mongodb://localhost:27017/solar_plant_db"
+
+app.config['MONGO_URI'] = mongo_uri
 app.config['UPLOAD_FOLDER'] = 'uploads_data'
 # Disable all reloading mechanisms
 app.config['DEBUG'] = False
@@ -55,8 +78,8 @@ handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 
 mongo = PyMongo(app)
-bucket_name = sec_config['bucket_name']
-s3_prefix =sec_config['s3_prefix']
+bucket_name = get_config('bucket_name', 'sylo-energy')
+s3_prefix = get_config('s3_prefix', 'https://sylo-energy.s3.ap-south-1.amazonaws.com')
 
 # Import enhanced upload configuration
 from upload_config import UploadConfig, StreamingUpload
@@ -84,9 +107,9 @@ anomalies_collection = mongo.db.anomalies
 def get_s3_resource():
     s3 = boto3.client(
         's3',
-        aws_access_key_id=sec_config['aws_access_key_id'],
-        aws_secret_access_key=sec_config['aws_secret_access_key'],
-        region_name=sec_config['region_name']  # example: Mumbai region
+        aws_access_key_id=get_config('aws_access_key_id'),
+        aws_secret_access_key=get_config('aws_secret_access_key'),
+        region_name=get_config('region_name', 'ap-south-1')  # example: Mumbai region
     )
     return s3
 
@@ -966,10 +989,10 @@ def upload():
         #     get_s3_resource().upload_fileobj(f, bucket_name, file_path)
         #
         # # os.rmdir(upload_path)
-        print("---output_cog_path","output_cog_path",output_cog_path, f"s3://{bucket_name}/{file_path}",sec_config['aws_access_key_id'],sec_config['aws_secret_access_key'])
+        print("---output_cog_path","output_cog_path",output_cog_path, f"s3://{bucket_name}/{file_path}",get_config('aws_access_key_id'),get_config('aws_secret_access_key'))
 
         s3_upload_status = copy_to_s3(output_cog_path,
-    f"s3://{bucket_name}/{file_path}",sec_config['aws_access_key_id'],sec_config['aws_secret_access_key'])
+    f"s3://{bucket_name}/{file_path}",get_config('aws_access_key_id'),get_config('aws_secret_access_key'))
         if s3_upload_status == False:
             audits_collection.update_one(query,set_failed_status )
 
