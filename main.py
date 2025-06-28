@@ -1,10 +1,3 @@
-"""
-  Developer: Dharmendra Bajiya
-  Email: bajiya2024@gmail.com
-  Contact: +91-9785540104
-  Date: June 2025
-  Description: Sylo complete
-"""
 import shutil
 import zipfile
 
