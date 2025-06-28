@@ -35,7 +35,7 @@
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
         }
 
-        .left-panel {
+        .right-panel {
             flex: 0.8;
             background: white;
             display: flex;
@@ -46,7 +46,14 @@
             animation: slideInLeft 0.8s ease-in-out;
         }
 
-.right-panel { flex: 1; background-image: url('static/images/login.jpeg'); background-size: 650px auto; /* Set width to 300px, height auto */ background-position: left center; background-repeat: no-repeat; animation: fadeInImage 1.2s ease-in-out; }
+        .left-panel {
+            flex: 1;
+            background-image: url('static/images/login.jpeg');
+            background-size: 750px auto;
+            background-position: center;
+            background-repeat: no-repeat;
+            animation: fadeInImage 1.2s ease-in-out;
+        }
 
         @keyframes slideInLeft {
             from { transform: translateX(-50px); opacity: 0; }
@@ -87,12 +94,12 @@
         }
 
         .tagline {
-                color: #000000;
-                font-size: 16px;
-                margin-bottom: 40px;
-                margin-top: 0; /* add this to remove extra space above */
-                text-align: center;
-                font-weight: bold;
+            color: #000000;
+            font-size: 16px;
+            margin-bottom: 40px;
+            margin-top: 0;
+            text-align: center;
+            font-weight: bold;
         }
 
         .login-card {
@@ -101,7 +108,7 @@
             border-radius: 16px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
             width: 100%;
-            max-width: 450px;
+            max-width: 419px;
             animation: fadeInCard 1s ease-in-out;
         }
 
@@ -123,7 +130,7 @@
         }
 
         .form-title {
-            font-size: 28px;
+            font-size: 20px;
             font-weight: 600;
             color: #1f2937;
             text-align: center;
@@ -233,11 +240,11 @@
         }
 
         @media (max-width: 1024px) {
-            .right-panel {
+            .left-panel {
                 display: none;
             }
 
-            .left-panel {
+            .right-panel {
                 flex: 1;
                 padding: 40px 20px;
             }
@@ -246,8 +253,8 @@
 </head>
 <body>
     <div class="container">
-        <div class="left-panel">
-
+        <div class="left-panel"></div>
+        <div class="right-panel">
             <div class="login-card">
                 <div class="form-logo">
                     <img src="static/images/logo/logo1.png" alt="Sylo Energy Logo">
@@ -278,7 +285,6 @@
                 </form>
             </div>
         </div>
-        <div class="right-panel"></div>
     </div>
 
     <script>
