@@ -1272,12 +1272,15 @@ def health_check():
             'error': str(e)
         }, 503
 
-# Import Render-optimized upload endpoints
+# Import and register Render-optimized upload endpoints
 try:
-    from render_upload_endpoints import *
+    from render_upload_endpoints import register_render_endpoints
+    register_render_endpoints(app, data_uploads_collection, get_s3_resource)
     print("✅ Render-optimized upload endpoints loaded successfully")
 except ImportError as e:
     print(f"⚠️ Render upload endpoints not loaded: {e}")
+except Exception as e:
+    print(f"⚠️ Error loading render endpoints: {e}")
 
 if __name__ == '__main__':
     app.run(port=3333)
