@@ -7,6 +7,7 @@ import json
 import uuid
 from datetime import datetime
 from flask import request, jsonify, render_template
+from upload_progress import UploadProgressTracker, upload_status
 
 # Import these after main app is created to avoid circular imports
 # These will be imported at runtime when the endpoints are registered
@@ -42,10 +43,16 @@ def register_render_endpoints(app, data_uploads_collection, get_s3_resource):
             
             upload_sessions[upload_id] = session
             
+            # Create progress tracker
+            tracker = UploadProgressTracker(upload_id, data['filename'], data['fileSize'])
+            tracker.set_stage('initializing', 'Chunked upload session initialized')
+            
             # Create temporary directory for chunks
             chunk_dir = os.path.join('temp_chunks', upload_id)
             os.makedirs(chunk_dir, exist_ok=True)
             session['chunk_dir'] = chunk_dir
+            
+            print(f"🚀 Chunked Upload Initialized [{upload_id}]: {data['filename']} ({data['fileSize']} bytes, {data['totalChunks']} chunks)")
             
             return jsonify({
                 'success': True,
@@ -75,8 +82,31 @@ def register_render_endpoints(app, data_uploads_collection, get_s3_resource):
             session = upload_sessions[upload_id]
             chunk_file = request.files['chunk']
             
+            # Get progress tracker
+            tracker = upload_status.get(upload_id)
+            if tracker:
+                tracker.set_stage('uploading_chunks', f'Uploading chunk {chunk_index + 1}/{session["total_chunks"]}')
+            
             # Save chunk to temporary file
             chunk_path = os.path.join(session['chunk_dir'], f'chunk_{chunk_index:06d}')
+            chunk_file.save(chunk_path)
+            
+            # Track uploaded chunks
+            session['uploaded_chunks'].append(chunk_index)
+            
+            # Update progress
+            if tracker:
+                bytes_uploaded = len(session['uploaded_chunks']) * (session['file_size'] // session['total_chunks'])
+                tracker.update_progress(bytes_uploaded, 'uploading_chunks')
+            
+            print(f"📦 Chunk Uploaded [{upload_id}]: {chunk_index + 1}/{session['total_chunks']}")
+            
+            return jsonify({
+                'success': True,
+                'chunkIndex': chunk_index,
+                'uploadedChunks': len(session['uploaded_chunks']),
+                'totalChunks': session['total_chunks']
+            })
             chunk_file.save(chunk_path)
             
             # Track uploaded chunk

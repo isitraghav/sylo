@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload with Progress Tracking</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .upload-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 2px dashed #ddd;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .upload-section.dragover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        .progress-container {
+            margin: 20px 0;
+            display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background-color: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #007bff;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        .status-info {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        .status-info.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .status-info.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+        .btn:disabled {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .upload-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 10px;
+            margin: 10px 0;
+        }
+        .stat-item {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+        }
+        .stat-value {
+            font-weight: bold;
+            font-size: 18px;
+            color: #007bff;
+        }
+        .stat-label {
+            font-size: 12px;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 File Upload with Real-time Progress</h1>
+        
+        <div class="upload-section" id="uploadArea">
+            <h3>Drop files here or click to select</h3>
+            <input type="file" id="fileInput" style="display: none;" multiple>
+            <button class="btn" onclick="document.getElementById('fileInput').click()">
+                📁 Select Files
+            </button>
+        </div>
+
+        <div class="progress-container" id="progressContainer">
+            <h4 id="fileName">Uploading...</h4>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <div class="upload-stats">
+                <div class="stat-item">
+                    <div class="stat-value" id="progressPercent">0%</div>
+                    <div class="stat-label">Progress</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="uploadSpeed">0 MB/s</div>
+                    <div class="stat-label">Speed</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="etaTime">--</div>
+                    <div class="stat-label">ETA</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-value" id="currentStage">--</div>
+                    <div class="stat-label">Stage</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="status-info" id="statusInfo" style="display: none;"></div>
+
+        <div>
+            <h3>Active Uploads</h3>
+            <button class="btn" onclick="refreshStatus()">🔄 Refresh Status</button>
+            <div id="activeUploads"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentUploadId = null;
+        let progressInterval = null;
+
+        // Setup drag and drop
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                uploadFile(files[0]);
+            }
+        });
+
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                uploadFile(e.target.files[0]);
+            }
+        });
+
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('statusInfo');
+            statusDiv.textContent = message;
+            statusDiv.className = `status-info ${type}`;
+            statusDiv.style.display = 'block';
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+
+        function updateProgress(data) {
+            const progressFill = document.getElementById('progressFill');
+            const progressPercent = document.getElementById('progressPercent');
+            const uploadSpeed = document.getElementById('uploadSpeed');
+            const etaTime = document.getElementById('etaTime');
+            const currentStage = document.getElementById('currentStage');
+
+            progressFill.style.width = `${data.progress_percentage}%`;
+            progressPercent.textContent = `${data.progress_percentage}%`;
+            uploadSpeed.textContent = `${data.upload_speed_mbps} MB/s`;
+            
+            if (data.eta_seconds > 0) {
+                const eta = Math.round(data.eta_seconds);
+                etaTime.textContent = eta > 60 ? `${Math.round(eta/60)}m` : `${eta}s`;
+            } else {
+                etaTime.textContent = '--';
+            }
+            
+            currentStage.textContent = data.stage || '--';
+        }
+
+        async function uploadFile(file) {
+            try {
+                document.getElementById('fileName').textContent = `Uploading: ${file.name}`;
+                document.getElementById('progressContainer').style.display = 'block';
+                
+                showStatus(`🚀 Starting upload: ${file.name} (${(file.size / 1024 / 1024).toFixed(2)} MB)`, 'info');
+
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('file_type', 'thermal');
+                formData.append('plant_id', 'test_plant');
+                formData.append('audit_id', 'test_audit');
+                formData.append('project_code', 'test_project');
+
+                const response = await fetch('/api/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    currentUploadId = result.upload_id;
+                    showStatus(`✅ Upload started successfully! Upload ID: ${currentUploadId}`, 'success');
+                    
+                    // Start monitoring progress
+                    startProgressMonitoring(currentUploadId);
+                } else {
+                    showStatus(`❌ Upload failed: ${result.message}`, 'error');
+                    console.error('Upload failed:', result);
+                }
+
+            } catch (error) {
+                showStatus(`❌ Upload error: ${error.message}`, 'error');
+                console.error('Upload error:', error);
+            }
+        }
+
+        function startProgressMonitoring(uploadId) {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+            }
+
+            progressInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/api/upload/progress/${uploadId}`);
+                    const result = await response.json();
+
+                    if (result.success) {
+                        const status = result.status;
+                        updateProgress(status);
+
+                        showStatus(`📊 ${status.filename}: ${status.progress_percentage}% - ${status.stage}`, 'info');
+
+                        if (status.status === 'completed') {
+                            clearInterval(progressInterval);
+                            showStatus(`✅ Upload completed successfully!`, 'success');
+                            document.getElementById('progressContainer').style.display = 'none';
+                        } else if (status.status === 'failed') {
+                            clearInterval(progressInterval);
+                            showStatus(`❌ Upload failed: ${status.error}`, 'error');
+                            document.getElementById('progressContainer').style.display = 'none';
+                        }
+                    } else {
+                        console.warn('Progress check failed:', result.error);
+                    }
+                } catch (error) {
+                    console.error('Progress monitoring error:', error);
+                }
+            }, 1000); // Check every second
+        }
+
+        async function refreshStatus() {
+            try {
+                const response = await fetch('/api/upload/status');
+                const result = await response.json();
+                
+                const activeUploadsDiv = document.getElementById('activeUploads');
+                
+                if (result.success) {
+                    const uploads = result.active_uploads;
+                    const uploadCount = Object.keys(uploads).length;
+                    
+                    if (uploadCount === 0) {
+                        activeUploadsDiv.innerHTML = '<p>No active uploads</p>';
+                    } else {
+                        let html = `<h4>Active Uploads (${uploadCount})</h4>`;
+                        
+                        for (const [uploadId, status] of Object.entries(uploads)) {
+                            html += `
+                                <div class="status-info">
+                                    <strong>${status.filename}</strong> (${uploadId})<br>
+                                    Status: ${status.status} | Stage: ${status.stage}<br>
+                                    Progress: ${status.progress_percentage}% | Speed: ${status.upload_speed_mbps} MB/s<br>
+                                    ${status.error ? `Error: ${status.error}` : ''}
+                                </div>
+                            `;
+                        }
+                        
+                        activeUploadsDiv.innerHTML = html;
+                    }
+                } else {
+                    activeUploadsDiv.innerHTML = `<p class="status-info error">Error: ${result.error}</p>`;
+                }
+            } catch (error) {
+                document.getElementById('activeUploads').innerHTML = 
+                    `<p class="status-info error">Error refreshing status: ${error.message}</p>`;
+            }
+        }
+
+        // Initial status refresh
+        refreshStatus();
+        
+        // Auto-refresh every 5 seconds
+        setInterval(refreshStatus, 5000);
+    </script>
+</body>
+</html>

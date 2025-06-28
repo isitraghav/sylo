@@ -83,6 +83,9 @@ s3_prefix = get_config('s3_prefix', 'https://sylo-energy.s3.ap-south-1.amazonaws
 
 # Import enhanced upload configuration
 from upload_config import UploadConfig, StreamingUpload
+# Import upload progress tracking
+from upload_progress import UploadProgressTracker, StreamingUploadWithProgress, upload_status
+import uuid
 
 # Configure upload settings with enhanced support
 ALLOWED_EXTENSIONS = UploadConfig.ALLOWED_EXTENSIONS
@@ -149,23 +152,28 @@ def login():
             login_id = data.get('loginId')
             password = data.get('password')
 
+            print(f"🔐 Login Attempt: {login_id}")
+            
             user = users_collection.find_one({'email': login_id})
-            if user and user['status'] == 0 :
+            if user and user['status'] == 0:
+                print(f"❌ Login Failed - Account Disabled: {login_id}")
                 return jsonify({'success': False, 'message': 'Invalid Access, Please Contact to site admin'})
 
             if user and user['password'] == password and user['status'] == 1:
                 session['user_id'] = str(user['_id'])
                 session['user_role'] = user['role']
                 session['user_name'] = user.get('name', '')
+                print(f"✅ Login Successful: {login_id} (Role: {user['role']})")
                 return jsonify({'success': True, 'redirect': url_for('homepage')})
             else:
+                print(f"❌ Login Failed - Invalid Credentials: {login_id}")
                 return jsonify({'success': False, 'message': 'Invalid credentials'})
         except Exception as err:
-
-            print("Error into login ", err)
+            print(f"❌ Login Error: {str(err)}")
             return jsonify({'success': False, 'message': 'Invalid credentials'})
 
-    return render_template('new_1_login.html')
+    print("🌐 Login Page Accessed")
+    return render_template('login.html')
 
 
 @app.route('/api/v1.0/register', methods=['POST'])
@@ -560,49 +568,93 @@ def data_page():
 @app.route('/api/upload', methods=['POST'])
 @login_required
 def upload_file():
-    file_type = request.form.get('file_type')
-    plant_id = request.form.get('plant_id')
-    audit_id = request.form.get('audit_id')
-    project_code = request.form.get('project_code')
+    upload_id = str(uuid.uuid4())
+    
+    try:
+        file_type = request.form.get('file_type')
+        plant_id = request.form.get('plant_id')
+        audit_id = request.form.get('audit_id')
+        project_code = request.form.get('project_code')
 
-    if 'file' not in request.files:
-        return jsonify({'success': False, 'message': 'No file selected'})
+        if 'file' not in request.files:
+            print(f"❌ Upload Failed [{upload_id}]: No file selected")
+            return jsonify({'success': False, 'message': 'No file selected', 'upload_id': upload_id})
 
-    file = request.files['file']
+        file = request.files['file']
 
-    if file.filename == '':
-        return jsonify({'success': False, 'message': 'No file selected'})
+        if file.filename == '':
+            print(f"❌ Upload Failed [{upload_id}]: No file selected")
+            return jsonify({'success': False, 'message': 'No file selected', 'upload_id': upload_id})
 
-    if file and allowed_file(file.filename, file_type):
+        if not file or not allowed_file(file.filename):
+            print(f"❌ Upload Failed [{upload_id}]: Invalid file type - {file.filename}")
+            return jsonify({'success': False, 'message': 'Invalid file type', 'upload_id': upload_id})
+
+        # Get file size
+        file.seek(0, 2)  # Seek to end
+        file_size = file.tell()
+        file.seek(0)  # Reset to beginning
+        
+        print(f"🚀 Starting Upload [{upload_id}]: {file.filename} ({file_size} bytes)")
+        
+        # Create progress tracker
+        tracker = UploadProgressTracker(upload_id, file.filename, file_size)
+        tracker.set_stage('preparing', 'Preparing file upload')
+
         filename = secure_filename(file.filename)
         # Create unique filename with timestamp
         timestamp = datetime.now().strftime('%Y%m%d_%H%M%S_')
         filename = timestamp + filename
 
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-        file.save(file_path)
+        
+        # Use streaming upload with progress tracking
+        streaming_upload = StreamingUploadWithProgress(file, file_path, tracker)
+        result = streaming_upload.save_with_progress()
+        
+        if result['success']:
+            tracker.set_stage('saving_metadata', 'Saving file metadata to database')
+            
+            # Save file info to database
+            upload_data = {
+                'filename': filename,
+                'original_filename': file.filename,
+                'file_type': file_type,
+                'file_path': file_path,
+                'plant_id': plant_id,
+                'audit_id': audit_id,
+                'project_code': project_code,
+                'uploaded_by': session['user_id'],
+                'uploaded_at': datetime.utcnow(),
+                'upload_id': upload_id,
+                'file_size': file_size
+            }
 
-        # Save file info to database
-        upload_data = {
-            'filename': filename,
-            'original_filename': file.filename,
-            'file_type': file_type,
-            'file_path': file_path,
-            'plant_id': plant_id,
-            'audit_id': audit_id,
-            'project_code': project_code,
-            'uploaded_by': session['user_id'],
-            'uploaded_at': datetime.utcnow()
-        }
+            db_result = data_uploads_collection.insert_one(upload_data)
 
-        result = data_uploads_collection.insert_one(upload_data)
-
-        if result.inserted_id:
-            return jsonify({'success': True, 'message': 'File uploaded successfully'})
+            if db_result.inserted_id:
+                tracker.complete(file_path)
+                print(f"✅ Upload Successful [{upload_id}]: {filename}")
+                return jsonify({
+                    'success': True, 
+                    'message': 'File uploaded successfully',
+                    'upload_id': upload_id,
+                    'filename': filename,
+                    'file_size': file_size
+                })
+            else:
+                tracker.fail('Failed to save file metadata to database')
+                print(f"❌ Database Error [{upload_id}]: Failed to save file info")
+                return jsonify({'success': False, 'message': 'Failed to save file info', 'upload_id': upload_id})
         else:
-            return jsonify({'success': False, 'message': 'Failed to save file info'})
+            print(f"❌ Upload Failed [{upload_id}]: File save failed")
+            return jsonify({'success': False, 'message': 'Failed to save file', 'upload_id': upload_id})
 
-    return jsonify({'success': False, 'message': 'Invalid file type'})
+    except Exception as e:
+        print(f"❌ Upload Exception [{upload_id}]: {str(e)}")
+        if upload_id in upload_status:
+            upload_status[upload_id].fail(str(e))
+        return jsonify({'success': False, 'message': f'Upload failed: {str(e)}', 'upload_id': upload_id})
 
 
 @app.route('/api/anomalies', methods=['GET', 'POST'])
@@ -879,140 +931,185 @@ def copy_to_s3(local_file_path, s3_bucket_path, aws_access_key, aws_secret_key):
 
 @app.route('/audi_tif/upload', methods=['POST'])
 def upload():
+    upload_id = str(uuid.uuid4())
+    
+    try:
+        print(f"🚀 Starting TIF Upload [{upload_id}]")
+        print("request", request.form)
+        
+        fields= ['audit_type', 'plant_id',  'audit_id','g_url', 'tif_file_name']
+        inputs = {}
 
-    print("coming here")
-    print("request", request.form)
-    # file = request.files['tif_file_name']
-    fields= ['audit_type', 'plant_id',  'audit_id','g_url', 'tif_file_name']
-    inputs = {}
+        data = request.form
+        for i in fields:
+            if data.get(i):
+                inputs[i] = data.get(i)
+            else:
+                print(f"❌ TIF Upload Failed [{upload_id}]: Missing field {i}")
+                return jsonify({"status": False, "error": "Invalid params", "upload_id": upload_id}), 400
 
-    data = request.form
-    for i in fields:
-        if data.get(i):
-            inputs[i] = data.get(i)
-        else:
-            print("comng here")
-            return jsonify({"status": False, "error": "Invalid params"}), 400
+        # Create progress tracker for Google Drive download
+        tracker = UploadProgressTracker(upload_id, inputs['tif_file_name'], 0)  # Size unknown initially
+        tracker.set_stage('validating', 'Checking Google Drive folder')
 
-    files = gdown.download_folder(inputs['g_url'], skip_download=True, use_cookies=False)
-    file_exist = False
-    file_name = None
-    file_id = None
+        files = gdown.download_folder(inputs['g_url'], skip_download=True, use_cookies=False)
+        file_exist = False
+        file_name = None
+        file_id = None
 
-    for file in files:
-        file_id_value = file[0]
-        file_name = file[1]
-        print("file coming", file_name, inputs['tif_file_name'])
-        if file_name == inputs['tif_file_name']:
-            print("file ---", file,file_id_value)
-            file_exist=True
-            file_name = inputs['tif_file_name']
-            file_id = file_id_value
-            break
+        for file in files:
+            file_id_value = file[0]
+            file_name = file[1]
+            print(f"📁 Found file: {file_name} vs {inputs['tif_file_name']}")
+            if file_name == inputs['tif_file_name']:
+                print("file ---", file,file_id_value)
+                file_exist=True
+                file_name = inputs['tif_file_name']
+                file_id = file_id_value
+                break
 
-    if not file_exist:
-        print("Tif file not exist into google drive", file_exist)
-        return jsonify({"status": False, "message":"Invalid File Name"}), 400
+        if not file_exist:
+            error_msg = f"TIF file '{inputs['tif_file_name']}' not found in Google Drive"
+            tracker.fail(error_msg)
+            print(f"❌ TIF Upload Failed [{upload_id}]: {error_msg}")
+            return jsonify({"status": False, "message":"Invalid File Name", "upload_id": upload_id}), 400
 
-    file_path = f"audits/{inputs['plant_id']}/{inputs['audit_id']}/{inputs['audit_type']}/{file_name}"
-    file_path = file_path
-    new_task = {
-        "tif_path": file_path,
-        "status": "In Progress",
-        "ortho_type": inputs['audit_type'],
-        "created_at": datetime.utcnow()
-    }
+        tracker.set_stage('preparing_database', 'Setting up database records')
 
-    query = {
-        "_id": ObjectId(inputs['audit_id']),
-        "tif_files.tif_path": file_path
-    }
-    set_failed_status ={"$set": {"tif_files.$.status": "failed"  }}
+        file_path = f"audits/{inputs['plant_id']}/{inputs['audit_id']}/{inputs['audit_type']}/{file_name}"
+        file_path = file_path
+        new_task = {
+            "tif_path": file_path,
+            "status": "In Progress",
+            "ortho_type": inputs['audit_type'],
+            "created_at": datetime.utcnow(),
+            "upload_id": upload_id
+        }
 
-    existing = audits_collection.find_one(query)
+        query = {
+            "_id": ObjectId(inputs['audit_id']),
+            "tif_files.tif_path": file_path
+        }
+        set_failed_status ={"$set": {"tif_files.$.status": "failed"  }}
 
-    if existing:
-        audits_collection.update_one(query,
-            {
-                "$set": {
-                    "tif_files.$.status": 'In Progress',
-                    "created_at": datetime.utcnow()
+        existing = audits_collection.find_one(query)
+
+        if existing:
+            audits_collection.update_one(query,
+                {
+                    "$set": {
+                        "tif_files.$.status": 'In Progress',
+                        "created_at": datetime.utcnow()
+                    }
                 }
-            }
+            )
+        else:
+            audits_collection.update_one(
+                {"_id": ObjectId(inputs['audit_id'])},
+                {"$push": {"tif_files": new_task}}
+            )
+
+        tracker.set_stage('downloading', 'Downloading TIF file from Google Drive')
+
+        # Save original TIF
+        upload_path = os.path.join(
+            app.config['UPLOAD_FOLDER'],
+            str(inputs['plant_id']),
+            'audit',
+            str(inputs['audit_id'])
         )
-    else:
-        audits_collection.update_one(
-            {"_id": ObjectId(inputs['audit_id'])},
-            {"$push": {"tif_files": new_task}}
-        )
-
-    # Save original TIF
-    upload_path = os.path.join(
-        app.config['UPLOAD_FOLDER'],
-        str(inputs['plant_id']),
-        'audit',
-        str(inputs['audit_id'])
-    )
-    input_path = os.path.join(upload_path, file_name)
-    os.makedirs(upload_path, exist_ok=True)
-
-    try:
-        url = f'https://drive.google.com/uc?id={file_id}'
-        gdown.download(url, input_path, quiet=False,fuzzy=True, use_cookies=False)
-    except Exception as err:
-        print("Error to download file on local", err)
-        app.logger.error( "Error to download file on local", err)
-        audits_collection.update_one(query, set_failed_status)
-        return {"status": False, "message":"Failed to download file"}
-
-    output_cog_path = os.path.join(upload_path, f"COG_{file_name}")
-
-    app.logger.info("output_cog_path", output_cog_path)
-    # Convert to COG
-    try:
-        subprocess.check_call([
-            "gdal_translate", "-of", "COG",
-            "-co", "COMPRESS=DEFLATE",
-            "-co", "BLOCKSIZE=512",
-            # "-co", "OVERVIEWS=AUTO",
-            "-co", "BIGTIFF=YES",
-            input_path,
-            output_cog_path
-        ])
-    except subprocess.CalledProcessError as e:
-        app.logger.error("GDAL conversion failed", str(e))
-        return jsonify({'error': 'GDAL conversion failed', 'details': str(e)}), 500
-
-    try:
-
-        # with open(output_cog_path, "rb") as f:
-        #     get_s3_resource().upload_fileobj(f, bucket_name, file_path)
-        #
-        # # os.rmdir(upload_path)
-        print("---output_cog_path","output_cog_path",output_cog_path, f"s3://{bucket_name}/{file_path}",get_config('aws_access_key_id'),get_config('aws_secret_access_key'))
-
-        s3_upload_status = copy_to_s3(output_cog_path,
-    f"s3://{bucket_name}/{file_path}",get_config('aws_access_key_id'),get_config('aws_secret_access_key'))
-        if s3_upload_status == False:
-            audits_collection.update_one(query,set_failed_status )
+        input_path = os.path.join(upload_path, file_name)
+        os.makedirs(upload_path, exist_ok=True)
 
         try:
-            shutil.rmtree(upload_path)
-        except OSError as e:
-            print("Error: %s - %s." % (e.filename, e.strerror))
+            url = f'https://drive.google.com/uc?id={file_id}'
+            tracker.set_stage('downloading', f'Downloading from: {url}')
+            gdown.download(url, input_path, quiet=False,fuzzy=True, use_cookies=False)
+            
+            # Get actual file size after download
+            if os.path.exists(input_path):
+                actual_size = os.path.getsize(input_path)
+                tracker.total_size = actual_size
+                tracker.update_progress(actual_size, 'download_complete')
+                
+        except Exception as err:
+            error_msg = f"Error downloading file from Google Drive: {str(err)}"
+            tracker.fail(error_msg)
+            print(f"❌ Download Failed [{upload_id}]: {error_msg}")
+            app.logger.error(error_msg)
+            audits_collection.update_one(query, set_failed_status)
+            return jsonify({"status": False, "message":"Failed to download file", "upload_id": upload_id})
 
-        audits_collection.update_one(query,
-            {
-                "$set": {
-                    "tif_files.$.status": "Completed"  # $ points to the matched array element
+        tracker.set_stage('converting', 'Converting TIF to COG format')
+        output_cog_path = os.path.join(upload_path, f"COG_{file_name}")
+
+        app.logger.info("output_cog_path", output_cog_path)
+        # Convert to COG
+        try:
+            subprocess.check_call([
+                "gdal_translate", "-of", "COG",
+                "-co", "COMPRESS=DEFLATE",
+                "-co", "BLOCKSIZE=512",
+                # "-co", "OVERVIEWS=AUTO",
+                "-co", "BIGTIFF=YES",
+                input_path,
+                output_cog_path
+            ])
+            tracker.set_stage('conversion_complete', 'COG conversion completed')
+        except subprocess.CalledProcessError as e:
+            error_msg = f"GDAL conversion failed: {str(e)}"
+            tracker.fail(error_msg)
+            print(f"❌ Conversion Failed [{upload_id}]: {error_msg}")
+            app.logger.error(error_msg)
+            audits_collection.update_one(query, set_failed_status)
+            return jsonify({'error': 'GDAL conversion failed', 'details': str(e), 'upload_id': upload_id}), 500
+
+        try:
+            tracker.set_stage('uploading_s3', 'Uploading to AWS S3')
+            print("---output_cog_path","output_cog_path",output_cog_path, f"s3://{bucket_name}/{file_path}",get_config('aws_access_key_id'),get_config('aws_secret_access_key'))
+
+            s3_upload_status = copy_to_s3(output_cog_path,
+        f"s3://{bucket_name}/{file_path}",get_config('aws_access_key_id'),get_config('aws_secret_access_key'))
+            if s3_upload_status == False:
+                error_msg = "S3 upload failed"
+                tracker.fail(error_msg)
+                print(f"❌ S3 Upload Failed [{upload_id}]: {error_msg}")
+                audits_collection.update_one(query,set_failed_status )
+                return jsonify({"status": False, "message": "S3 upload failed", "upload_id": upload_id})
+
+            tracker.set_stage('cleaning_up', 'Cleaning up temporary files')
+            try:
+                shutil.rmtree(upload_path)
+            except OSError as e:
+                print("Error: %s - %s." % (e.filename, e.strerror))
+
+            # Mark as completed
+            audits_collection.update_one(query,
+                {
+                    "$set": {
+                        "tif_files.$.status": "Completed"  # $ points to the matched array element
+                    }
                 }
-            }
-        )
-    except Exception as  err:
-        print("Eerr", err)
-        audits_collection.update_one(query,set_failed_status)
+            )
+            
+            tracker.complete(f"s3://{bucket_name}/{file_path}")
+            print(f"✅ TIF Upload Successful [{upload_id}]: {file_name}")
+            
+        except Exception as err:
+            error_msg = f"S3 upload error: {str(err)}"
+            tracker.fail(error_msg)
+            print(f"❌ S3 Upload Error [{upload_id}]: {error_msg}")
+            audits_collection.update_one(query,set_failed_status)
+            return jsonify({"status": False, "message": "Upload processing failed", "upload_id": upload_id})
 
-    return jsonify({"status": True, "message":"File uploaded completed"})
+        return jsonify({"status": True, "message":"File uploaded completed", "upload_id": upload_id})
+    
+    except Exception as e:
+        error_msg = f"TIF upload failed: {str(e)}"
+        print(f"❌ TIF Upload Exception [{upload_id}]: {error_msg}")
+        if upload_id in upload_status:
+            upload_status[upload_id].fail(error_msg)
+        return jsonify({"status": False, "message": error_msg, "upload_id": upload_id})
 
 def upload_single_file(file_name, file_bytes):
     try:
@@ -1304,6 +1401,55 @@ except ImportError as e:
     print(f"⚠️ Render upload endpoints not loaded: {e}")
 except Exception as e:
     print(f"⚠️ Error loading render endpoints: {e}")
+
+# Add upload progress tracking endpoints
+@app.route('/api/upload/progress/<upload_id>', methods=['GET'])
+def get_upload_progress(upload_id):
+    """Get upload progress status"""
+    try:
+        if upload_id in upload_status:
+            tracker = upload_status[upload_id]
+            return jsonify({
+                'success': True,
+                'status': tracker.get_status()
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Upload ID not found'
+            }), 404
+    except Exception as e:
+        print(f"❌ Error getting upload progress: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+@app.route('/api/upload/status', methods=['GET'])
+def get_all_upload_status():
+    """Get status of all active uploads"""
+    try:
+        active_uploads = {}
+        for upload_id, tracker in upload_status.items():
+            active_uploads[upload_id] = tracker.get_status()
+        
+        return jsonify({
+            'success': True,
+            'active_uploads': active_uploads,
+            'total_active': len(active_uploads)
+        })
+    except Exception as e:
+        print(f"❌ Error getting upload status: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Upload progress test page
+@app.route('/upload-progress-test')
+def upload_progress_test():
+    """Test page for upload progress tracking"""
+    return render_template('upload_with_progress.html')
 
 if __name__ == '__main__':
     app.run(port=3333)
