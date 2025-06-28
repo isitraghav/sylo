@@ -226,6 +226,53 @@
             cursor: not-allowed;
         }
 
+        .upload-options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .upload-option {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .local-upload {
+            background: var(--primary-color);
+        }
+
+        .gdrive-upload {
+            background: linear-gradient(135deg, #4285f4 0%, #34a853 100%);
+        }
+
+        .gdrive-input {
+            padding: 10px;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .gdrive-input:focus {
+            outline: none;
+            border-color: #4285f4;
+            box-shadow: 0 0 0 3px rgba(66, 133, 244, 0.1);
+        }
+
+        .progress-text {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 12px;
+            color: white;
+            font-weight: 500;
+            line-height: 1;
+            padding-top: 1px;
+        }
+
         .success-icon {
             position: absolute;
             top: 10px;
@@ -253,18 +300,20 @@
         /* Progress bar */
         .progress-bar {
             width: 100%;
-            height: 4px;
+            height: 20px;
             background: var(--border-color);
-            border-radius: 2px;
+            border-radius: 10px;
             margin-top: 10px;
             overflow: hidden;
+            position: relative;
         }
 
         .progress-fill {
             height: 100%;
-            background: var(--primary-color);
+            background: linear-gradient(90deg, var(--primary-color), var(--success-color));
             width: 0%;
             transition: width 0.3s ease;
+            position: relative;
         }
 
         /* Responsive Design */
@@ -380,14 +429,27 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                         <div class="upload-title">Visual Ortho GeoTIFF</div>
-                        <div class="upload-description">RASTER TILE format (.tiff, .tif)</div>
-                        <input type="file" id="file-visual-ortho" class="file-input" accept=".tiff,.tif" onchange="handleFileSelect('visual_ortho', this)">
-                        <button class="upload-btn" onclick="document.getElementById('file-visual-ortho').click()">
-                            Choose File
-                        </button>
+                        <div class="upload-description">RASTER TILE format (.tiff, .tif) - Max 5GB</div>
+                        
+                        <div class="upload-options">
+                            <div class="upload-option">
+                                <input type="file" id="file-visual-ortho" class="file-input" accept=".tiff,.tif" onchange="handleFileSelect('visual_ortho', this)">
+                                <button class="upload-btn local-upload" onclick="document.getElementById('file-visual-ortho').click()">
+                                    📁 Choose Local File
+                                </button>
+                            </div>
+                            <div class="upload-option">
+                                <input type="url" id="gdrive-visual-ortho" class="form-input gdrive-input" placeholder="Google Drive folder URL..." onchange="handleGoogleDriveSelect('visual_ortho', this)">
+                                <button class="upload-btn gdrive-upload" onclick="startGoogleDriveUpload('visual_ortho')">
+                                    ☁️ Upload from Google Drive
+                                </button>
+                            </div>
+                        </div>
+                        
                         <div class="upload-status" id="status-visual-ortho"></div>
                         <div class="progress-bar" id="progress-visual-ortho" style="display: none;">
                             <div class="progress-fill"></div>
+                            <div class="progress-text"></div>
                         </div>
                     </div>
 
@@ -397,14 +459,27 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                         </svg>
                         <div class="upload-title">Thermal Ortho GeoTIFF</div>
-                        <div class="upload-description">RASTER TILE format (.tiff, .tif)</div>
-                        <input type="file" id="file-thermal-ortho" class="file-input" accept=".tiff,.tif" onchange="handleFileSelect('thermal_ortho', this)">
-                        <button class="upload-btn" onclick="document.getElementById('file-thermal-ortho').click()">
-                            Choose File
-                        </button>
+                        <div class="upload-description">RASTER TILE format (.tiff, .tif) - Max 5GB</div>
+                        
+                        <div class="upload-options">
+                            <div class="upload-option">
+                                <input type="file" id="file-thermal-ortho" class="file-input" accept=".tiff,.tif" onchange="handleFileSelect('thermal_ortho', this)">
+                                <button class="upload-btn local-upload" onclick="document.getElementById('file-thermal-ortho').click()">
+                                    📁 Choose Local File
+                                </button>
+                            </div>
+                            <div class="upload-option">
+                                <input type="url" id="gdrive-thermal-ortho" class="form-input gdrive-input" placeholder="Google Drive folder URL..." onchange="handleGoogleDriveSelect('thermal_ortho', this)">
+                                <button class="upload-btn gdrive-upload" onclick="startGoogleDriveUpload('thermal_ortho')">
+                                    ☁️ Upload from Google Drive
+                                </button>
+                            </div>
+                        </div>
+                        
                         <div class="upload-status" id="status-thermal-ortho"></div>
                         <div class="progress-bar" id="progress-thermal-ortho" style="display: none;">
                             <div class="progress-fill"></div>
+                            <div class="progress-text"></div>
                         </div>
                     </div>
 
@@ -576,6 +651,212 @@
                 statusElement.className = 'upload-status status-error';
                 progressBar.style.display = 'none';
             }
+        }
+
+        // Google Drive handlers
+        let currentUploadId = null;
+        let progressInterval = null;
+
+        function handleGoogleDriveSelect(fileType, input) {
+            // Just validate the URL format
+            if (input.value && !input.value.includes('drive.google.com')) {
+                alert('Please provide a valid Google Drive folder URL');
+                input.value = '';
+            }
+        }
+
+        async function startGoogleDriveUpload(fileType) {
+            const gdriveInput = document.getElementById(`gdrive-${fileType.replace('_', '-')}`);
+            const statusElement = document.getElementById(`status-${fileType.replace('_', '-')}`);
+            const progressBar = document.getElementById(`progress-${fileType.replace('_', '-')}`);
+            const uploadButton = event.target;
+
+            // Validate required fields
+            const plantId = document.getElementById('plantSelect').value;
+            const auditId = document.getElementById('auditSelect').value;
+            const projectCode = document.getElementById('projectCode').value;
+            const gdriveUrl = gdriveInput.value;
+
+            if (!plantId) {
+                alert('Please select a plant first');
+                return;
+            }
+
+            if (!auditId) {
+                alert('Please select an audit first');
+                return;
+            }
+
+            if (!projectCode) {
+                alert('Please enter a project code');
+                return;
+            }
+
+            if (!gdriveUrl) {
+                alert('Please enter a Google Drive folder URL');
+                return;
+            }
+
+            if (!gdriveUrl.includes('drive.google.com')) {
+                alert('Please provide a valid Google Drive folder URL');
+                return;
+            }
+
+            // Get TIF file name from user
+            const tifFileName = prompt('Enter the TIF file name (including .tif extension):');
+            if (!tifFileName) {
+                return;
+            }
+
+            if (!tifFileName.toLowerCase().endsWith('.tif') && !tifFileName.toLowerCase().endsWith('.tiff')) {
+                alert('Please enter a valid TIF file name with .tif or .tiff extension');
+                return;
+            }
+
+            try {
+                // Disable upload button
+                uploadButton.disabled = true;
+                uploadButton.textContent = '⏳ Starting Upload...';
+
+                // Show progress bar and status
+                progressBar.style.display = 'block';
+                statusElement.textContent = 'Initializing Google Drive upload...';
+                statusElement.className = 'upload-status status-uploading';
+
+                // Prepare form data
+                const formData = new FormData();
+                formData.append('audit_type', fileType);
+                formData.append('plant_id', plantId);
+                formData.append('audit_id', auditId);
+                formData.append('tif_file_name', tifFileName);
+                formData.append('g_url', gdriveUrl);
+
+                // Start upload
+                const response = await fetch('/audi_tif/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.upload_id) {
+                    currentUploadId = result.upload_id;
+                    statusElement.textContent = `Upload started (ID: ${currentUploadId})`;
+                    
+                    // Start monitoring progress
+                    startProgressMonitoring(fileType, statusElement, progressBar, uploadButton);
+                } else {
+                    throw new Error(result.message || 'Upload failed to start');
+                }
+
+            } catch (error) {
+                console.error('Google Drive upload error:', error);
+                statusElement.textContent = `Upload failed: ${error.message}`;
+                statusElement.className = 'upload-status status-error';
+                progressBar.style.display = 'none';
+                
+                // Re-enable upload button
+                uploadButton.disabled = false;
+                uploadButton.textContent = '☁️ Upload from Google Drive';
+            }
+        }
+
+        function startProgressMonitoring(fileType, statusElement, progressBar, uploadButton) {
+            if (!currentUploadId) return;
+
+            const progressFill = progressBar.querySelector('.progress-fill');
+            const progressText = progressBar.querySelector('.progress-text');
+
+            progressInterval = setInterval(async () => {
+                try {
+                    const response = await fetch(`/upload_progress/${currentUploadId}`);
+                    const data = await response.json();
+
+                    if (data.status === 'not_found') {
+                        statusElement.textContent = 'Upload session not found';
+                        statusElement.className = 'upload-status status-error';
+                        clearInterval(progressInterval);
+                        return;
+                    }
+
+                    // Update progress
+                    const percentage = data.progress_percentage || 0;
+                    progressFill.style.width = `${percentage}%`;
+                    progressText.textContent = `${percentage.toFixed(1)}%`;
+
+                    // Update status
+                    statusElement.textContent = data.stage || 'Processing...';
+
+                    if (data.status === 'completed') {
+                        clearInterval(progressInterval);
+                        handleUploadComplete(fileType, data, statusElement, progressBar, uploadButton);
+                    } else if (data.status === 'failed') {
+                        clearInterval(progressInterval);
+                        handleUploadError(fileType, data, statusElement, progressBar, uploadButton);
+                    }
+
+                } catch (error) {
+                    console.error('Progress monitoring error:', error);
+                    statusElement.textContent = 'Progress monitoring failed';
+                    statusElement.className = 'upload-status status-error';
+                }
+            }, 2000); // Check every 2 seconds
+
+            // Timeout after 30 minutes
+            setTimeout(() => {
+                if (progressInterval) {
+                    clearInterval(progressInterval);
+                    statusElement.textContent = 'Upload timeout - please try again';
+                    statusElement.className = 'upload-status status-error';
+                    uploadButton.disabled = false;
+                    uploadButton.textContent = '☁️ Upload from Google Drive';
+                }
+            }, 30 * 60 * 1000);
+        }
+
+        function handleUploadComplete(fileType, data, statusElement, progressBar, uploadButton) {
+            const uploadItem = document.getElementById(`upload-${fileType.replace('_', '-')}`);
+            
+            // Show success state
+            uploadItem.classList.add('success');
+            uploadItem.innerHTML += '<svg class="success-icon" width="24" height="24" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>';
+            
+            statusElement.textContent = '🎉 Google Drive upload completed successfully!';
+            statusElement.className = 'upload-status status-success';
+            
+            // Final progress update
+            const progressFill = progressBar.querySelector('.progress-fill');
+            const progressText = progressBar.querySelector('.progress-text');
+            progressFill.style.width = '100%';
+            progressText.textContent = '100%';
+            
+            // Reset upload button
+            uploadButton.disabled = false;
+            uploadButton.textContent = '☁️ Upload from Google Drive';
+            
+            // Hide progress bar after delay
+            setTimeout(() => {
+                progressBar.style.display = 'none';
+            }, 3000);
+            
+            currentUploadId = null;
+        }
+
+        function handleUploadError(fileType, data, statusElement, progressBar, uploadButton) {
+            const errorMsg = data.error || 'Upload failed';
+            statusElement.textContent = `❌ Upload failed: ${errorMsg}`;
+            statusElement.className = 'upload-status status-error';
+            
+            // Reset upload button
+            uploadButton.disabled = false;
+            uploadButton.textContent = '☁️ Upload from Google Drive';
+            
+            // Hide progress bar
+            setTimeout(() => {
+                progressBar.style.display = 'none';
+            }, 3000);
+            
+            currentUploadId = null;
         }
     </script>
 </body>
