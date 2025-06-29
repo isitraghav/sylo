@@ -1,0 +1,1019 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ plant.name }} - Anomalies Map</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo/logo1.png') }}">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #F8FAFC;
+            color: #1E293B;
+            overflow: hidden;
+        }
+
+        .main-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 350px;
+            background: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid #E2E8F0;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #E2E8F0;
+            background: linear-gradient(135deg, #16A34A, #15803D);
+            color: white;
+        }
+
+        .sidebar-header h1 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .sidebar-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #1E293B;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .add-audit-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #16A34A, #15803D);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .add-audit-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+        }
+
+        .audit-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .audit-item {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .audit-item:hover {
+            background: #F1F5F9;
+            border-color: #16A34A;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .audit-item.active {
+            background: #DCFCE7;
+            border-color: #16A34A;
+        }
+
+        .audit-name {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+            color: #1E293B;
+        }
+
+        .audit-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 12px;
+            color: #64748B;
+        }
+
+        .audit-date {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .audit-status {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .status-completed {
+            background: #DCFCE7;
+            color: #166534;
+        }
+
+        .status-processing {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .status-failed {
+            background: #FEE2E2;
+            color: #DC2626;
+        }
+
+        /* Map Container */
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Map Controls */
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 250px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            color: #374151;
+        }
+
+        .control-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            font-size: 12px;
+            background: white;
+        }
+
+        .control-button {
+            width: 100%;
+            padding: 8px 12px;
+            background: #16A34A;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-bottom: 5px;
+            transition: background 0.3s;
+        }
+
+        .control-button:hover {
+            background: #15803D;
+        }
+
+        /* Upload Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            padding: 0;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: 20px;
+            background: linear-gradient(135deg, #16A34A, #15803D);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            font-size: 18px;
+            margin: 0;
+        }
+
+        .close {
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .close:hover {
+            opacity: 1;
+        }
+
+        .modal-body {
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #D1D5DB;
+            border-radius: 8px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: #16A34A;
+            box-shadow: 0 0 0 3px rgba(22, 163, 74, 0.1);
+        }
+
+        .upload-method-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .upload-tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            border-bottom: 2px solid transparent;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+
+        .upload-tab.active {
+            color: #16A34A;
+            border-bottom-color: #16A34A;
+        }
+
+        .upload-content {
+            display: none;
+        }
+
+        .upload-content.active {
+            display: block;
+        }
+
+        .file-upload-area {
+            border: 2px dashed #D1D5DB;
+            border-radius: 8px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .file-upload-area:hover {
+            border-color: #16A34A;
+            background: #F0FDF4;
+        }
+
+        .file-upload-area.dragover {
+            border-color: #16A34A;
+            background: #F0FDF4;
+        }
+
+        .progress-container {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: #F3F4F6;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #16A34A, #10B981);
+            width: 0%;
+            transition: width 0.3s;
+            position: relative;
+        }
+
+        .progress-text {
+            text-align: center;
+            font-size: 12px;
+            color: #374151;
+            margin-bottom: 5px;
+        }
+
+        .progress-status {
+            font-size: 12px;
+            color: #64748B;
+            text-align: center;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #16A34A, #15803D);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #16A34A;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                height: 40vh;
+                position: absolute;
+                z-index: 1001;
+            }
+
+            .map-container {
+                margin-top: 40vh;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h1><i class="fas fa-map-marked-alt"></i> {{ plant.name }}</h1>
+                <p>Thermal Anomalies Analysis</p>
+            </div>
+            
+            <div class="sidebar-content">
+                <!-- Add Audit Button -->
+                <button class="add-audit-btn" onclick="openUploadModal()">
+                    <i class="fas fa-plus"></i>
+                    Add New Audit
+                </button>
+
+                <!-- Audits Section -->
+                <div class="section">
+                    <div class="section-title">
+                        <i class="fas fa-list-ul"></i>
+                        Thermal Audits ({{ audits|length }})
+                    </div>
+                    
+                    <div class="audit-list">
+                        {% for audit in audits %}
+                        <div class="audit-item" onclick="loadAuditMap('{{ audit._id }}', '{{ audit.s3_url }}')" data-audit-id="{{ audit._id }}">
+                            <div class="audit-name">{{ audit.tif_file_name }}</div>
+                            <div class="audit-meta">
+                                <span class="audit-date">
+                                    <i class="fas fa-calendar"></i>
+                                    {{ audit.upload_date }}
+                                </span>
+                                <span class="audit-status status-{{ audit.status }}">
+                                    {{ audit.status.title() }}
+                                </span>
+                            </div>
+                        </div>
+                        {% endfor %}
+                        
+                        {% if not audits %}
+                        <div style="text-align: center; padding: 40px; color: #64748B;">
+                            <i class="fas fa-upload" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                            <p>No thermal audits found.<br>Upload your first audit to get started.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Map Container -->
+        <div class="map-container">
+            <div id="map"></div>
+            
+            <!-- Map Controls -->
+            <div class="map-controls">
+                <div class="control-group">
+                    <label class="control-label">Map Style:</label>
+                    <select id="mapStyle" class="control-select" onchange="changeMapStyle()">
+                        <option value="osm">OpenStreetMap</option>
+                        <option value="satellite">Satellite</option>
+                        <option value="topo">Topographic</option>
+                        <option value="dark">Dark Theme</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <button class="control-button" onclick="getCurrentLocation()">
+                        <i class="fas fa-location-arrow"></i> Find My Location
+                    </button>
+                    <button class="control-button" onclick="goToPlantLocation()">
+                        <i class="fas fa-solar-panel"></i> Go to Plant
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="uploadModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cloud-upload-alt"></i> Upload Thermal Audit</h2>
+                <span class="close" onclick="closeUploadModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <form id="uploadForm">
+                    <div class="form-group">
+                        <label class="form-label">Audit Type:</label>
+                        <select class="form-input" name="audit_type" required>
+                            <option value="thermal">Thermal Imaging</option>
+                            <option value="visual">Visual Inspection</option>
+                            <option value="electrical">Electrical Testing</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">File Name:</label>
+                        <input type="text" class="form-input" name="tif_file_name" placeholder="Enter file name" required>
+                    </div>
+
+                    <!-- Upload Method Tabs -->
+                    <div class="upload-method-tabs">
+                        <div class="upload-tab active" onclick="switchUploadTab('files')">
+                            <i class="fas fa-file-upload"></i> Upload Files
+                        </div>
+                        <div class="upload-tab" onclick="switchUploadTab('google-drive')">
+                            <i class="fab fa-google-drive"></i> Google Drive
+                        </div>
+                    </div>
+
+                    <!-- File Upload Tab -->
+                    <div id="files-upload" class="upload-content active">
+                        <div class="file-upload-area" id="fileUploadArea">
+                            <i class="fas fa-cloud-upload-alt" style="font-size: 48px; color: #9CA3AF; margin-bottom: 15px;"></i>
+                            <h3>Drag & Drop Files Here</h3>
+                            <p>or <strong>click to browse</strong></p>
+                            <p style="font-size: 12px; color: #64748B; margin-top: 10px;">
+                                Supports: .tif, .tiff, .jpg, .png, .zip (up to 50GB)
+                            </p>
+                            <input type="file" id="fileInput" multiple accept=".tif,.tiff,.jpg,.jpeg,.png,.zip" style="display: none;">
+                        </div>
+                    </div>
+
+                    <!-- Google Drive Upload Tab -->
+                    <div id="google-drive-upload" class="upload-content">
+                        <div class="form-group">
+                            <label class="form-label">Google Drive Share Link:</label>
+                            <input type="url" class="form-input" name="g_url" placeholder="https://drive.google.com/file/d/...">
+                            <small style="color: #64748B; font-size: 12px;">
+                                Make sure the file is publicly accessible or shared with view permissions
+                            </small>
+                        </div>
+                    </div>
+
+                    <!-- Progress Container -->
+                    <div id="progressContainer" class="progress-container">
+                        <div class="progress-text">Uploading... <span id="progressPercent">0%</span></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill"></div>
+                        </div>
+                        <div class="progress-status" id="progressStatus">Initializing upload...</div>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <span id="submitText">Start Upload</span>
+                        <span id="submitLoader" class="loading" style="display: none;"></span>
+                    </button>
+
+                    <input type="hidden" name="plant_id" value="{{ plant._id }}">
+                    <input type="hidden" name="audit_id" id="auditId">
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    
+    <script>
+        let map;
+        let currentLayer = null;
+        let markers = [];
+        let uploadId = null;
+        let progressInterval = null;
+
+        // Initialize map
+        function initMap() {
+            // Default location (can be customized based on plant location)
+            const defaultLat = {{ plant.location.coordinates[1] if plant.location else 20.5937 }};
+            const defaultLng = {{ plant.location.coordinates[0] if plant.location else 78.9629 }};
+            
+            map = L.map('map').setView([defaultLat, defaultLng], 13);
+            
+            // Default OpenStreetMap layer
+            currentLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '© OpenStreetMap contributors'
+            }).addTo(map);
+
+            // Add plant marker
+            const plantMarker = L.marker([defaultLat, defaultLng], {
+                icon: L.divIcon({
+                    className: 'plant-marker',
+                    html: '<i class="fas fa-solar-panel" style="color: #16A34A; font-size: 24px;"></i>',
+                    iconSize: [30, 30],
+                    iconAnchor: [15, 15]
+                })
+            }).addTo(map);
+
+            plantMarker.bindPopup(`
+                <div style="text-align: center;">
+                    <h3>${'{{ plant.name }}'}</h3>
+                    <p>Solar Plant Location</p>
+                    <small>Lat: ${defaultLat.toFixed(6)}, Lng: ${defaultLng.toFixed(6)}</small>
+                </div>
+            `);
+        }
+
+        // Change map style
+        function changeMapStyle() {
+            const style = document.getElementById('mapStyle').value;
+            
+            if (currentLayer) {
+                map.removeLayer(currentLayer);
+            }
+            
+            switch(style) {
+                case 'satellite':
+                    currentLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: 'Tiles © Esri'
+                    });
+                    break;
+                case 'topo':
+                    currentLayer = L.tileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                        attribution: 'Map data: © OpenStreetMap contributors, SRTM | Map style: © OpenTopoMap'
+                    });
+                    break;
+                case 'dark':
+                    currentLayer = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+                        attribution: '© OpenStreetMap contributors © CARTO'
+                    });
+                    break;
+                default:
+                    currentLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    });
+            }
+            
+            currentLayer.addTo(map);
+        }
+
+        // Get current location
+        function getCurrentLocation() {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    const lat = position.coords.latitude;
+                    const lng = position.coords.longitude;
+                    
+                    map.setView([lat, lng], 15);
+                    
+                    L.marker([lat, lng], {
+                        icon: L.divIcon({
+                            className: 'location-marker',
+                            html: '<i class="fas fa-location-arrow" style="color: #EF4444; font-size: 20px;"></i>',
+                            iconSize: [25, 25],
+                            iconAnchor: [12, 12]
+                        })
+                    }).addTo(map).bindPopup('Your Current Location');
+                });
+            } else {
+                alert('Geolocation is not supported by this browser.');
+            }
+        }
+
+        // Go to plant location
+        function goToPlantLocation() {
+            const defaultLat = {{ plant.location.coordinates[1] if plant.location else 20.5937 }};
+            const defaultLng = {{ plant.location.coordinates[0] if plant.location else 78.9629 }};
+            map.setView([defaultLat, defaultLng], 15);
+        }
+
+        // Load audit map data
+        function loadAuditMap(auditId, s3Url) {
+            // Remove active class from all audit items
+            document.querySelectorAll('.audit-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            document.querySelector(`[data-audit-id="${auditId}"]`).classList.add('active');
+            
+            // Here you would load the thermal imaging data
+            // For now, we'll just show a notification
+            console.log('Loading audit:', auditId, s3Url);
+            
+            // You can implement thermal overlay loading here
+            // Example: Load GeoTIFF and display as map overlay
+        }
+
+        // Upload Modal Functions
+        function openUploadModal() {
+            document.getElementById('uploadModal').style.display = 'block';
+            document.getElementById('auditId').value = generateAuditId();
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').style.display = 'none';
+            resetUploadForm();
+        }
+
+        function switchUploadTab(tab) {
+            // Remove active class from all tabs
+            document.querySelectorAll('.upload-tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.upload-content').forEach(c => c.classList.remove('active'));
+            
+            // Add active class to selected tab
+            event.target.classList.add('active');
+            document.getElementById(tab + '-upload').classList.add('active');
+        }
+
+        // File upload handling
+        document.getElementById('fileUploadArea').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect);
+
+        // Drag and drop handling
+        const uploadArea = document.getElementById('fileUploadArea');
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            handleFiles(files);
+        });
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            handleFiles(files);
+        }
+
+        function handleFiles(files) {
+            if (files.length > 0) {
+                let totalSize = 0;
+                let fileNames = [];
+                
+                for (let file of files) {
+                    totalSize += file.size;
+                    fileNames.push(file.name);
+                }
+                
+                // Check total file size (50GB limit)
+                const maxSize = 50 * 1024 * 1024 * 1024; // 50 GB
+                if (totalSize > maxSize) {
+                    alert('Total file size exceeds 50GB limit. Please select smaller files.');
+                    return;
+                }
+                
+                const sizeText = formatFileSize(totalSize);
+                document.querySelector('.file-upload-area h3').textContent = `Selected: ${fileNames.join(', ')}`;
+                document.querySelector('.file-upload-area p').textContent = `Total size: ${sizeText}`;
+            }
+        }
+        
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        // Form submission
+        document.getElementById('uploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const activeTab = document.querySelector('.upload-content.active').id;
+            
+            if (activeTab === 'files-upload') {
+                handleFileUpload();
+            } else {
+                handleGoogleDriveUpload();
+            }
+        });
+
+        function handleFileUpload() {
+            const fileInput = document.getElementById('fileInput');
+            const files = fileInput.files;
+            
+            if (files.length === 0) {
+                alert('Please select files to upload');
+                return;
+            }
+            
+            // Show progress container
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitText').style.display = 'none';
+            document.getElementById('submitLoader').style.display = 'inline-block';
+            
+            // Create FormData for file upload
+            const formData = new FormData();
+            formData.append('audit_type', document.querySelector('[name="audit_type"]').value);
+            formData.append('plant_id', document.querySelector('[name="plant_id"]').value);
+            formData.append('audit_id', document.querySelector('[name="audit_id"]').value);
+            formData.append('tif_file_name', document.querySelector('[name="tif_file_name"]').value);
+            
+            for (let file of files) {
+                formData.append('files', file);
+            }
+            
+            uploadId = generateUploadId();
+            formData.append('upload_id', uploadId);
+            
+            // Start progress tracking
+            startProgressTracking();
+            
+            // Upload files
+            fetch('/api/upload/files', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    stopProgressTracking();
+                    updateProgress(100, 'Upload completed successfully!');
+                    setTimeout(() => {
+                        closeUploadModal();
+                        location.reload(); // Refresh to show new audit
+                    }, 2000);
+                } else {
+                    throw new Error(data.error || 'Upload failed');
+                }
+            })
+            .catch(error => {
+                stopProgressTracking();
+                updateProgress(0, 'Upload failed: ' + error.message);
+                resetUploadForm();
+            });
+        }
+
+        function handleGoogleDriveUpload() {
+            const formData = new FormData(document.getElementById('uploadForm'));
+            
+            if (!formData.get('g_url')) {
+                alert('Please provide a Google Drive link');
+                return;
+            }
+            
+            // Show progress container
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('submitBtn').disabled = true;
+            document.getElementById('submitText').style.display = 'none';
+            document.getElementById('submitLoader').style.display = 'inline-block';
+            
+            uploadId = generateUploadId();
+            formData.append('upload_id', uploadId);
+            
+            // Start progress tracking
+            startProgressTracking();
+            
+            // Upload via Google Drive
+            fetch('/audit/upload', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    g_url: formData.get('g_url'),
+                    plant_id: formData.get('plant_id'),
+                    audit_type: formData.get('audit_type'),
+                    audit_id: formData.get('audit_id'),
+                    tif_file_name: formData.get('tif_file_name') || 'thermal_audit_' + Date.now() + '.tif'
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Continue tracking until completion
+                    updateProgress(10, 'Starting Google Drive download...');
+                } else {
+                    throw new Error(data.error || 'Upload failed');
+                }
+            })
+            .catch(error => {
+                stopProgressTracking();
+                updateProgress(0, 'Upload failed: ' + error.message);
+                resetUploadForm();
+            });
+        }
+
+        function startProgressTracking() {
+            if (!uploadId) return;
+            
+            progressInterval = setInterval(() => {
+                fetch(`/api/upload-progress/${uploadId}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'completed') {
+                            stopProgressTracking();
+                            updateProgress(100, 'Upload completed successfully!');
+                            setTimeout(() => {
+                                closeUploadModal();
+                                location.reload();
+                            }, 2000);
+                        } else if (data.status === 'failed') {
+                            stopProgressTracking();
+                            updateProgress(0, data.message || 'Upload failed');
+                            resetUploadForm();
+                        } else {
+                            updateProgress(data.progress || 0, data.message || 'Processing...');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Progress tracking error:', error);
+                    });
+            }, 1000);
+        }
+
+        function stopProgressTracking() {
+            if (progressInterval) {
+                clearInterval(progressInterval);
+                progressInterval = null;
+            }
+        }
+
+        function updateProgress(percent, message) {
+            document.getElementById('progressPercent').textContent = Math.round(percent) + '%';
+            document.getElementById('progressFill').style.width = percent + '%';
+            document.getElementById('progressStatus').textContent = message;
+        }
+
+        function resetUploadForm() {
+            document.getElementById('uploadForm').reset();
+            document.getElementById('progressContainer').style.display = 'none';
+            document.getElementById('submitBtn').disabled = false;
+            document.getElementById('submitText').style.display = 'inline';
+            document.getElementById('submitLoader').style.display = 'none';
+            document.querySelector('.file-upload-area h3').textContent = 'Drag & Drop Files Here';
+            stopProgressTracking();
+        }
+
+        function generateAuditId() {
+            return 'audit_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        function generateUploadId() {
+            return 'upload_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+        }
+
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+            
+            // Close modal when clicking outside
+            window.addEventListener('click', function(e) {
+                const modal = document.getElementById('uploadModal');
+                if (e.target === modal) {
+                    closeUploadModal();
+                }
+            });
+        });
+    </script>
+</body>
+</html>

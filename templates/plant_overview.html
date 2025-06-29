@@ -339,6 +339,140 @@
             overflow: hidden;
         }
 
+        .pie-chart-container {
+            display: flex;
+            gap: 16px;
+            align-items: flex-start;
+        }
+
+        .pie-chart-section {
+            flex: 1;
+            min-width: 300px;
+        }
+
+        .pie-chart-wrapper {
+            position: relative;
+            width: 100%;
+            height: 280px;
+            margin-bottom: 16px;
+        }
+
+        .pie-chart-wrapper canvas {
+            max-width: 100% !important;
+            max-height: 280px !important;
+        }
+
+        .chart-center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            pointer-events: none;
+        }
+
+        .center-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1E293B;
+            line-height: 1;
+        }
+
+        .center-label {
+            font-size: 12px;
+            color: #64748B;
+            margin-top: 4px;
+        }
+
+        .custom-legend {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 8px;
+            font-size: 11px;
+        }
+
+        .legend-item-pie {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-color-pie {
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+
+        .legend-text-pie {
+            color: #374151;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .pie-table-section {
+            flex: 0 0 280px;
+            min-width: 280px;
+        }
+
+        .anomaly-table-container {
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            padding: 12px;
+            max-height: 320px;
+            overflow-y: auto;
+        }
+
+        .anomaly-table {
+            width: 100%;
+            font-size: 11px;
+            border-collapse: collapse;
+        }
+
+        .anomaly-table th {
+            text-align: left;
+            padding: 8px 4px;
+            font-weight: 600;
+            color: #374151;
+            border-bottom: 2px solid #E2E8F0;
+            position: sticky;
+            top: 0;
+            background: #F8FAFC;
+        }
+
+        .anomaly-table th:nth-child(2),
+        .anomaly-table th:nth-child(3) {
+            text-align: right;
+        }
+
+        .anomaly-table td {
+            padding: 6px 4px;
+            color: #374151;
+            border-bottom: 1px solid #F3F4F6;
+        }
+
+        .anomaly-table td:nth-child(2),
+        .anomaly-table td:nth-child(3) {
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .table-anomaly-type {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .table-color-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
         .chart-title {
             font-size: 12px;
             font-weight: 600;
@@ -384,6 +518,37 @@
                 flex: 1;
                 margin-bottom: 0;
                 min-width: 250px;
+            }
+
+            .pie-chart-container {
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .pie-table-section {
+                flex: none;
+                width: 100%;
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .pie-chart-container {
+                flex-direction: column;
+            }
+
+            .pie-chart-section {
+                min-width: auto;
+            }
+
+            .pie-table-section {
+                flex: none;
+                width: 100%;
+                min-width: auto;
+            }
+
+            .custom-legend {
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             }
         }
 
@@ -443,6 +608,32 @@
             .chart-container {
                 margin-top: 0;
             }
+
+            .pie-chart-wrapper {
+                height: 240px;
+            }
+
+            .center-value {
+                font-size: 20px;
+            }
+
+            .center-label {
+                font-size: 10px;
+            }
+
+            .custom-legend {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 6px;
+            }
+
+            .anomaly-table {
+                font-size: 10px;
+            }
+
+            .anomaly-table th,
+            .anomaly-table td {
+                padding: 4px 2px;
+            }
         }
 
         @media (max-width: 480px) {
@@ -462,6 +653,31 @@
             
             .analytics-value {
                 font-size: 12px;
+            }
+
+            .pie-chart-wrapper {
+                height: 200px;
+            }
+
+            .center-value {
+                font-size: 18px;
+            }
+
+            .center-label {
+                font-size: 9px;
+            }
+
+            .custom-legend {
+                grid-template-columns: 1fr;
+                gap: 4px;
+            }
+
+            .anomaly-table-container {
+                padding: 8px;
+            }
+
+            .anomaly-table {
+                font-size: 9px;
             }
         }
     </style>
@@ -558,9 +774,9 @@
                         </button>
                         <button class="top-btn" onclick="openAnomaliesMap()">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                             </svg>
-                            Anomalies
+                            Anomalies Map
                         </button>
                         <button class="top-btn">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -708,9 +924,37 @@
                     </div>
                     
                     <!-- Charts -->
-                    <div class="chart-container">
-                        <h3 class="chart-title">Anomaly Distribution</h3>
-                        <canvas id="pieChart" class="chart"></canvas>
+                    <div class="chart-container pie-chart-container">
+                        <div class="pie-chart-section">
+                            <h3 class="chart-title">Anomaly Distribution</h3>
+                            <div class="pie-chart-wrapper">
+                                <canvas id="pieChart"></canvas>
+                                <div id="chartCenterText" class="chart-center-text">
+                                    <div class="center-value">0</div>
+                                    <div class="center-label">Total Anomalies</div>
+                                </div>
+                            </div>
+                            <!-- Custom Legend -->
+                            <div id="customLegend" class="custom-legend">
+                                <!-- Legend items will be populated by JavaScript -->
+                            </div>
+                        </div>
+                        <div class="pie-table-section">
+                            <div class="anomaly-table-container">
+                                <table class="anomaly-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Anomaly Type</th>
+                                            <th>Count</th>
+                                            <th>%</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="anomalyTableBody">
+                                        <!-- Table rows will be populated by JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                     <div class="chart-container">
                         <h3 class="chart-title">Anomalies vs Categories</h3>
@@ -791,253 +1035,314 @@
     <script>
         // Initialize Charts and Progress Bars
         document.addEventListener('DOMContentLoaded', function() {
-            // Set progress bar widths
-            const progressSegments = document.querySelectorAll('.progress-segment[data-width]');
-            progressSegments.forEach(segment => {
-                const width = segment.getAttribute('data-width');
-                const textSpan = segment.querySelector('.progress-text');
-                
-                setTimeout(() => {
-                    segment.style.width = width + '%';
-                    if (width > 15) {
-                        textSpan.textContent = width + '%';
-                    }
-                }, 300);
-            });
+            try {
+                // Set progress bar widths
+                const progressSegments = document.querySelectorAll('.progress-segment[data-width]');
+                progressSegments.forEach(segment => {
+                    const width = segment.getAttribute('data-width');
+                    const textSpan = segment.querySelector('.progress-text');
+                    
+                    setTimeout(() => {
+                        segment.style.width = width + '%';
+                        if (width > 15) {
+                            textSpan.textContent = width + '%';
+                        }
+                    }, 300);
+                });
 
-            // Pie Chart Data - Replace with your actual data
-            const anomalyData = {
-                labels: [
-                    'Bypass Diode',
-                    'Multi-Cell',
-                    'Cell',
-                    'Partial String Offline',
-                    'Vegetation',
-                    'Physical Damage',
-                    'Module Power Mismatch'
-                ],
-                counts: [125, 87, 63, 42, 38, 29, 56], // Example counts
-                backgroundColor: [
-                    '#EF4444', // Red
-                    '#F59E0B', // Orange
-                    '#10B981', // Green
-                    '#3B82F6', // Blue
-                    '#8B5CF6', // Purple
-                    '#EC4899', // Pink
-                    '#F97316'  // Amber
-                ]
-            };
+                // Pie Chart Data
+                const anomalyData = {
+                    labels: [
+                        'Bypass Diode',
+                        'Multi-Cell Hotspot',
+                        'Cell Hotspot',
+                        'Partial String Offline',
+                        'Vegetation',
+                        'Physical Damage',
+                        'Module Power Mismatch',
+                        'Shading',
+                        'Short Circuit',
+                        'String Offline',
+                        'Module Offline'
+                    ],
+                    counts: [125, 87, 63, 42, 38, 29, 56, 34, 18, 25, 33],
+                    backgroundColor: [
+                        '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6',
+                        '#EC4899', '#F97316', '#06B6D4', '#84CC16', '#6366F1', '#14B8A6'
+                    ]
+                };
 
-            // Calculate percentages
-            const total = anomalyData.counts.reduce((sum, count) => sum + count, 0);
-            const percentages = anomalyData.counts.map(count => 
-                Math.round((count / total) * 100)
-            );
+                // Calculate total and percentages
+                const total = anomalyData.counts.reduce((sum, count) => sum + count, 0);
+                const percentages = anomalyData.counts.map(count => 
+                    Math.round((count / total) * 100)
+                );
 
-            // Pie Chart with exploded slice and donut hole
-            const pieCtx = document.getElementById('pieChart').getContext('2d');
-            new Chart(pieCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: anomalyData.labels.map((label, i) => 
-                        `${label} (${anomalyData.counts[i]} - ${percentages[i]}%)`),
-                    datasets: [{
-                        data: anomalyData.counts,
-                        backgroundColor: anomalyData.backgroundColor,
-                        borderWidth: 1,
-                        // Explode the first slice (Bypass Diode) by 10px
-                        offset: [10, 0, 0, 0, 0, 0, 0]
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    cutout: '60%', // Creates the donut hole
-                    layout: {
-                        padding: 5
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 8,
-                                usePointStyle: true,
-                                font: {
-                                    size: 9
-                                },
-                                boxWidth: 8
-                            }
+                // Update center text with total
+                document.querySelector('.center-value').textContent = total;
+
+                // Create Pie Chart
+                const pieCtx = document.getElementById('pieChart');
+                if (pieCtx) {
+                    const pieChart = new Chart(pieCtx, {
+                        type: 'doughnut',
+                        data: {
+                            labels: anomalyData.labels,
+                            datasets: [{
+                                data: anomalyData.counts,
+                                backgroundColor: anomalyData.backgroundColor,
+                                borderWidth: 2,
+                                borderColor: '#ffffff',
+                                offset: anomalyData.counts.map((_, index) => index === 0 ? 10 : 0) // Explode first slice
+                            }]
                         },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    const label = context.label || '';
-                                    const value = context.raw || 0;
-                                    const percentage = Math.round((value / total) * 100);
-                                    return `${label}: ${value} (${percentage}%)`;
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            cutout: '60%',
+                            layout: {
+                                padding: 10
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            const label = context.label || '';
+                                            const value = context.raw || 0;
+                                            const percentage = Math.round((value / total) * 100);
+                                            return `${label}: ${value} (${percentage}%)`;
+                                        }
+                                    }
                                 }
+                            },
+                            animation: {
+                                animateScale: true,
+                                animateRotate: true
                             }
                         }
-                    }
+                    });
                 }
-            });
 
-            // Anomalies vs Categories Bar Chart
-            const anomalyVsCtx = document.getElementById('anomalyVsChart').getContext('2d');
-            
-            // Sample data for the categories you specified
-            const anomalyVsData = {
-                labels: [
-                    'Block 1-5', 'Block 6-10', 'Block 11-15', 'Block 16-19', 'Block 20-25',
-                    'Block 26-30', 'Block 31-36', 'Foreign Object', 'Junction Box',
-                    'Isolated Module', 'Bypass Diode', 'Multi Hotspot', 'Vegetation',
-                    'Short Circuit', 'Substring SC', 'Missing Module', 'Single Hotspot', 'LA/TP Shadow'
-                ],
-                counts: [8, 12, 15, 7, 10, 6, 9, 3, 5, 14, 11, 8, 4, 2, 6, 1, 13, 7]
-            };
+                // Create custom legend
+                const customLegend = document.getElementById('customLegend');
+                if (customLegend) {
+                    customLegend.innerHTML = '';
+                    anomalyData.labels.forEach((label, index) => {
+                        const legendItem = document.createElement('div');
+                        legendItem.className = 'legend-item-pie';
+                        legendItem.innerHTML = `
+                            <div class="legend-color-pie" style="background-color: ${anomalyData.backgroundColor[index]};"></div>
+                            <span class="legend-text-pie">${label}</span>
+                        `;
+                        customLegend.appendChild(legendItem);
+                    });
+                }
 
-            new Chart(anomalyVsCtx, {
-                type: 'bar',
-                data: {
-                    labels: anomalyVsData.labels,
-                    datasets: [{
-                        label: 'Anomaly Count',
-                        data: anomalyVsData.counts,
-                        backgroundColor: [
-                            '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
-                            '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1',
-                            '#14B8A6', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4',
-                            '#84CC16', '#F97316', '#EC4899'
+                // Populate anomaly table
+                const tableBody = document.getElementById('anomalyTableBody');
+                if (tableBody) {
+                    tableBody.innerHTML = '';
+                    anomalyData.labels.forEach((label, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>
+                                <div class="table-anomaly-type">
+                                    <div class="table-color-dot" style="background-color: ${anomalyData.backgroundColor[index]};"></div>
+                                    <span>${label}</span>
+                                </div>
+                            </td>
+                            <td>${anomalyData.counts[index]}</td>
+                            <td>${percentages[index]}%</td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+
+                // Anomalies vs Categories Bar Chart
+                const anomalyVsCtx = document.getElementById('anomalyVsChart');
+                if (anomalyVsCtx) {
+                    const anomalyVsData = {
+                        labels: [
+                            'Block 1-5', 'Block 6-10', 'Block 11-15', 'Block 16-19', 'Block 20-25',
+                            'Block 26-30', 'Block 31-36', 'Foreign Object', 'Junction Box',
+                            'Isolated Module', 'Bypass Diode', 'Multi Hotspot', 'Vegetation',
+                            'Short Circuit', 'Substring SC', 'Missing Module', 'Single Hotspot', 'LA/TP Shadow'
                         ],
-                        borderWidth: 1,
-                        borderColor: 'rgba(255, 255, 255, 0.8)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    layout: {
-                        padding: 5
-                    },
-                    scales: {
-                        x: {
-                            ticks: {
-                                font: {
-                                    size: 8
-                                },
-                                maxRotation: 45,
-                                minRotation: 45
-                            }
-                        },
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                font: {
-                                    size: 9
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: {
-                            display: false
-                        },
-                        tooltip: {
-                            callbacks: {
-                                title: function(context) {
-                                    return context[0].label;
-                                },
-                                label: function(context) {
-                                    return `Count: ${context.raw}`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
+                        counts: [8, 12, 15, 7, 10, 6, 9, 3, 5, 14, 11, 8, 4, 2, 6, 1, 13, 7]
+                    };
 
-            // Bar Chart
-            const barCtx = document.getElementById('barChart').getContext('2d');
-            new Chart(barCtx, {
-                type: 'bar',
-                data: {
-                    labels: ['Hotspot', 'Shading', 'Soiling', 'Damage', 'Other'],
-                    datasets: [{
-                        label: 'High',
-                        data: [12, 8, 15, 5, 3],
-                        backgroundColor: '#EF4444'
-                    }, {
-                        label: 'Medium',
-                        data: [18, 12, 22, 8, 6],
-                        backgroundColor: '#F59E0B'
-                    }, {
-                        label: 'Low',
-                        data: [25, 18, 30, 12, 10],
-                        backgroundColor: '#10B981'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    layout: {
-                        padding: 5
-                    },
-                    scales: {
-                        x: {
-                            stacked: true,
-                            ticks: {
-                                font: {
-                                    size: 9
-                                }
-                            }
+                    new Chart(anomalyVsCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: anomalyVsData.labels,
+                            datasets: [{
+                                label: 'Anomaly Count',
+                                data: anomalyVsData.counts,
+                                backgroundColor: [
+                                    '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+                                    '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1',
+                                    '#14B8A6', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4',
+                                    '#84CC16', '#F97316', '#EC4899'
+                                ],
+                                borderWidth: 1,
+                                borderColor: 'rgba(255, 255, 255, 0.8)',
+                                borderRadius: 4
+                            }]
                         },
-                        y: {
-                            stacked: true,
-                            beginAtZero: true,
-                            ticks: {
-                                font: {
-                                    size: 9
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            layout: {
+                                padding: 5
+                            },
+                            scales: {
+                                x: {
+                                    ticks: {
+                                        font: {
+                                            size: 8
+                                        },
+                                        maxRotation: 45,
+                                        minRotation: 45
+                                    },
+                                    grid: {
+                                        display: false
+                                    }
+                                },
+                                y: {
+                                    beginAtZero: true,
+                                    ticks: {
+                                        font: {
+                                            size: 9
+                                        }
+                                    },
+                                    grid: {
+                                        color: 'rgba(0,0,0,0.1)'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    display: false
+                                },
+                                tooltip: {
+                                    callbacks: {
+                                        title: function(context) {
+                                            return context[0].label;
+                                        },
+                                        label: function(context) {
+                                            return `Count: ${context.raw}`;
+                                        }
+                                    }
                                 }
                             }
                         }
-                    },
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                padding: 8,
-                                usePointStyle: true,
-                                font: {
-                                    size: 9
+                    });
+                }
+
+                // Severity by Type Bar Chart
+                const barCtx = document.getElementById('barChart');
+                if (barCtx) {
+                    new Chart(barCtx, {
+                        type: 'bar',
+                        data: {
+                            labels: ['Hotspot', 'Shading', 'Soiling', 'Damage', 'Other'],
+                            datasets: [{
+                                label: 'High',
+                                data: [12, 8, 15, 5, 3],
+                                backgroundColor: '#EF4444',
+                                borderRadius: 4
+                            }, {
+                                label: 'Medium',
+                                data: [18, 12, 22, 8, 6],
+                                backgroundColor: '#F59E0B',
+                                borderRadius: 4
+                            }, {
+                                label: 'Low',
+                                data: [25, 18, 30, 12, 10],
+                                backgroundColor: '#10B981',
+                                borderRadius: 4
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            layout: {
+                                padding: 5
+                            },
+                            scales: {
+                                x: {
+                                    stacked: true,
+                                    ticks: {
+                                        font: {
+                                            size: 9
+                                        }
+                                    },
+                                    grid: {
+                                        display: false
+                                    }
                                 },
-                                boxWidth: 8
+                                y: {
+                                    stacked: true,
+                                    beginAtZero: true,
+                                    ticks: {
+                                        font: {
+                                            size: 9
+                                        }
+                                    },
+                                    grid: {
+                                        color: 'rgba(0,0,0,0.1)'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                legend: {
+                                    position: 'bottom',
+                                    labels: {
+                                        padding: 8,
+                                        usePointStyle: true,
+                                        font: {
+                                            size: 9
+                                        },
+                                        boxWidth: 8
+                                    }
+                                }
                             }
                         }
-                    }
+                    });
                 }
-            });
+
+            } catch (error) {
+                console.error('Error initializing charts:', error);
+            }
         });
 
         // Open anomalies map function
         function openAnomaliesMap() {
             const plantId = '{{ plant._id }}';
-            // Open the thermal image analysis map
+            // Open the thermal inspection map for this plant
             window.open('/check/' + plantId, '_blank');
         }
 
         // Tab switching functionality
         function switchTab(tabName) {
-            // Remove active class from all buttons
             document.querySelectorAll('.top-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
             
-            // Add active class to clicked button
-            event.target.classList.add('active');
-            
-            // Here you would also show/hide the corresponding tab content
-            // For now we're just handling the button states
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
         }
+
+        // Handle window resize for responsive charts
+        window.addEventListener('resize', function() {
+            Chart.helpers.each(Chart.instances, function(instance) {
+                instance.resize();
+            });
+        });
     </script>
 </body>
 

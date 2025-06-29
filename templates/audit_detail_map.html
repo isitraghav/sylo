@@ -1,0 +1,678 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ audit.tif_file_name }} - Audit Details</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo/logo1.png') }}">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #F8FAFC;
+            color: #1E293B;
+            overflow: hidden;
+        }
+
+        .header {
+            background: white;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 1000;
+            position: relative;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .back-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #16A34A;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #15803D;
+        }
+
+        .audit-info h1 {
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .audit-info p {
+            font-size: 14px;
+            color: #64748B;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .action-btn:hover {
+            background: #F1F5F9;
+        }
+
+        .action-btn.primary {
+            background: #3B82F6;
+            color: white;
+            border-color: #3B82F6;
+        }
+
+        .action-btn.primary:hover {
+            background: #2563EB;
+        }
+
+        .main-container {
+            display: flex;
+            height: calc(100vh - 70px);
+        }
+
+        .map-container {
+            flex: 1;
+            position: relative;
+        }
+
+        #map {
+            height: 100%;
+            width: 100%;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-left: 1px solid #E2E8F0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid #E2E8F0;
+            background: #F8FAFC;
+        }
+
+        .sidebar-header h3 {
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .sidebar-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        .info-section {
+            margin-bottom: 25px;
+        }
+
+        .info-section h4 {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #374151;
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #F3F4F6;
+            font-size: 13px;
+        }
+
+        .info-label {
+            color: #64748B;
+        }
+
+        .info-value {
+            font-weight: 500;
+            color: #1E293B;
+        }
+
+        .anomaly-legend {
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            font-size: 13px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        .map-controls {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            min-width: 200px;
+        }
+
+        .control-group {
+            margin-bottom: 15px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .control-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 12px;
+            color: #374151;
+        }
+
+        .control-select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #D1D5DB;
+            border-radius: 6px;
+            font-size: 12px;
+            background: white;
+        }
+
+        .loading-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(255, 255, 255, 0.9);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+        }
+
+        .loading-content {
+            text-align: center;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #16A34A;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 15px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 10px;
+                padding: 10px;
+            }
+
+            .main-container {
+                flex-direction: column;
+                height: calc(100vh - 120px);
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 40%;
+                border-left: none;
+                border-top: 1px solid #E2E8F0;
+            }
+
+            .map-container {
+                height: 60%;
+            }
+
+            .map-controls {
+                top: 10px;
+                left: 10px;
+                min-width: 150px;
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <a href="/check/{{ plant._id }}" class="back-btn">
+                <i class="fas fa-arrow-left"></i>
+                Back to Anomalies
+            </a>
+            <div class="audit-info">
+                <h1>{{ audit.tif_file_name }}</h1>
+                <p>{{ plant.name }} - {{ audit.audit_type.title() }} Inspection</p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <button class="action-btn" onclick="downloadAudit()">
+                <i class="fas fa-download"></i>
+                Download
+            </button>
+            <button class="action-btn" onclick="shareAudit()">
+                <i class="fas fa-share-alt"></i>
+                Share
+            </button>
+            <button class="action-btn primary" onclick="generateReport()">
+                <i class="fas fa-file-pdf"></i>
+                Generate Report
+            </button>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- Map Container -->
+        <div class="map-container">
+            <div id="map"></div>
+            
+            <!-- Loading Overlay -->
+            <div id="loadingOverlay" class="loading-overlay">
+                <div class="loading-content">
+                    <div class="spinner"></div>
+                    <p>Loading thermal imagery...</p>
+                </div>
+            </div>
+            
+            <!-- Map Controls -->
+            <div class="map-controls">
+                <div class="control-group">
+                    <label class="control-label">Map Style:</label>
+                    <select id="mapStyle" class="control-select" onchange="changeMapStyle()">
+                        <option value="osm">OpenStreetMap</option>
+                        <option value="satellite">Satellite</option>
+                        <option value="thermal" selected>Thermal Overlay</option>
+                    </select>
+                </div>
+
+                <div class="control-group">
+                    <label class="control-label">Opacity:</label>
+                    <input type="range" id="opacitySlider" min="0" max="100" value="80" 
+                           onchange="updateOverlayOpacity(this.value)" style="width: 100%;">
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-info-circle"></i> Audit Information</h3>
+            </div>
+            
+            <div class="sidebar-content">
+                <!-- Audit Details -->
+                <div class="info-section">
+                    <h4>Details</h4>
+                    <div class="info-item">
+                        <span class="info-label">Type:</span>
+                        <span class="info-value">{{ audit.audit_type.title() }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Date:</span>
+                        <span class="info-value">{{ audit.upload_date.strftime('%Y-%m-%d %H:%M') if audit.upload_date else 'N/A' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Status:</span>
+                        <span class="info-value">{{ audit.status.title() if audit.status else 'Completed' }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">File Size:</span>
+                        <span class="info-value">{{ "%.2f MB"|format(audit.file_size / 1024 / 1024) if audit.file_size else 'N/A' }}</span>
+                    </div>
+                </div>
+
+                <!-- Plant Information -->
+                <div class="info-section">
+                    <h4>Plant Information</h4>
+                    <div class="info-item">
+                        <span class="info-label">Name:</span>
+                        <span class="info-value">{{ plant.name }}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Capacity:</span>
+                        <span class="info-value">{{ plant.ac_capacity or 'N/A' }} MW</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Location:</span>
+                        <span class="info-value">{{ plant.location_name or 'N/A' }}</span>
+                    </div>
+                </div>
+
+                <!-- Anomaly Legend -->
+                <div class="info-section">
+                    <h4>Anomaly Types</h4>
+                    <div class="anomaly-legend">
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #EF4444;"></div>
+                            <span>Critical Hotspots</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #F59E0B;"></div>
+                            <span>Moderate Issues</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #10B981;"></div>
+                            <span>Normal Operation</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #3B82F6;"></div>
+                            <span>Bypass Diodes</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color" style="background: #8B5CF6;"></div>
+                            <span>Shading Effects</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="info-section">
+                    <h4>Quick Actions</h4>
+                    <button class="action-btn" style="width: 100%; margin-bottom: 10px;" onclick="exportData()">
+                        <i class="fas fa-file-export"></i>
+                        Export Data
+                    </button>
+                    <button class="action-btn" style="width: 100%; margin-bottom: 10px;" onclick="viewFullScreen()">
+                        <i class="fas fa-expand"></i>
+                        Full Screen
+                    </button>
+                    <button class="action-btn" style="width: 100%;" onclick="printMap()">
+                        <i class="fas fa-print"></i>
+                        Print Map
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    
+    <script>
+        let map;
+        let currentLayer = null;
+        let thermalOverlay = null;
+        let auditData = {
+            id: '{{ audit._id }}',
+            fileName: '{{ audit.tif_file_name }}',
+            s3Url: '{{ audit.s3_url or "" }}',
+            plantId: '{{ plant._id }}',
+            plantName: '{{ plant.name }}'
+        };
+
+        // Initialize map
+        function initMap() {
+            // Get plant location or use default
+            const defaultLat = {{ plant.location.coordinates[1] if plant.location else 20.5937 }};
+            const defaultLng = {{ plant.location.coordinates[0] if plant.location else 78.9629 }};
+            
+            map = L.map('map').setView([defaultLat, defaultLng], 16);
+            
+            // Default satellite layer for thermal inspection
+            currentLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                attribution: 'Tiles © Esri'
+            }).addTo(map);
+
+            // Add plant marker
+            const plantMarker = L.marker([defaultLat, defaultLng], {
+                icon: L.divIcon({
+                    className: 'plant-marker',
+                    html: '<i class="fas fa-solar-panel" style="color: #16A34A; font-size: 20px;"></i>',
+                    iconSize: [25, 25],
+                    iconAnchor: [12, 12]
+                })
+            }).addTo(map);
+
+            plantMarker.bindPopup(`
+                <div style="text-align: center;">
+                    <h3>${auditData.plantName}</h3>
+                    <p>${auditData.fileName}</p>
+                    <small>Thermal Inspection</small>
+                </div>
+            `);
+
+            // Load thermal overlay if available
+            loadThermalOverlay();
+        }
+
+        // Load thermal overlay
+        function loadThermalOverlay() {
+            if (auditData.s3Url) {
+                // Hide loading overlay after 3 seconds (simulated)
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    
+                    // Here you would load actual thermal data
+                    // For demo, we'll add some sample markers representing anomalies
+                    addSampleAnomalies();
+                    
+                }, 3000);
+            } else {
+                document.getElementById('loadingOverlay').style.display = 'none';
+                console.log('No thermal data URL available');
+            }
+        }
+
+        // Add sample anomaly markers for demonstration
+        function addSampleAnomalies() {
+            const plantLat = {{ plant.location.coordinates[1] if plant.location else 20.5937 }};
+            const plantLng = {{ plant.location.coordinates[0] if plant.location else 78.9629 }};
+            
+            // Sample anomaly data
+            const anomalies = [
+                { lat: plantLat + 0.001, lng: plantLng + 0.001, type: 'critical', temp: '85°C', description: 'Critical hotspot detected' },
+                { lat: plantLat - 0.001, lng: plantLng + 0.002, type: 'moderate', temp: '72°C', description: 'Moderate temperature rise' },
+                { lat: plantLat + 0.002, lng: plantLng - 0.001, type: 'bypass', temp: '45°C', description: 'Bypass diode activation' },
+                { lat: plantLat - 0.002, lng: plantLng - 0.002, type: 'shading', temp: '38°C', description: 'Partial shading effect' }
+            ];
+
+            anomalies.forEach(anomaly => {
+                let color, icon;
+                switch(anomaly.type) {
+                    case 'critical':
+                        color = '#EF4444';
+                        icon = 'exclamation-triangle';
+                        break;
+                    case 'moderate':
+                        color = '#F59E0B';
+                        icon = 'exclamation-circle';
+                        break;
+                    case 'bypass':
+                        color = '#3B82F6';
+                        icon = 'bolt';
+                        break;
+                    case 'shading':
+                        color = '#8B5CF6';
+                        icon = 'cloud';
+                        break;
+                    default:
+                        color = '#10B981';
+                        icon = 'check-circle';
+                }
+
+                const marker = L.marker([anomaly.lat, anomaly.lng], {
+                    icon: L.divIcon({
+                        className: 'anomaly-marker',
+                        html: `<i class="fas fa-${icon}" style="color: ${color}; font-size: 16px; background: white; border-radius: 50%; padding: 4px; border: 2px solid ${color};"></i>`,
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 12]
+                    })
+                }).addTo(map);
+
+                marker.bindPopup(`
+                    <div style="min-width: 200px;">
+                        <h4 style="margin: 0 0 10px 0; color: ${color};">${anomaly.description}</h4>
+                        <p><strong>Temperature:</strong> ${anomaly.temp}</p>
+                        <p><strong>Type:</strong> ${anomaly.type.charAt(0).toUpperCase() + anomaly.type.slice(1)}</p>
+                        <div style="margin-top: 10px;">
+                            <button onclick="viewAnomalyDetails('${anomaly.type}')" style="background: ${color}; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">
+                                View Details
+                            </button>
+                        </div>
+                    </div>
+                `);
+            });
+        }
+
+        // Change map style
+        function changeMapStyle() {
+            const style = document.getElementById('mapStyle').value;
+            
+            if (currentLayer && style !== 'thermal') {
+                map.removeLayer(currentLayer);
+            }
+            
+            switch(style) {
+                case 'satellite':
+                    currentLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: 'Tiles © Esri'
+                    });
+                    currentLayer.addTo(map);
+                    break;
+                case 'osm':
+                    currentLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                        attribution: '© OpenStreetMap contributors'
+                    });
+                    currentLayer.addTo(map);
+                    break;
+                case 'thermal':
+                    // Keep satellite as base and add thermal overlay
+                    currentLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: 'Tiles © Esri'
+                    });
+                    currentLayer.addTo(map);
+                    // Add thermal overlay logic here
+                    break;
+            }
+        }
+
+        // Update overlay opacity
+        function updateOverlayOpacity(value) {
+            const opacity = value / 100;
+            if (thermalOverlay) {
+                thermalOverlay.setOpacity(opacity);
+            }
+            // Update all anomaly markers opacity
+            document.querySelectorAll('.anomaly-marker').forEach(marker => {
+                marker.style.opacity = opacity;
+            });
+        }
+
+        // Action functions
+        function downloadAudit() {
+            if (auditData.s3Url) {
+                window.open(auditData.s3Url, '_blank');
+            } else {
+                alert('Download not available for this audit');
+            }
+        }
+
+        function shareAudit() {
+            const shareUrl = window.location.href;
+            if (navigator.share) {
+                navigator.share({
+                    title: `${auditData.fileName} - Thermal Audit`,
+                    text: `View thermal audit for ${auditData.plantName}`,
+                    url: shareUrl
+                });
+            } else {
+                // Fallback: copy to clipboard
+                navigator.clipboard.writeText(shareUrl).then(() => {
+                    alert('Share link copied to clipboard!');
+                });
+            }
+        }
+
+        function generateReport() {
+            // Generate PDF report
+            window.open(`/api/audit/${auditData.id}/report`, '_blank');
+        }
+
+        function exportData() {
+            // Export audit data as JSON/CSV
+            window.open(`/api/audit/${auditData.id}/export`, '_blank');
+        }
+
+        function viewFullScreen() {
+            if (map.isFullscreen && map.isFullscreen()) {
+                map.toggleFullscreen();
+            } else {
+                map.toggleFullscreen();
+            }
+        }
+
+        function printMap() {
+            window.print();
+        }
+
+        function viewAnomalyDetails(type) {
+            alert(`Viewing details for ${type} anomaly. This would open a detailed analysis panel.`);
+        }
+
+        // Initialize map when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            initMap();
+        });
+    </script>
+</body>
+</html>
