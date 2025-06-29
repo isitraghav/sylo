@@ -434,6 +434,13 @@
             box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
         }
 
+        .form-help {
+            display: block;
+            margin-top: 5px;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
         .form-textarea {
             resize: vertical;
             min-height: 80px;
@@ -631,9 +638,13 @@
                     {% if plants %}
                     <div class="plants-grid">
                         {% for plant in plants %}
-                        <div class="plant-card">
+                        <div class="plant-card" onclick="openPlantDetail('{{ plant._id }}')">
                             <div class="plant-image">
+                                {% if plant.plant_photo %}
+                                <img src="{{ plant.plant_photo }}" alt="{{ plant.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% else %}
                                 <img src="{{ url_for('static', filename='images/new_plan_image.jpeg') }}" alt="{{ plant.name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                {% endif %}
                             </div>
                             <div class="plant-details">
                                 <div class="plant-name">{{ plant.name }}</div>
@@ -650,17 +661,17 @@
                                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                                     </svg>
-                                    Inspected: {{ plant.inspection_date.strftime('%d %b %Y') if plant.inspection_date else 'Not Set' }}
+                                    Inspected: {{ plant.inspection_date if plant.inspection_date else 'Not Set' }}
                                 </div>
                                 {% endif %}
                                 <div class="plant-actions">
-                                    <button class="plant-btn btn-details" onclick="openPlantDetail('{{ plant._id }}')">
+                                    <button class="plant-btn btn-details" onclick="event.stopPropagation(); openPlantDetail('{{ plant._id }}')">
                                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         Site Details
                                     </button>
-                                    <button class="plant-btn btn-anomalies" onclick="openPlantAnomalies('{{ plant._id }}')">
+                                    <button class="plant-btn btn-anomalies" onclick="event.stopPropagation(); openPlantAnomalies('{{ plant._id }}')">
                                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                                         </svg>
@@ -675,7 +686,7 @@
                                     <div><strong>Module:</strong> {{ plant.module_type }}</div>
                                     <div><strong>Mount:</strong> {{ plant.mounting_type }}</div>
                                     {% if plant.inspection_date %}
-                                    <div><strong>Inspection:</strong> {{ plant.inspection_date.strftime('%d %b %Y') if plant.inspection_date else 'Not Set' }}</div>
+                                    <div><strong>Inspection:</strong> {{ plant.inspection_date if plant.inspection_date else 'Not Set' }}</div>
                                     {% endif %}
                                 </div>
                             </div>
@@ -810,6 +821,12 @@
                             <label class="form-label">Inspection Date</label>
                             <input type="date" name="inspection_date" class="form-input" required>
                         </div>
+                        
+                        <div class="form-group full-width">
+                            <label class="form-label">Plant Photo</label>
+                            <input type="file" name="plant_photo" class="form-input" accept="image/*">
+                            <small class="form-help">Upload a photo of the plant (optional)</small>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -857,19 +874,11 @@
             e.preventDefault();
 
             const formData = new FormData(this);
-            const plantData = {};
-
-            for (let [key, value] of formData.entries()) {
-                plantData[key] = value;
-            }
 
             try {
                 const response = await fetch('/api/plants', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(plantData)
+                    body: formData  // Send FormData directly for file uploads
                 });
 
                 const result = await response.json();
@@ -891,8 +900,8 @@
         }
 
         function openPlantAnomalies(plantId) {
-            // Navigate to plant detail page and show audits tab
-            window.location.href = '/plant/' + plantId + '#audits';
+            // Navigate to plant detail page and show anomalies tab
+            window.location.href = '/plant/' + plantId + '#anomalies';
         }
 
         function toggleUserDropdown() {

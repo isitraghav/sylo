@@ -1,7 +1,7 @@
 import shutil
 import zipfile
 
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, send_from_directory
 from flask_pymongo import PyMongo
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -117,7 +117,7 @@ def make_serializable(doc):
         if isinstance(value, ObjectId):
             doc[key] = str(value)
         elif isinstance(value, datetime):
-            doc[key] = value.date().isoformat()
+            doc[key] = value.strftime('%Y-%m-%d') if hasattr(value, 'strftime') else str(value)
     return doc
 def login_required(f):
     def decorated_function(*args, **kwargs):
@@ -222,7 +222,25 @@ def homepage():
 @login_required
 def plants_api():
     if request.method == 'POST':
-        data = request.get_json()
+        if request.content_type and 'multipart/form-data' in request.content_type:
+            # Handle form data with file upload
+            data = request.form.to_dict()
+            plant_photo = request.files.get('plant_photo')
+            
+            plant_photo_url = None
+            if plant_photo and plant_photo.filename:
+                # Save the uploaded file
+                filename = secure_filename(plant_photo.filename)
+                timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+                filename = f"plant_{timestamp}_{filename}"
+                upload_path = os.path.join(UPLOAD_FOLDER, 'plant_photos')
+                os.makedirs(upload_path, exist_ok=True)
+                file_path = os.path.join(upload_path, filename)
+                plant_photo.save(file_path)
+                plant_photo_url = f"/static/uploads/plant_photos/{filename}"
+        else:
+            # Handle JSON data
+            data = request.get_json()
 
         plant_data = {
             'name': data.get('name'),
@@ -244,6 +262,7 @@ def plants_api():
             'no_of_inverters':data.get('no_of_inverters'),
             'no_of_blocks': data.get('no_of_blocks'),
             'inspection_date': datetime.strptime(data.get('inspection_date'), '%Y-%m-%d') if data.get('inspection_date') else None,
+            'plant_photo': plant_photo_url,
             'created_at': datetime.utcnow(),
         }
 
@@ -275,19 +294,77 @@ def plant_detail(plant_id):
     # Get audits for this plant
     audits = list(audits_collection.find({'plant_id': str(plant['_id'])}).sort('_id', -1))
     analysis_data = []
+    
+    # Calculate analytics data and progress percentages
+    analytics = {
+        'power_loss': 0,
+        'revenue_loss': 0,
+    }
+    
+    # Progress percentages
+    progress_data = {
+        'pending': 25,     # Default values
+        'resolved': 60,
+        'not_found': 15,
+        'high': 30,
+        'medium': 45,
+        'low': 25
+    }
+    
     try:
-
-        if audits and len(audits) >0:
-            for i in json.loads(audits[0]['anomalies'])['features']:
-                analysis_data.append(i['properties'])
-
+        if audits and len(audits) > 0:
+            for audit in audits:
+                try:
+                    anomalies = json.loads(audit['anomalies'])['features']
+                    for anomaly in anomalies:
+                        analysis_data.append(anomaly['properties'])
+                except:
+                    continue
+            
+            # Calculate real percentages from analysis_data
+            if analysis_data:
+                total_anomalies = len(analysis_data)
+                
+                # Count by status (if available)
+                pending_count = sum(1 for item in analysis_data if item.get('status', '').lower() == 'pending')
+                resolved_count = sum(1 for item in analysis_data if item.get('status', '').lower() == 'resolved')
+                not_found_count = total_anomalies - pending_count - resolved_count
+                
+                # Count by severity
+                high_count = sum(1 for item in analysis_data if 'High' in item.get('Severity', ''))
+                medium_count = sum(1 for item in analysis_data if 'Mid' in item.get('Severity', ''))
+                low_count = sum(1 for item in analysis_data if 'Low' in item.get('Severity', ''))
+                
+                # Calculate percentages
+                if total_anomalies > 0:
+                    progress_data.update({
+                        'pending': round((pending_count / total_anomalies) * 100),
+                        'resolved': round((resolved_count / total_anomalies) * 100),
+                        'not_found': round((not_found_count / total_anomalies) * 100),
+                        'high': round((high_count / total_anomalies) * 100) if high_count else 20,
+                        'medium': round((medium_count / total_anomalies) * 100) if medium_count else 30,
+                        'low': round((low_count / total_anomalies) * 100) if low_count else 50
+                    })
+                
+                # Calculate power loss and revenue loss
+                analytics['power_loss'] = round(total_anomalies * 0.5, 1)  # 0.5 kW per anomaly
+                analytics['revenue_loss'] = round(analytics['power_loss'] * 8760 * 3.5, 0)  # annual calculation
+                
     except Exception as err:
-        print("Error into get features for analysis_data",err)
+        print("Error processing analysis_data:", err)
+        
     get_session_user = session.get('user_role')
     role = 1 if get_session_user == 'admin' else 0
     audits = [make_serializable(i) for i in audits]
+    
     print("audit length", len(audits))
-    return render_template('plant_detail_1.html', plant=plant, audits=audits,analysis_data=analysis_data,check_mate=role)
+    return render_template('plant_detail_1.html', 
+                         plant=plant, 
+                         audits=audits, 
+                         analysis_data=analysis_data, 
+                         analytics=analytics,
+                         progress_data=progress_data,
+                         check_mate=role)
 
 
 # @app.route('/api/audits', methods=['POST'])
@@ -773,6 +850,10 @@ def uploaded_file(filename):
     from flask import send_from_directory
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
 
+@app.route('/static/uploads/<path:filename>')
+def serve_upload_file(filename):
+    """Serve uploaded files"""
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 # @app.route('/audi_tif/upload', methods=['POST'])
 # def upload():

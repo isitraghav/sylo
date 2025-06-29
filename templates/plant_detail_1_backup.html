@@ -188,329 +188,18 @@
             overflow-y: auto;
         }
 
-        /* Top Navigation */
-        .top-navigation {
-            margin-bottom: 30px;
-            background: var(--surface-color);
-            border-radius: 15px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            padding: 20px;
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-
-        .nav-btn {
-            padding: 15px 25px;
-            background: var(--background-color);
-            border: 2px solid var(--border-color);
-            border-radius: 12px;
-            cursor: pointer;
-            font-weight: 600;
-            color: var(--text-secondary);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 140px;
-            justify-content: center;
-        }
-
-        .nav-btn.active {
+        /* Plant Navigation Header */
+        .plant-nav-header {
             background: var(--primary-color);
             color: white;
-            border-color: var(--primary-color);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(46, 125, 50, 0.3);
-        }
-
-        .nav-btn:hover:not(.active) {
-            background: var(--primary-color);
-            color: white;
-            border-color: var(--primary-color);
-            transform: translateY(-1px);
-        }
-
-        /* Section Content */
-        .section-content {
-            display: none;
-        }
-
-        .section-content.active {
-            display: block;
-        }
-
-        /* Progress Bars Container */
-        .progress-bars-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 30px;
-            margin-bottom: 40px;
-        }
-
-        .progress-bar-group {
-            background: var(--surface-color);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .progress-bar-group h3 {
-            text-align: center;
-            margin-bottom: 20px;
-            color: var(--text-color);
-            font-size: 18px;
-            font-weight: 600;
-        }
-
-        /* Liquid Progress Bar */
-        .liquid-progress-bar {
-            margin-bottom: 20px;
-        }
-
-        .liquid-container {
-            position: relative;
-            width: 120px;
-            height: 120px;
-            margin: 0 auto;
-            border-radius: 50%;
-            overflow: hidden;
-            border: 4px solid var(--border-color);
-            background: var(--background-color);
-        }
-
-        .liquid-fill {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 0%;
-            border-radius: 50%;
-            transition: height 2s ease-in-out;
-        }
-
-        .liquid-fill.pending {
-            background: linear-gradient(45deg, #f59e0b, #fbbf24);
-        }
-
-        .liquid-fill.resolved {
-            background: linear-gradient(45deg, #10b981, #34d399);
-        }
-
-        .liquid-fill.not-found {
-            background: linear-gradient(45deg, #ef4444, #f87171);
-        }
-
-        .liquid-fill.high {
-            background: linear-gradient(45deg, #dc2626, #ef4444);
-        }
-
-        .liquid-fill.medium {
-            background: linear-gradient(45deg, #f59e0b, #fbbf24);
-        }
-
-        .liquid-fill.low {
-            background: linear-gradient(45deg, #10b981, #34d399);
-        }
-
-        .liquid-wave {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 200%;
-            height: 100%;
-            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 50"><path d="M0,25 Q75,0 150,25 T300,25 V50 H0 Z" fill="rgba(255,255,255,0.3)"/></svg>') repeat-x;
-            animation: liquid-wave 3s ease-in-out infinite;
-            opacity: 0.6;
-        }
-
-        .liquid-wave.wave2 {
-            animation: liquid-wave 2s ease-in-out infinite reverse;
-            opacity: 0.4;
-        }
-
-        @keyframes liquid-wave {
-            0%, 100% {
-                transform: translateX(-50%);
-            }
-            50% {
-                transform: translateX(-25%);
-            }
-        }
-
-        .progress-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            z-index: 10;
-        }
-
-        .progress-text .percentage {
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text-color);
-            display: block;
-        }
-
-        .progress-text .label {
-            font-size: 12px;
-            color: var(--text-secondary);
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Analytics Grid */
-        .analytics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .analytics-box {
-            background: var(--surface-color);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-            border: 1px solid var(--border-color);
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .analytics-box:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .analytics-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            flex-shrink: 0;
-        }
-
-        .analytics-icon.power-loss {
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-        }
-
-        .analytics-icon.revenue-loss {
-            background: linear-gradient(135deg, #f59e0b, #d97706);
-        }
-
-        .analytics-icon.capacity {
-            background: linear-gradient(135deg, #06b6d4, #0891b2);
-        }
-
-        .analytics-icon.modules {
-            background: linear-gradient(135deg, #8b5cf6, #7c3aed);
-        }
-
-        .analytics-icon.land {
-            background: linear-gradient(135deg, #10b981, #059669);
-        }
-
-        .analytics-icon.inverters {
-            background: linear-gradient(135deg, #6366f1, #4f46e5);
-        }
-
-        .analytics-icon.blocks {
-            background: linear-gradient(135deg, #ec4899, #db2777);
-        }
-
-        .analytics-content h4 {
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--text-color);
-            margin-bottom: 8px;
-        }
-
-        .analytics-value {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 5px;
-        }
-
-        .analytics-subtitle {
-            font-size: 12px;
-            color: var(--text-secondary);
-            margin: 0;
-        }
-
-        /* Badge Styles */
-        .red-badge {
-            background: rgba(239, 68, 68, 0.1);
-            color: var(--error-color);
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .green-badge {
-            background: rgba(16, 185, 129, 0.1);
-            color: var(--success-color);
-            padding: 4px 8px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        /* Table Styles */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 20px;
-        }
-
-        table th,
-        table td {
-            padding: 12px;
-            text-align: left;
-            border-bottom: 1px solid var(--border-color);
-        }
-
-        table th {
-            background: var(--background-color);
-            font-weight: 600;
-            color: var(--text-color);
-        }
-
-        table .link {
-            color: var(--primary-color);
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        table .link:hover {
-            text-decoration: underline;
-        }
-
-        /* Plant Header */
-        .plant-header {
-            background: var(--primary-color);
-            color: white;
-            padding: 10px 40px;
+            padding: 20px 40px;
             border-radius: 15px;
             margin-bottom: 30px;
             position: relative;
             overflow: hidden;
         }
 
-        .plant-header::before {
+        .plant-nav-header::before {
             content: '';
             position: absolute;
             top: -50%;
@@ -529,6 +218,59 @@
             100% {
                 transform: translateX(-50px) translateY(-50px);
             }
+        }
+
+        .plant-nav-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .nav-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px 15px;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+        }
+
+        .nav-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .nav-btn.active {
+            background: rgba(255, 255, 255, 0.25);
+            border-color: rgba(255, 255, 255, 0.4);
+        }
+
+        .nav-btn svg {
+            margin-bottom: 5px;
+        }
+
+        .nav-btn span {
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .btn-description {
+            font-size: 11px;
+            opacity: 0.8;
+            line-height: 1.3;
+            text-align: center;
         }
 
         .plant-title {
@@ -862,38 +604,6 @@
             .audit-meta {
                 flex-direction: column;
                 gap: 10px;
-            }
-
-            .nav-buttons {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .nav-btn {
-                min-width: auto;
-                width: 100%;
-            }
-
-            .progress-bars-container {
-                grid-template-columns: 1fr;
-                gap: 20px;
-            }
-
-            .analytics-grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-
-            .analytics-box {
-                padding: 20px;
-                flex-direction: column;
-                text-align: center;
-                gap: 15px;
-            }
-
-            .charts-grid {
-                grid-template-columns: 1fr;
-                gap: 20px;
             }
         }
 
@@ -1423,6 +1133,248 @@
             cursor: pointer;
             font-size: 0.8rem;
         }
+
+        /* Analytics Dashboard Styles */
+        .overview-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .analytics-section {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .analytics-card {
+            background: var(--surface-color);
+            border-radius: 8px;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.3s ease;
+            min-height: 85px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .analytics-card:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .analytics-icon {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .analytics-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 2px;
+            line-height: 1.2;
+        }
+
+        .analytics-label {
+            font-size: 11px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            line-height: 1.3;
+        }
+
+        .analytics-trend {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            margin-top: 4px;
+            font-size: 9px;
+        }
+
+        .status-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .status-card {
+            background: var(--surface-color);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .status-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: var(--background-color);
+            border-radius: 8px;
+            font-size: 14px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .status-item::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--fill-percentage, 0%);
+            background: linear-gradient(90deg, var(--fill-color, #3B82F6), rgba(var(--fill-color-rgb, 59, 130, 246), 0.3));
+            transition: width 1s ease-in-out;
+            z-index: 1;
+        }
+
+        .status-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            position: relative;
+            z-index: 2;
+        }
+
+        .status-count {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--text-color);
+            position: relative;
+            z-index: 2;
+            min-width: 30px;
+            text-align: right;
+        }
+
+        /* Status Colors */
+        .status-pending { background: #3B82F6; }
+        .status-resolved { background: var(--success-color); }
+        .status-not-found { background: var(--text-secondary); }
+        
+        .severity-critical { background: var(--error-color); }
+        .severity-medium { background: var(--warning-color); }
+        .severity-low { background: var(--success-color); }
+
+        .icon-green { background: rgba(16, 185, 129, 0.1); color: var(--success-color); }
+        .icon-blue { background: rgba(59, 130, 246, 0.1); color: #3B82F6; }
+        .icon-orange { background: rgba(245, 158, 11, 0.1); color: var(--warning-color); }
+        .icon-purple { background: rgba(139, 92, 246, 0.1); color: #8B5CF6; }
+        .icon-red { background: rgba(239, 68, 68, 0.1); color: var(--error-color); }
+        .icon-teal { background: rgba(6, 182, 212, 0.1); color: var(--accent-color); }
+
+        .trend-up { color: var(--success-color); }
+        .trend-down { color: var(--error-color); }
+
+        /* Responsive Design */
+        @media (max-width: 1200px) {
+            .overview-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .analytics-grid {
+                grid-template-columns: repeat(4, 1fr);
+            }
+            
+            .plant-nav-buttons {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .analytics-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .analytics-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+            
+            .analytics-card {
+                padding: 10px;
+                min-height: 75px;
+            }
+            
+            .analytics-value {
+                font-size: 16px;
+            }
+            
+            .analytics-label {
+                font-size: 10px;
+            }
+            
+            .plant-nav-buttons {
+                grid-template-columns: 1fr 1fr;
+                gap: 10px;
+            }
+            
+            .nav-btn {
+                padding: 15px 10px;
+            }
+            
+            .nav-btn span {
+                font-size: 13px;
+            }
+            
+            .btn-description {
+                font-size: 10px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .plant-nav-buttons {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+        }
     </style>
 </head>
 
@@ -1520,461 +1472,448 @@
 
             <!-- Content Area -->
             <div class="content-area">
-                <!-- Top Navigation Buttons -->
-                <div class="top-navigation">
-                    <div class="nav-buttons">
-                        <button class="nav-btn active" onclick="showSection('overview')">
+                <!-- Plant Navigation Header -->
+                <div class="plant-nav-header">
+                    <h1 class="plant-title">{{ plant.name }}</h1>
+                    <p class="plant-subtitle">{{ plant.client }} • {{ plant.country }}</p>
+                    
+                    <div class="plant-nav-buttons">
+                        <button class="nav-btn overview-btn active" onclick="showTab('overview')">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
                             </svg>
-                            Overview
+                            <span>Overview</span>
+                            <div class="btn-description">Plant analytics and key metrics</div>
                         </button>
-                        <button class="nav-btn" onclick="showSection('anomalies')">
+                        
+                        <button class="nav-btn anomalies-btn" onclick="openAnomaliesMap()">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
                             </svg>
-                            Anomalies
+                            <span>Anomalies Map</span>
+                            <div class="btn-description">View thermal anomalies on site map</div>
                         </button>
-                        <button class="nav-btn" onclick="showSection('site-details')">
+                        
+                        <button class="nav-btn details-btn" onclick="showTab('site-details')">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
                             </svg>
-                            Site Details
+                            <span>Site Details</span>
+                            <div class="btn-description">Technical specs and location info</div>
                         </button>
-                        <button class="nav-btn" onclick="showSection('report')">
+                        
+                        <button class="nav-btn report-btn" onclick="showTab('report')">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                    d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                             </svg>
-                            Report
+                            <span>Generate Report</span>
+                            <div class="btn-description">Download comprehensive reports</div>
                         </button>
                     </div>
                 </div>
 
-                <!-- Overview Section -->
-                <div id="overview" class="section-content active">
-                    <!-- Liquid Progress Bars -->
-                    <div class="progress-bars-container">
-                        <div class="progress-bar-group">
-                            <h3>Anomaly Status</h3>
-                            <div class="liquid-progress-bar">
-                                <div class="liquid-container">
-                                    <div class="liquid-fill pending" data-percentage="{{ progress_data.pending }}">
-                                        <div class="liquid-wave"></div>
-                                        <div class="liquid-wave wave2"></div>
+                <!-- Tab Content Area -->
+                <div class="tab-content">
+                    <!-- Overview Tab -->
+                    <div id="overview" class="tab-pane active">
+                            <div class="overview-container">
+                                <!-- Left Side - Analytics Cards -->
+                                <div class="analytics-section">
+                                    <h3 style="margin: 0 0 15px 0; font-size: 18px; font-weight: 600; color: var(--text-color); display: flex; align-items: center; gap: 8px;">
+                                        📊 Plant Analytics
+                                    </h3>
+                                    <div class="analytics-grid">
+                                        <div class="analytics-card">
+                                            <div class="analytics-icon icon-red">⚡</div>
+                                            <div class="analytics-value">-</div>
+                                            <div class="analytics-label">Power Loss</div>
+                                            <div class="analytics-trend trend-down">
+                                                <span>↓</span>
+                                                <span>Data N/A</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="analytics-card">
+                                            <div class="analytics-icon icon-orange">💰</div>
+                                            <div class="analytics-value">-</div>
+                                            <div class="analytics-label">Revenue Loss/yr</div>
+                                            <div class="analytics-trend trend-down">
+                                                <span>↓</span>
+                                                <span>Data N/A</span>
+                                            </div>
+                                        </div>
+
+                                        <div class="analytics-card">
+                                            <div class="analytics-icon icon-blue">🔌</div>
+                                            <div class="analytics-value">{{ plant.ac_capacity }} MW</div>
+                                            <div class="analytics-label">AC Capacity</div>
+                                        </div>
+
+                                        <div class="analytics-card">
+                                            <div class="analytics-icon icon-green">⚡</div>
+                                            <div class="analytics-value">{{ plant.dc_capacity }} MW</div>
+                                            <div class="analytics-label">DC Capacity</div>
+                                        </div>
+
+                                        <div class="analytics-card">
+                                            <div class="analytics-icon icon-purple">📱</div>
+                                            <div class="analytics-value">{{ plant.total_modules_inspected or '-' }}</div>
+                                            <div class="analytics-label">Total Modules</div>
+                                        </div>
+
+                                        <div class="analytics-card">
+                                            <div class="analytics-icon icon-teal">🏞️</div>
+                                            <div class="analytics-value">{{ plant.land_area or '-' }}</div>
+                                            <div class="analytics-label">Land Area (Acres)</div>
+                                        </div>
+
+                                        <div class="analytics-card">
+                                            <div class="analytics-icon icon-orange">🔧</div>
+                                            <div class="analytics-value">{{ plant.no_of_inverters or '-' }}</div>
+                                            <div class="analytics-label">Number of Inverters</div>
+                                        </div>
+
+                                        <div class="analytics-card">
+                                            <div class="analytics-icon icon-blue">🏗️</div>
+                                            <div class="analytics-value">{{ plant.no_of_blocks or '-' }}</div>
+                                            <div class="analytics-label">No of Blocks</div>
+                                        </div>
                                     </div>
-                                    <div class="progress-text">
-                                        <span class="percentage">{{ progress_data.pending }}%</span>
-                                        <span class="label">Pending</span>
+                                </div>
+
+                                <!-- Right Side - Status Bars -->
+                                <div class="status-section">
+                                    <!-- Anomaly Status Bar -->
+                                    <div class="status-card">
+                                        <div class="status-title">
+                                            � Anomaly Status
+                                        </div>
+                                        <div class="status-bars">
+                                            <div class="status-item">
+                                                <div class="status-info">
+                                                    <div class="status-indicator status-pending"></div>
+                                                    <span>Pending</span>
+                                                </div>
+                                                <div class="status-count" id="pending-count">-</div>
+                                            </div>
+                                            <div class="status-item">
+                                                <div class="status-info">
+                                                    <div class="status-indicator status-resolved"></div>
+                                                    <span>Resolved</span>
+                                                </div>
+                                                <div class="status-count" id="resolved-count">-</div>
+                                            </div>
+                                            <div class="status-item">
+                                                <div class="status-info">
+                                                    <div class="status-indicator status-not-found"></div>
+                                                    <span>Not Found</span>
+                                                </div>
+                                                <div class="status-count" id="not-found-count">-</div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Severity Status Bar -->
+                                    <div class="status-card">
+                                        <div class="status-title">
+                                            ⚠️ Severity Analysis
+                                        </div>
+                                        <div class="status-bars">
+                                            <div class="status-item">
+                                                <div class="status-info">
+                                                    <div class="status-indicator severity-critical"></div>
+                                                    <span>High</span>
+                                                </div>
+                                                <div class="status-count" id="critical-count">-</div>
+                                            </div>
+                                            <div class="status-item">
+                                                <div class="status-info">
+                                                    <div class="status-indicator severity-medium"></div>
+                                                    <span>Medium</span>
+                                                </div>
+                                                <div class="status-count" id="medium-count">-</div>
+                                            </div>
+                                            <div class="status-item">
+                                                <div class="status-info">
+                                                    <div class="status-indicator severity-low"></div>
+                                                    <span>Low</span>
+                                                </div>
+                                                <div class="status-count" id="low-count">-</div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            
-                            <div class="liquid-progress-bar">
-                                <div class="liquid-container">
-                                    <div class="liquid-fill resolved" data-percentage="{{ progress_data.resolved }}">
-                                        <div class="liquid-wave"></div>
-                                        <div class="liquid-wave wave2"></div>
-                                    </div>
-                                    <div class="progress-text">
-                                        <span class="percentage">{{ progress_data.resolved }}%</span>
-                                        <span class="label">Resolved</span>
-                                    </div>
-                                </div>
-                            </div>
-                            
-                            <div class="liquid-progress-bar">
-                                <div class="liquid-container">
-                                    <div class="liquid-fill not-found" data-percentage="{{ progress_data.not_found }}">
-                                        <div class="liquid-wave"></div>
-                                        <div class="liquid-wave wave2"></div>
-                                    </div>
-                                    <div class="progress-text">
-                                        <span class="percentage">{{ progress_data.not_found }}%</span>
-                                        <span class="label">Not Found</span>
-                                    </div>
-                                </div>
-                            </div>
                         </div>
 
-                        <div class="progress-bar-group">
-                            <h3>Severity Levels</h3>
-                            <div class="liquid-progress-bar">
-                                <div class="liquid-container">
-                                    <div class="liquid-fill high" data-percentage="{{ progress_data.high }}">
-                                        <div class="liquid-wave"></div>
-                                        <div class="liquid-wave wave2"></div>
-                                    </div>
-                                    <div class="progress-text">
-                                        <span class="percentage">{{ progress_data.high }}%</span>
-                                        <span class="label">High</span>
-                                    </div>
-                                </div>
+                        <!-- Anomalies Tab -->
+                        <div id="anomalies" class="tab-pane">
+                            <div class="info-grid">
                             </div>
-                            
-                            <div class="liquid-progress-bar">
-                                <div class="liquid-container">
-                                    <div class="liquid-fill medium" data-percentage="{{ progress_data.medium }}">
-                                        <div class="liquid-wave"></div>
-                                        <div class="liquid-wave wave2"></div>
+
+                            <div class="info-section">
+                                <div class="charts-grid">
+                                    <div class="chart-container">
+                                        <h3 class="chart-title">📊 Anomaly Distribution</h3>
+                                        <div class="chart-wrapper">
+                                            <canvas id="pieChart"></canvas>
+                                        </div>
                                     </div>
-                                    <div class="progress-text">
-                                        <span class="percentage">{{ progress_data.medium }}%</span>
-                                        <span class="label">Medium</span>
+
+                                    <div class="chart-container ">
+                                        <h3 class="chart-title">⚠️ Severity-wise Analysis</h3>
+                                        <div class="chart-wrapper">
+                                            <canvas id="severityChartNew"></canvas>
+                                        </div>
                                     </div>
-                                </div>
-                            </div>
-                            
-                            <div class="liquid-progress-bar">
-                                <div class="liquid-container">
-                                    <div class="liquid-fill low" data-percentage="{{ progress_data.low }}">
-                                        <div class="liquid-wave"></div>
-                                        <div class="liquid-wave wave2"></div>
-                                    </div>
-                                    <div class="progress-text">
-                                        <span class="percentage">{{ progress_data.low }}%</span>
-                                        <span class="label">Low</span>
+                                    <div class="chart-container full-width-chart">
+                                        <h3 class="chart-title">🏢 Block-wise Anomalies</h3>
+                                        <div class="chart-wrapper">
+                                            <canvas id="blockChart"></canvas>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
 
-                    <!-- Analytics Boxes -->
-                    <div class="analytics-grid">
-                        <div class="analytics-box">
-                            <div class="analytics-icon power-loss">
-                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-content">
-                                <h4>Power Loss</h4>
-                                <p class="analytics-value">{{ analytics.power_loss or '0' }} kW</p>
-                                <p class="analytics-subtitle">Total power loss detected</p>
-                            </div>
-                        </div>
-
-                        <div class="analytics-box">
-                            <div class="analytics-icon revenue-loss">
-                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-content">
-                                <h4>Revenue Loss/yr</h4>
-                                <p class="analytics-value">₹{{ analytics.revenue_loss or '0' }}</p>
-                                <p class="analytics-subtitle">Annual revenue impact</p>
-                            </div>
-                        </div>
-
-                        <div class="analytics-box">
-                            <div class="analytics-icon capacity">
-                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-content">
-                                <h4>AC Capacity</h4>
-                                <p class="analytics-value">{{ plant.ac_capacity }} MW</p>
-                                <p class="analytics-subtitle">Alternating current capacity</p>
-                            </div>
-                        </div>
-
-                        <div class="analytics-box">
-                            <div class="analytics-icon capacity">
-                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-content">
-                                <h4>DC Capacity</h4>
-                                <p class="analytics-value">{{ plant.dc_capacity }} MW</p>
-                                <p class="analytics-subtitle">Direct current capacity</p>
-                            </div>
-                        </div>
-
-                        <div class="analytics-box">
-                            <div class="analytics-icon modules">
-                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-content">
-                                <h4>Total Modules</h4>
-                                <p class="analytics-value">{{ plant.total_modules_inspected }}</p>
-                                <p class="analytics-subtitle">Modules inspected</p>
-                            </div>
-                        </div>
-
-                        <div class="analytics-box">
-                            <div class="analytics-icon land">
-                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-content">
-                                <h4>Land Area</h4>
-                                <p class="analytics-value">{{ plant.land_area }} acres</p>
-                                <p class="analytics-subtitle">Total land coverage</p>
-                            </div>
-                        </div>
-
-                        <div class="analytics-box">
-                            <div class="analytics-icon inverters">
-                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-content">
-                                <h4>Number of Inverters</h4>
-                                <p class="analytics-value">{{ plant.no_of_inverters }}</p>
-                                <p class="analytics-subtitle">Total inverter count</p>
-                            </div>
-                        </div>
-
-                        <div class="analytics-box">
-                            <div class="analytics-icon blocks">
-                                <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-content">
-                                <h4>No of Blocks</h4>
-                                <p class="analytics-value">{{ plant.no_of_blocks }}</p>
-                                <p class="analytics-subtitle">Total block count</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Anomalies Section -->
-                <div id="anomalies" class="section-content">
-                    <div class="audit-header">
-                        <h3>Plant Audits & Anomaly Map</h3>
-                        {% if check_mate == 1 %}
-                        <button class="btn btn-primary" onclick="showAddAuditModal()">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-                            </svg>
-                            Add Audit
-                        </button>
-                        {% endif %}
-                    </div>
-
-                    <div class="audit-grid">
-                        {% if audits %}
-                        {% for audit in audits %}
-                        <div class="audit-card">
-                            <div class="audit-main" onclick="openAuditDetail('{{ audit._id }}')">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th>Name of Inspections</th>
-                                            <th>Modules Inspected</th>
-                                            <th>Anomalies Found</th>
-                                            <th>Corrected Anomalies</th>
-                                            <th>Start Date</th>
-                                            <th>Completion Date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td><a href="#" class="link">{{audit.name}}</a></td>
-                                            <td>{{ plant.total_modules_inspected }}</td>
-                                            <td><span class="red-badge">{{audit.anomalies_count}}</span></td>
-                                            <td><span class="green-badge">{{audit.anomalies_corrected_count}}</span></td>
-                                            <td>{{audit.start_date}}</td>
-                                            <td>{{audit.completion_date}}</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                                <div class="progress-">
-                                    <div class="progress-wrapper">
-                                        <progress value="{{audit.anomalies_corrected_count}}" max="{{audit.anomalies_count - audit.anomalies_corrected_count}}"></progress>
-                                        <div class="min-label">{{audit.anomalies_corrected_count}} </div>
-                                        <div class="max-label">{{audit.anomalies_count-audit.anomalies_corrected_count}}</div>
+                        <!-- Site Details Tab -->
+                        <div id="site-details" class="tab-pane">
+                            <div class="info-grid">
+                                <!-- Location Information -->
+                                <div class="info-section">
+                                    <div class="info-title">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                            </path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        Location Details
                                     </div>
-                                    <div class="stats">
-                                        Corrected: {{audit.anomalies_corrected_count}} | Total Anomalies: {{audit.anomalies_count}}
+                                    <div class="info-item">
+                                        <span class="info-value">Address</span>
+                                        <span class="info-value1">{{ plant.address }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-value">Country</span>
+                                        <span class="info-value1">{{ plant.country }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-value">Pincode</span>
+                                        <span class="info-value1">{{ plant.pincode }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-value">Latitude</span>
+                                        <span class="info-value1">{{ plant.latitude }}°</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-value">Longitude</span>
+                                        <span class="info-value1">{{ plant.longitude }}°</span>
                                     </div>
                                 </div>
+
+                                <!-- Technical Specifications -->
+                                <div class="info-section">
+                                    <div class="info-title">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor"
+                                            viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                            </path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                        </svg>
+                                        Technical Specifications
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-value">Plant Type</span>
+                                        <span class="info-value1">{{ plant.plant_type}}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-value">Mounting Type</span>
+                                        <span class="info-value1">{{ plant.mounting_type }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-value">Module Type</span>
+                                        <span class="info-value1">{{ plant.module_type }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-value">No. of Inverters</span>
+                                        <span class="info-value1">{{ plant.no_of_inverters }}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <span class="info-value">No. of Blocks</span>
+                                        <span class="info-value1">{{ plant.no_of_blocks }}</span>
+                                    </div>
+                                    {% if plant.inspection_date %}
+                                    <div class="info-item">
+                                        <span class="info-value">Inspection Date</span>
+                                        <span class="info-value1">{{ plant.inspection_date.strftime('%d %B %Y') if plant.inspection_date else 'Not Set' }}</span>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+
+                            <!-- Audit History -->
+                            <div class="audit-header">
+                                <h3>Plant Audits</h3>
 
                                 {% if check_mate == 1 %}
-                                <div class="tif-files-section">
-                                    <h4 class="section-title">TIF Files</h4>
-                                    <div class="tif-file-list">
-                                        {% for tif_file in audit.tif_files %}
-                                        <div class="tif-file-item">
-                                            <div class="tif-file-path">{{ tif_file.tif_path }}</div>
-                                            <div class="tif-file-status {{ tif_file.status|lower }}">
-                                                {% if tif_file.status == 'In Progress' %}
-                                                <div class="spinner"></div>
-                                                {% endif %}
-                                                {{ tif_file.status }}
-                                            </div>
-                                            <div class="tif-file-created-at">{{ tif_file.created_at }}</div>
-                                        </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
+                                <button class="btn btn-primary" onclick="showAddAuditModal()">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                                    </svg>
+                                    Add Audit
+                                </button>
                                 {% endif %}
                             </div>
 
-                            {% if check_mate == 1 %}
-                            <div class="audit-files">
-                                <div class="upload-section">
-                                    <button class="upload-btn" onclick="showAddTifModal('{{ audit._id }}')">
-                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                            <div class="audit-grid">
+                                {% if audits %}
+                                {% for audit in audits %}
+                                <div class="audit-card">
+                                    <div class="audit-main" onclick="openAuditDetail('{{ audit._id }}')">
+
+                                        <table>
+                                            <thead>
+                                                <tr>
+                                                    <th>Name of Inspections</th>
+                                                    <th>Modules Inspected</th>
+                                                    <th>Anomalies Found</th>
+                                                    <th>Corrected Anomalies</th>
+                                                    <th>Start Date</th>
+                                                    <th>Completion Date</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr>
+                                                    <td><a href="#" class="link">{{audit.name}}</a></td>
+                                                    <td>{{ plant.total_modules_inspected }}</td>
+                                                    <td><span class="red-badge">{{audit.anomalies_count}}</span></td>
+                                                    <td><span
+                                                            class="green-badge">{{audit.anomalies_corrected_count}}</span>
+                                                    </td>
+                                                    <td>{{audit.start_date}}</td>
+                                                    <td>{{audit.completion_date}}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+
+                                        <div class="progress-">
+                                            <div class="progress-wrapper">
+                                                <progress value="{{audit.anomalies_corrected_count}}" max="{{audit.anomalies_count - audit.anomalies_corrected_count}}"></progress>
+                                                <div class="min-label">{{audit.anomalies_corrected_count}} </div>
+                                                <div class="max-label">{{audit.anomalies_count-audit.anomalies_corrected_count}}</div>
+                                            </div>
+
+                                            <div class="stats">
+                                                Corrected: {{audit.anomalies_corrected_count}} | Total Anamolies:
+                                                {{audit.anomalies_count}}
+                                            </div>
+                                        </div>
+
+                                        {% if check_mate == 1 %}
+
+                                        <div class="tif-files-section">
+                                            <h4 class="section-title">TIF Files</h4>
+                                            <div class="tif-file-list">
+                                                {% for tif_file in audit.tif_files %}
+                                                <div class="tif-file-item">
+                                                    <div class="tif-file-path">{{ tif_file.tif_path }}</div>
+                                                    <div class="tif-file-status {{ tif_file.status|lower }}">
+                                                        {% if tif_file.status == 'In Progress' %}
+                                                        <div class="spinner"></div>
+                                                        {% endif %}
+                                                        {{ tif_file.status }}
+                                                    </div>
+                                                    <div class="tif-file-created-at">{{ tif_file.created_at }}</div>
+                                                </div>
+                                                {% endfor %}
+                                            </div>
+                                        </div>
+
+                                        {% endif %}
+                                    </div>
+                                    {% if check_mate == 1 %}
+                                    <div class="audit-files">
+                                        <div class="upload-section">
+                                            <button class="upload-btn" onclick="showAddTifModal('{{ audit._id }}')">
+                                                <svg width="16" height="16" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                                </svg>
+                                                Upload Files
+                                            </button>
+                                        </div>
+                                        <div id="fileList_{{ audit._id }}" class="file-list"></div>
+
+                                        <div class="upload-section">
+                                            <button class="upload-btn" onclick="showAddZipModal('{{ audit._id }}')">
+                                                <svg width="16" height="16" fill="none" stroke="currentColor"
+                                                    viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2" d="M12 4v16m8-8H4"></path>
+                                                </svg>
+                                                Upload Images
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <div id="zipFileList_{{ audit._id }}" class="file-list"></div>
+                                    {% endif %}
+
+                                </div>
+                                {% endfor %}
+                                {% else %}
+                                <div class="empty-state">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
+                                        </path>
+                                    </svg>
+                                    <h3>No audits found</h3>
+                                    <p>Start by creating your first audit for this plant</p>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Report Tab -->
+                        <div id="report" class="tab-pane">
+                            <div class="info-section">
+                                <div class="info-title">
+                                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
+                                        </path>
+                                    </svg>
+                                    Plant Report
+                                </div>
+                                <div style="text-align: center; padding: 40px 20px;">
+                                    <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-bottom: 20px; opacity: 0.5;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                        </path>
+                                    </svg>
+                                    <h3 style="color: #64748b; margin-bottom: 10px;">Report Generation</h3>
+                                    <p style="color: #94a3b8; margin-bottom: 20px;">Generate comprehensive reports for this plant</p>
+                                    <button class="btn btn-primary" onclick="generateReport()">
+                                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z">
+                                            </path>
                                         </svg>
-                                        Upload Files
+                                        Generate Report
                                     </button>
                                 </div>
-                                <div id="fileList_{{ audit._id }}" class="file-list"></div>
-
-                                <div class="upload-section">
-                                    <button class="upload-btn" onclick="showAddZipModal('{{ audit._id }}')">
-                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                                        </svg>
-                                        Upload Images
-                                    </button>
-                                </div>
-                            </div>
-                            <div id="zipFileList_{{ audit._id }}" class="file-list"></div>
-                            {% endif %}
-                        </div>
-                        {% endfor %}
-                        {% else %}
-                        <div class="empty-state">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
-                                </path>
-                            </svg>
-                            <h3>No audits found</h3>
-                            <p>Start by creating your first audit for this plant</p>
-                        </div>
-                        {% endif %}
-                    </div>
-                </div>
-
-                <!-- Site Details Section -->
-                <div id="site-details" class="section-content">
-                    <div class="info-grid">
-                        <!-- Location Information -->
-                        <div class="info-section">
-                            <div class="info-title">
-                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                    </path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                                Location Details
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Plant Name</span>
-                                <span class="info-value">{{ plant.name }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Client</span>
-                                <span class="info-value">{{ plant.client }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Address</span>
-                                <span class="info-value">{{ plant.address }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Country</span>
-                                <span class="info-value">{{ plant.country }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Pincode</span>
-                                <span class="info-value">{{ plant.pincode }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Latitude</span>
-                                <span class="info-value">{{ plant.latitude }}°</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Longitude</span>
-                                <span class="info-value">{{ plant.longitude }}°</span>
-                            </div>
-                        </div>
-
-                        <!-- Technical Specifications -->
-                        <div class="info-section">
-                            <div class="info-title">
-                                <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                                    </path>
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                </svg>
-                                Technical Specifications
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Plant Type</span>
-                                <span class="info-value">{{ plant.plant_type}}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Mounting Type</span>
-                                <span class="info-value">{{ plant.mounting_type }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">Module Type</span>
-                                <span class="info-value">{{ plant.module_type }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">No. of Inverters</span>
-                                <span class="info-value">{{ plant.no_of_inverters }}</span>
-                            </div>
-                            <div class="info-item">
-                                <span class="info-label">No. of Blocks</span>
-                                <span class="info-value">{{ plant.no_of_blocks }}</span>
-                            </div>
-                            {% if plant.inspection_date %}
-                            <div class="info-item">
-                                <span class="info-label">Inspection Date</span>
-                                <span class="info-value">{{ plant.inspection_date if plant.inspection_date else 'Not Set' }}</span>
-                            </div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Report Section -->
-                <div id="report" class="section-content">
-                    <div class="charts-grid">
-                        <div class="chart-container">
-                            <h3 class="chart-title">📊 Anomaly Distribution</h3>
-                            <div class="chart-wrapper">
-                                <canvas id="pieChart"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="chart-container">
-                            <h3 class="chart-title">⚠️ Severity-wise Analysis</h3>
-                            <div class="chart-wrapper">
-                                <canvas id="severityChartNew"></canvas>
-                            </div>
-                        </div>
-
-                        <div class="chart-container full-width-chart">
-                            <h3 class="chart-title">🏢 Block-wise Anomalies</h3>
-                            <div class="chart-wrapper">
-                                <canvas id="blockChart"></canvas>
                             </div>
                         </div>
                     </div>
@@ -2273,40 +2212,51 @@
             }
         }
 
-        // Section navigation
-        function showSection(sectionName) {
-            // Hide all sections
-            document.querySelectorAll('.section-content').forEach(section => {
-                section.classList.remove('active');
+        // Navigation and tab functionality
+        function showTab(tabName) {
+            // Hide all tab panes
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('active');
             });
 
-            // Remove active from all nav buttons
+            // Remove active class from all navigation buttons
             document.querySelectorAll('.nav-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
 
-            // Show selected section
-            document.getElementById(sectionName).classList.add('active');
+            // Show selected tab
+            document.getElementById(tabName).classList.add('active');
             
-            // Add active to clicked button
-            event.target.classList.add('active');
+            // Add active class to corresponding nav button
+            const activeBtn = document.querySelector(`.${tabName}-btn`);
+            if (activeBtn) {
+                activeBtn.classList.add('active');
+            }
+
+            // Initialize charts when anomalies tab is shown
+            if (tabName === 'anomalies' && data && data.length > 0) {
+                setTimeout(() => {
+                    createPieChart();
+                    createBlockChart();
+                    createPieChartForSaviry();
+                }, 100);
+            }
         }
 
-        // Initialize liquid progress bars
-        function initLiquidProgressBars() {
-            const liquidFills = document.querySelectorAll('.liquid-fill');
-            
-            setTimeout(() => {
-                liquidFills.forEach(fill => {
-                    const percentage = parseInt(fill.getAttribute('data-percentage')) || 0;
-                    fill.style.height = percentage + '%';
-                });
-            }, 500);
-        }
-
-        // Tab functionality (for backward compatibility)
-        function showTab(tabName) {
-            showSection(tabName);
+        // Navigation button functions
+        function openAnomaliesMap() {
+            // Get the first audit ID if available
+            const auditElements = document.querySelectorAll('[onclick*="openAuditDetail"]');
+            if (auditElements.length > 0) {
+                const onclickValue = auditElements[0].getAttribute('onclick');
+                const auditId = onclickValue.match(/'([^']+)'/)[1];
+                if (auditId) {
+                    window.location.href = '/audit/' + auditId;
+                }
+            } else {
+                // If no audits available, show the anomalies tab
+                showTab('anomalies');
+            }
         }
 
         // Modal functions
@@ -2352,9 +2302,7 @@
             };
 
             xhr.send(formData);
-            hideAddTifModal()
             location.reload();
-            showTab('audits')
         });
 
         // Add zip file form submission
@@ -2486,9 +2434,12 @@
         }
 
         // Sample data - replace with your actual data
-        const data = {{ analysis_data | tojson | safe}}
+        var data = {{ analysis_data | tojson | safe }};
+        if (!data) {
+            data = [];
+        }
 
-        fault_colors =  {
+        var fault_colors =  {
             "Cell": "#FF0000",
             "Multi Cell": "#FFA500",
             "Bypass Diode": "#9C27B0",
@@ -2651,14 +2602,92 @@
 
         // Initialize dashboard
         function init() {
-            createPieChart();
-            createBlockChart();
-            createPieChartForSaviry();
-            initLiquidProgressBars();
+            updateSeverityCounts();
+            if (data && data.length > 0) {
+                // Charts will be initialized when anomalies tab is shown
+            }
+        }
+
+        // Update severity counts in overview tab with fill effects
+        function updateSeverityCounts() {
+            if (!data || data.length === 0) {
+                return;
+            }
+
+            const severityCounts = {
+                'Remediation Recommended (High)': 0,
+                'Monitor & Remediate (Mid)': 0,
+                'Long-Term Monitoring (Low)': 0
+            };
+
+            // For now, setting dummy data for pending/resolved/not found
+            // This would be replaced with actual data from the backend
+            const statusCounts = {
+                pending: Math.floor(Math.random() * 50) + 10,
+                resolved: Math.floor(Math.random() * 30) + 5,
+                notFound: Math.floor(Math.random() * 15) + 2
+            };
+
+            data.forEach(item => {
+                if (severityCounts.hasOwnProperty(item.Severity)) {
+                    severityCounts[item.Severity]++;
+                }
+            });
+
+            // Calculate max values for percentage calculation
+            const maxSeverity = Math.max(...Object.values(severityCounts));
+            const maxStatus = Math.max(...Object.values(statusCounts));
+
+            // Update the severity counts with fill effects
+            updateStatusBar('critical-count', severityCounts['Remediation Recommended (High)'] || 0, maxSeverity, '#EF4444', '239, 68, 68');
+            updateStatusBar('medium-count', severityCounts['Monitor & Remediate (Mid)'] || 0, maxSeverity, '#F59E0B', '245, 158, 11');
+            updateStatusBar('low-count', severityCounts['Long-Term Monitoring (Low)'] || 0, maxSeverity, '#10B981', '16, 185, 129');
+
+            // Update the status counts with fill effects
+            updateStatusBar('pending-count', statusCounts.pending, maxStatus, '#3B82F6', '59, 130, 246');
+            updateStatusBar('resolved-count', statusCounts.resolved, maxStatus, '#10B981', '16, 185, 129');
+            updateStatusBar('not-found-count', statusCounts.notFound, maxStatus, '#64748B', '100, 116, 139');
+        }
+
+        // Function to update individual status bar with fill effect
+        function updateStatusBar(elementId, count, maxValue, color, rgbValues) {
+            const element = document.getElementById(elementId);
+            if (!element) return;
+
+            const parentItem = element.closest('.status-item');
+            if (!parentItem) return;
+
+            // Update count
+            element.textContent = count || '-';
+
+            // Calculate fill percentage (minimum 5% for visibility, maximum 95%)
+            const percentage = maxValue > 0 ? Math.max(5, Math.min(95, (count / maxValue) * 100)) : 5;
+
+            // Apply CSS custom properties for fill effect
+            parentItem.style.setProperty('--fill-percentage', `${percentage}%`);
+            parentItem.style.setProperty('--fill-color', color);
+            parentItem.style.setProperty('--fill-color-rgb', rgbValues);
+        }
+
+            if (pendingCount) pendingCount.textContent = statusCounts.pending;
+            if (resolvedCount) resolvedCount.textContent = statusCounts.resolved;
+            if (notFoundCount) notFoundCount.textContent = statusCounts.notFound;
         }
 
         // Load everything when page is ready
-        document.addEventListener('DOMContentLoaded', init);
+        document.addEventListener('DOMContentLoaded', function() {
+            init();
+            
+            // Handle URL hash for tab navigation
+            const hash = window.location.hash.substring(1);
+            if (hash && ['overview', 'anomalies', 'site-details', 'report'].includes(hash)) {
+                // Find and click the appropriate tab button
+                const tabButton = document.querySelector(`[onclick="showTab('${hash}')"]`);
+                if (tabButton) {
+                    tabButton.click();
+                }
+            }
+        });
     </script>
 
 </body>
