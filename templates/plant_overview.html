@@ -713,6 +713,10 @@
                         <canvas id="pieChart" class="chart"></canvas>
                     </div>
                     <div class="chart-container">
+                        <h3 class="chart-title">Anomalies vs Categories</h3>
+                        <canvas id="anomalyVsChart" class="chart"></canvas>
+                    </div>
+                    <div class="chart-container">
                         <h3 class="chart-title">Severity by Type</h3>
                         <canvas id="barChart" class="chart"></canvas>
                     </div>
@@ -830,10 +834,10 @@
                 Math.round((count / total) * 100)
             );
 
-            // Pie Chart with exploded slice
+            // Pie Chart with exploded slice and donut hole
             const pieCtx = document.getElementById('pieChart').getContext('2d');
             new Chart(pieCtx, {
-                type: 'pie',
+                type: 'doughnut',
                 data: {
                     labels: anomalyData.labels.map((label, i) => 
                         `${label} (${anomalyData.counts[i]} - ${percentages[i]}%)`),
@@ -848,6 +852,7 @@
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
+                    cutout: '60%', // Creates the donut hole
                     layout: {
                         padding: 5
                     },
@@ -870,6 +875,80 @@
                                     const value = context.raw || 0;
                                     const percentage = Math.round((value / total) * 100);
                                     return `${label}: ${value} (${percentage}%)`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Anomalies vs Categories Bar Chart
+            const anomalyVsCtx = document.getElementById('anomalyVsChart').getContext('2d');
+            
+            // Sample data for the categories you specified
+            const anomalyVsData = {
+                labels: [
+                    'Block 1-5', 'Block 6-10', 'Block 11-15', 'Block 16-19', 'Block 20-25',
+                    'Block 26-30', 'Block 31-36', 'Foreign Object', 'Junction Box',
+                    'Isolated Module', 'Bypass Diode', 'Multi Hotspot', 'Vegetation',
+                    'Short Circuit', 'Substring SC', 'Missing Module', 'Single Hotspot', 'LA/TP Shadow'
+                ],
+                counts: [8, 12, 15, 7, 10, 6, 9, 3, 5, 14, 11, 8, 4, 2, 6, 1, 13, 7]
+            };
+
+            new Chart(anomalyVsCtx, {
+                type: 'bar',
+                data: {
+                    labels: anomalyVsData.labels,
+                    datasets: [{
+                        label: 'Anomaly Count',
+                        data: anomalyVsData.counts,
+                        backgroundColor: [
+                            '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
+                            '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1',
+                            '#14B8A6', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4',
+                            '#84CC16', '#F97316', '#EC4899'
+                        ],
+                        borderWidth: 1,
+                        borderColor: 'rgba(255, 255, 255, 0.8)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    layout: {
+                        padding: 5
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                font: {
+                                    size: 8
+                                },
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: {
+                                    size: 9
+                                }
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            callbacks: {
+                                title: function(context) {
+                                    return context[0].label;
+                                },
+                                label: function(context) {
+                                    return `Count: ${context.raw}`;
                                 }
                             }
                         }
