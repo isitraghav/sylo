@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ plant.name }} - Overview</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo/logo1.png') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #F8FAFC;
+            color: #1E293B;
+            line-height: 1.6;
+        }
+
+        .main-app {
+            min-height: 100vh;
+            display: flex;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 160px;
+            background: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100vh;
+            z-index: 50;
+        }
+
+        .sidebar-logo {
+            padding: 16px;
+            border-bottom: 1px solid #E2E8F0;
+        }
+
+        .sidebar-logo .logo-text {
+            color: #16A34A;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .sidebar-logo .logo-subtext {
+            color: #64748B;
+            font-size: 14px;
+        }
+
+        .sidebar-nav {
+            margin-top: 16px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            font-size: 14px;
+            text-decoration: none;
+            color: #374151;
+            transition: all 0.2s;
+        }
+
+        .sidebar-item:hover,
+        .sidebar-item.active {
+            background: #16A34A;
+            color: white;
+            border-right: 2px solid #16A34A;
+        }
+
+        .sidebar-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 12px;
+            flex-shrink: 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 160px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #64748B;
+        }
+
+        .breadcrumb a {
+            color: #64748B;
+            text-decoration: none;
+        }
+
+        .breadcrumb .current {
+            color: #111827;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            padding: 8px 16px;
+            background: #16A34A;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .back-button:hover {
+            background: #15803D;
+        }
+
+        /* Navigation Tabs */
+        .nav-tabs {
+            background: white;
+            border-bottom: 1px solid #E2E8F0;
+            padding: 16px 24px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 4px;
+        }
+
+        .tab-btn {
+            display: flex;
+            align-items: center;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: transparent;
+            color: #64748B;
+        }
+
+        .tab-btn.active {
+            background: #16A34A;
+            color: white;
+            box-shadow: 0 4px 12px rgba(22, 163, 74, 0.3);
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #F3F4F6;
+        }
+
+        .tab-icon {
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+        }
+
+        /* Content */
+        .content {
+            padding: 24px;
+        }
+
+        /* Overview Grid */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 24px;
+        }
+
+        /* Progress Bars Section */
+        .progress-section {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        .progress-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .progress-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .progress-items {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+
+        /* Liquid Progress Bar */
+        .liquid-progress {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .liquid-circle {
+            position: relative;
+            width: 64px;
+            height: 64px;
+            border-radius: 50%;
+            border: 4px solid #E5E7EB;
+            overflow: hidden;
+            background: #F9FAFB;
+        }
+
+        .liquid-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            transition: height 1s ease-out;
+            border-radius: 50%;
+        }
+
+        .liquid-wave {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.3);
+            animation: wave 2s linear infinite;
+        }
+
+        @keyframes wave {
+            0% { transform: translateX(-50%); }
+            100% { transform: translateX(-25%); }
+        }
+
+        .liquid-text {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #374151;
+        }
+
+        .liquid-info {
+            flex: 1;
+        }
+
+        .liquid-label {
+            font-weight: 500;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .liquid-subtitle {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        /* Color variants for liquid progress */
+        .liquid-pending { background: linear-gradient(to top, #F59E0B, #FBBF24); }
+        .liquid-resolved { background: linear-gradient(to top, #10B981, #34D399); }
+        .liquid-not-found { background: linear-gradient(to top, #EF4444, #F87171); }
+        .liquid-high { background: linear-gradient(to top, #DC2626, #EF4444); }
+        .liquid-medium { background: linear-gradient(to top, #F59E0B, #FBBF24); }
+        .liquid-low { background: linear-gradient(to top, #10B981, #34D399); }
+
+        /* Analytics Grid */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+
+        .analytics-card {
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.2s;
+        }
+
+        .analytics-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .analytics-content {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .analytics-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .analytics-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .analytics-info {
+            flex: 1;
+        }
+
+        .analytics-title {
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 4px;
+        }
+
+        .analytics-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #16A34A;
+            margin-bottom: 4px;
+        }
+
+        .analytics-subtitle {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        /* Icon colors */
+        .icon-power-loss { background: linear-gradient(135deg, #EF4444, #DC2626); }
+        .icon-revenue-loss { background: linear-gradient(135deg, #F59E0B, #D97706); }
+        .icon-capacity { background: linear-gradient(135deg, #06B6D4, #0891B2); }
+        .icon-modules { background: linear-gradient(135deg, #8B5CF6, #7C3AED); }
+        .icon-land { background: linear-gradient(135deg, #10B981, #059669); }
+        .icon-inverters { background: linear-gradient(135deg, #6366F1, #4F46E5); }
+        .icon-blocks { background: linear-gradient(135deg, #EC4899, #DB2777); }
+
+        /* Anomalies Tab */
+        .anomalies-content {
+            display: none;
+        }
+
+        .anomalies-content.active {
+            display: block;
+        }
+
+        .capacity-cards {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .capacity-card {
+            background: white;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .capacity-title {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 4px;
+        }
+
+        .capacity-value {
+            font-size: 20px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .anomalies-summary {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+        }
+
+        .anomalies-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .anomalies-legend {
+            display: flex;
+            gap: 16px;
+            font-size: 14px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 2px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 16px;
+            background: #E5E7EB;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(to right, #F59E0B, #3B82F6, #10B981, #8B5CF6);
+            width: 40%;
+            border-radius: 8px;
+        }
+
+        .total-anomalies {
+            text-align: center;
+        }
+
+        .total-number {
+            font-size: 32px;
+            font-weight: bold;
+            color: #111827;
+        }
+
+        .total-label {
+            color: #6B7280;
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .anomaly-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 16px;
+        }
+
+        .anomaly-table th,
+        .anomaly-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border-bottom: 1px solid #E5E7EB;
+        }
+
+        .anomaly-table th {
+            font-weight: 600;
+            color: #6B7280;
+            font-size: 14px;
+        }
+
+        .anomaly-table td {
+            color: #111827;
+            font-size: 14px;
+        }
+
+        .anomaly-table .text-right {
+            text-align: right;
+        }
+
+        .bar-chart-card {
+            grid-column: 1 / -1;
+        }
+
+        /* Other tabs */
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .placeholder-content {
+            background: white;
+            border-radius: 8px;
+            padding: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            color: #6B7280;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .capacity-cards {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+            }
+            
+            .main-content {
+                margin-left: 0;
+            }
+            
+            .capacity-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .anomalies-legend {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-app">
+        <!-- Fixed Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-logo">
+                <img src="{{ url_for('static', filename='images/logo/logo1.png') }}" alt="Solar Plant Manager Logo">
+            </div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="/homepage">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                            </path>
+                        </svg>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="/homepage" class="active">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                            <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        Thermography
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                        <path d="M3 20 V4 H21" />
+                        <path d="M3 18 C6 14, 12 8, 21 4" />
+                      </svg>
+                      IV Curve Testing
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                        <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
+                        <path d="M4 10h16M4 14h16" />
+                        <path d="M10 4v16" />
+                      </svg>
+                      EL Testing
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                        <path d="M12 3v18" />
+                        <path d="M6 6h12M4 10h16M6 14h12" />
+                        <path d="M6 6l-2 4M18 6l2 4M6 14l-2-4M18 14l2-4" />
+                      </svg>
+                      Transmission Line
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4">
+                            </path>
+                        </svg>
+                        Data
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="breadcrumb">
+                    <a href="/homepage">Plants</a>
+                    <span>›</span>
+                    <a href="/plant/{{ plant._id }}">{{ plant.name }}</a>
+                    <span>›</span>
+                    <span>Overview</span>
+                </div>
+                <div class="header-actions">
+                    <a href="/plant/{{ plant._id }}" class="btn btn-secondary">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Back to Plant
+                    </a>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <!-- Top Navigation Buttons -->
+                <div class="top-navigation">
+                    <div class="nav-buttons">
+                        <a href="/plant/{{ plant._id }}/overview" class="nav-btn active">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Overview
+                        </a>
+                        <a href="/plant/{{ plant._id }}/anomalies" class="nav-btn">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.464 0L4.35 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                            </svg>
+                            Anomalies
+                        </a>
+                        <a href="/plant/{{ plant._id }}/site-details" class="nav-btn">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Site Details
+                        </a>
+                        <a href="/plant/{{ plant._id }}/report" class="nav-btn">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Report
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Liquid Progress Bars -->
+                <div class="progress-bars-container">
+                    <div class="progress-bar-group">
+                        <h3>Anomaly Status</h3>
+                        <div class="liquid-progress-bar">
+                            <div class="liquid-container">
+                                <div class="liquid-fill pending" data-percentage="{{ progress_data.pending }}">
+                                    <div class="liquid-wave"></div>
+                                    <div class="liquid-wave wave2"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span class="percentage">{{ progress_data.pending }}%</span>
+                                    <span class="label">Pending</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="liquid-progress-bar">
+                            <div class="liquid-container">
+                                <div class="liquid-fill resolved" data-percentage="{{ progress_data.resolved }}">
+                                    <div class="liquid-wave"></div>
+                                    <div class="liquid-wave wave2"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span class="percentage">{{ progress_data.resolved }}%</span>
+                                    <span class="label">Resolved</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="liquid-progress-bar">
+                            <div class="liquid-container">
+                                <div class="liquid-fill not-found" data-percentage="{{ progress_data.not_found }}">
+                                    <div class="liquid-wave"></div>
+                                    <div class="liquid-wave wave2"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span class="percentage">{{ progress_data.not_found }}%</span>
+                                    <span class="label">Not Found</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="progress-bar-group">
+                        <h3>Severity Levels</h3>
+                        <div class="liquid-progress-bar">
+                            <div class="liquid-container">
+                                <div class="liquid-fill high" data-percentage="{{ progress_data.high }}">
+                                    <div class="liquid-wave"></div>
+                                    <div class="liquid-wave wave2"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span class="percentage">{{ progress_data.high }}%</span>
+                                    <span class="label">High</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="liquid-progress-bar">
+                            <div class="liquid-container">
+                                <div class="liquid-fill medium" data-percentage="{{ progress_data.medium }}">
+                                    <div class="liquid-wave"></div>
+                                    <div class="liquid-wave wave2"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span class="percentage">{{ progress_data.medium }}%</span>
+                                    <span class="label">Medium</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="liquid-progress-bar">
+                            <div class="liquid-container">
+                                <div class="liquid-fill low" data-percentage="{{ progress_data.low }}">
+                                    <div class="liquid-wave"></div>
+                                    <div class="liquid-wave wave2"></div>
+                                </div>
+                                <div class="progress-text">
+                                    <span class="percentage">{{ progress_data.low }}%</span>
+                                    <span class="label">Low</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytics Boxes -->
+                <div class="analytics-grid">
+                    <div class="analytics-box">
+                        <div class="analytics-icon power-loss">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <div class="analytics-content">
+                            <h4>Power Loss</h4>
+                            <p class="analytics-value">{{ analytics.power_loss or '0' }} kW</p>
+                            <p class="analytics-subtitle">Total power loss detected</p>
+                        </div>
+                    </div>
+
+                    <div class="analytics-box">
+                        <div class="analytics-icon revenue-loss">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                            </svg>
+                        </div>
+                        <div class="analytics-content">
+                            <h4>Revenue Loss/yr</h4>
+                            <p class="analytics-value">₹{{ analytics.revenue_loss or '0' }}</p>
+                            <p class="analytics-subtitle">Annual revenue impact</p>
+                        </div>
+                    </div>
+
+                    <div class="analytics-box">
+                        <div class="analytics-icon capacity">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                        </div>
+                        <div class="analytics-content">
+                            <h4>AC Capacity</h4>
+                            <p class="analytics-value">{{ plant.ac_capacity }} MW</p>
+                            <p class="analytics-subtitle">Alternating current capacity</p>
+                        </div>
+                    </div>
+
+                    <div class="analytics-box">
+                        <div class="analytics-icon capacity">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <div class="analytics-content">
+                            <h4>DC Capacity</h4>
+                            <p class="analytics-value">{{ plant.dc_capacity }} MW</p>
+                            <p class="analytics-subtitle">Direct current capacity</p>
+                        </div>
+                    </div>
+
+                    <div class="analytics-box">
+                        <div class="analytics-icon modules">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                            </svg>
+                        </div>
+                        <div class="analytics-content">
+                            <h4>Total Modules</h4>
+                            <p class="analytics-value">{{ plant.total_modules_inspected }}</p>
+                            <p class="analytics-subtitle">Modules inspected</p>
+                        </div>
+                    </div>
+
+                    <div class="analytics-box">
+                        <div class="analytics-icon land">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zM21 5a2 2 0 00-2-2h-4a2 2 0 00-2 2v12a4 4 0 004 4h4a2 2 0 002-2V5z"></path>
+                            </svg>
+                        </div>
+                        <div class="analytics-content">
+                            <h4>Land Area</h4>
+                            <p class="analytics-value">{{ plant.land_area }} acres</p>
+                            <p class="analytics-subtitle">Total land coverage</p>
+                        </div>
+                    </div>
+
+                    <div class="analytics-box">
+                        <div class="analytics-icon inverters">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
+                        </div>
+                        <div class="analytics-content">
+                            <h4>Number of Inverters</h4>
+                            <p class="analytics-value">{{ plant.no_of_inverters }}</p>
+                            <p class="analytics-subtitle">Total inverter count</p>
+                        </div>
+                    </div>
+
+                    <div class="analytics-box">
+                        <div class="analytics-icon blocks">
+                            <svg width="24" height="24" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                            </svg>
+                        </div>
+                        <div class="analytics-content">
+                            <h4>No of Blocks</h4>
+                            <p class="analytics-value">{{ plant.no_of_blocks }}</p>
+                            <p class="analytics-subtitle">Total block count</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts Grid -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <h3 class="chart-title">Anomaly Distribution</h3>
+                        <canvas id="donutChart" width="300" height="300"></canvas>
+                    </div>
+                    
+                    <div class="chart-card">
+                        <h3 class="chart-title">Severity by Type</h3>
+                        <canvas id="barChart" width="300" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Animate liquid progress bars on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const liquidFills = document.querySelectorAll('.liquid-fill');
+            
+            liquidFills.forEach(fill => {
+                const percentage = fill.getAttribute('data-percentage');
+                
+                // Animate the fill height
+                setTimeout(() => {
+                    fill.style.height = percentage + '%';
+                }, 500);
+            });
+
+            // Initialize Donut Chart
+            const donutCtx = document.getElementById('donutChart').getContext('2d');
+            new Chart(donutCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['High Severity', 'Medium Severity', 'Low Severity', 'Resolved'],
+                    datasets: [{
+                        data: [{{ anomaly_data.high if anomaly_data else 25 }}, {{ anomaly_data.medium if anomaly_data else 35 }}, {{ anomaly_data.low if anomaly_data else 30 }}, {{ anomaly_data.resolved if anomaly_data else 10 }}],
+                        backgroundColor: [
+                            '#EF4444', // Red for high
+                            '#F59E0B', // Orange for medium  
+                            '#10B981', // Green for low
+                            '#6B7280'  // Gray for resolved
+                        ],
+                        borderWidth: 0,
+                        cutout: '60%'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                padding: 20,
+                                usePointStyle: true
+                            }
+                        }
+                    }
+                }
+            });
+
+            // Initialize Stacked Bar Chart
+            const barCtx = document.getElementById('barChart').getContext('2d');
+            new Chart(barCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Hotspot', 'Shading', 'Soiling', 'Damage', 'Other'],
+                    datasets: [{
+                        label: 'High',
+                        data: [12, 8, 15, 5, 3],
+                        backgroundColor: '#EF4444'
+                    }, {
+                        label: 'Medium', 
+                        data: [18, 12, 22, 8, 6],
+                        backgroundColor: '#F59E0B'
+                    }, {
+                        label: 'Low',
+                        data: [25, 18, 30, 12, 10],
+                        backgroundColor: '#10B981'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            stacked: true
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>

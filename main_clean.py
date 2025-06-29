@@ -391,20 +391,12 @@ def plant_overview(plant_id):
             'low': 30
         }
         
-        anomaly_data = {
-            'high': 25,
-            'medium': 35,
-            'low': 30,
-            'resolved': 10
-        }
-        
         plant = make_serializable(plant)
         
         return render_template('plant_overview.html', 
                              plant=plant, 
                              analytics=analytics,
-                             progress_data=progress_data,
-                             anomaly_data=anomaly_data)
+                             progress_data=progress_data)
     except Exception as e:
         print(f"Error in plant_overview: {e}")
         flash('Error loading overview page', 'error')
