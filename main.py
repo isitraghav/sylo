@@ -243,6 +243,7 @@ def plants_api():
             'created_by': session['user_id'],
             'no_of_inverters':data.get('no_of_inverters'),
             'no_of_blocks': data.get('no_of_blocks'),
+            'inspection_date': datetime.strptime(data.get('inspection_date'), '%Y-%m-%d') if data.get('inspection_date') else None,
             'created_at': datetime.utcnow(),
         }
 

@@ -1302,6 +1302,12 @@
                                         <span class="info-value">No. of Blocks</span>
                                         <span class="info-value1">{{ plant.no_of_blocks }}</span>
                                     </div>
+                                    {% if plant.inspection_date %}
+                                    <div class="info-item">
+                                        <span class="info-value">Inspection Date</span>
+                                        <span class="info-value1">{{ plant.inspection_date.strftime('%d %B %Y') if plant.inspection_date else 'Not Set' }}</span>
+                                    </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>

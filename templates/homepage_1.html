@@ -229,7 +229,8 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             overflow: hidden;
             transition: all 0.3s ease;
-            cursor: pointer;
+            display: flex;
+            flex-direction: column;
         }
 
         .plant-card:hover {
@@ -250,25 +251,92 @@
 
         .plant-details {
             padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .plant-name {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 20px;
+            font-weight: 700;
             color: var(--text-color);
             margin-bottom: 8px;
+            line-height: 1.2;
         }
 
-        .plant-capacity {
+        .plant-location {
             font-size: 14px;
             color: var(--text-secondary);
             margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .plant-capacity {
+            font-size: 16px;
+            color: var(--text-color);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .plant-inspection {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .plant-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .plant-btn {
+            flex: 1;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .btn-details {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-details:hover {
+            background: #1e5f32;
+            transform: translateY(-1px);
+        }
+
+        .btn-anomalies {
+            background: var(--error-color);
+            color: white;
+        }
+
+        .btn-anomalies:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
         }
 
         .plant-info {
             font-size: 13px;
             color: var(--text-secondary);
             line-height: 1.4;
+            display: none; /* Hide the old info section */
         }
 
         .plant-info div {
@@ -563,19 +631,52 @@
                     {% if plants %}
                     <div class="plants-grid">
                         {% for plant in plants %}
-                        <div class="plant-card" onclick="openPlantDetail('{{ plant._id }}')">
+                        <div class="plant-card">
                             <div class="plant-image">
                                 <img src="{{ url_for('static', filename='images/new_plan_image.jpeg') }}" alt="{{ plant.name }}" style="width: 100%; height: 100%; object-fit: cover;">
                             </div>
                             <div class="plant-details">
                                 <div class="plant-name">{{ plant.name }}</div>
-                                <div class="plant-capacity">⚡ AC: {{ plant.ac_capacity }} MW | DC: {{ plant.dc_capacity
-                                    }} MW</div>
+                                <div class="plant-location">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    {{ plant.state }}, {{ plant.country }}
+                                </div>
+                                <div class="plant-capacity">⚡ AC: {{ plant.ac_capacity }} MW | DC: {{ plant.dc_capacity }} MW</div>
+                                {% if plant.inspection_date %}
+                                <div class="plant-inspection">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Inspected: {{ plant.inspection_date.strftime('%d %b %Y') if plant.inspection_date else 'Not Set' }}
+                                </div>
+                                {% endif %}
+                                <div class="plant-actions">
+                                    <button class="plant-btn btn-details" onclick="openPlantDetail('{{ plant._id }}')">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                        </svg>
+                                        Site Details
+                                    </button>
+                                    <button class="plant-btn btn-anomalies" onclick="openPlantAnomalies('{{ plant._id }}')">
+                                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
+                                        </svg>
+                                        Anomalies
+                                    </button>
+                                </div>
+                                
+                                <!-- Hidden old info for backward compatibility -->
                                 <div class="plant-info">
                                     <div><strong>Client:</strong> {{ plant.client }}</div>
                                     <div><strong>Location:</strong> {{ plant.state }}, {{ plant.country }}</div>
                                     <div><strong>Module:</strong> {{ plant.module_type }}</div>
                                     <div><strong>Mount:</strong> {{ plant.mounting_type }}</div>
+                                    {% if plant.inspection_date %}
+                                    <div><strong>Inspection:</strong> {{ plant.inspection_date.strftime('%d %b %Y') if plant.inspection_date else 'Not Set' }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -704,6 +805,11 @@
                             <label class="form-label">Mounting Type</label>
                             <input type="text" name="mounting_type" class="form-input" required>
                         </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Inspection Date</label>
+                            <input type="date" name="inspection_date" class="form-input" required>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -737,6 +843,9 @@
         // Modal functions
         function showAddPlantModal() {
             document.getElementById('addPlantModal').classList.remove('hidden');
+            // Set today's date as default for inspection date
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelector('input[name="inspection_date"]').value = today;
         }
 
         function hideAddPlantModal() {
@@ -779,6 +888,11 @@
 
         function openPlantDetail(plantId) {
             window.location.href = '/plant/' + plantId;
+        }
+
+        function openPlantAnomalies(plantId) {
+            // Navigate to plant detail page and show audits tab
+            window.location.href = '/plant/' + plantId + '#audits';
         }
 
         function toggleUserDropdown() {
