@@ -287,85 +287,23 @@ def plants_api():
 @app.route('/plant/<plant_id>')
 @login_required
 def plant_detail(plant_id):
-    plant = plants_collection.find_one({'_id': ObjectId(plant_id)})
-    if not plant:
-        flash('Plant not found', 'error')
-        return redirect(url_for('homepage'))
-
-    # Get audits for this plant
-    audits = list(audits_collection.find({'plant_id': str(plant['_id'])}).sort('_id', -1))
-    analysis_data = []
-    
-    # Calculate analytics data and progress percentages
-    analytics = {
-        'power_loss': 0,
-        'revenue_loss': 0,
-    }
-    
-    # Progress percentages
-    progress_data = {
-        'pending': 25,     # Default values
-        'resolved': 60,
-        'not_found': 15,
-        'high': 30,
-        'medium': 45,
-        'low': 25
-    }
-    
+    """Plant detail page with overview, site details, and report tabs"""
     try:
-        if audits and len(audits) > 0:
-            for audit in audits:
-                try:
-                    anomalies = json.loads(audit['anomalies'])['features']
-                    for anomaly in anomalies:
-                        analysis_data.append(anomaly['properties'])
-                except:
-                    continue
-            
-            # Calculate real percentages from analysis_data
-            if analysis_data:
-                total_anomalies = len(analysis_data)
-                
-                # Count by status (if available)
-                pending_count = sum(1 for item in analysis_data if item.get('status', '').lower() == 'pending')
-                resolved_count = sum(1 for item in analysis_data if item.get('status', '').lower() == 'resolved')
-                not_found_count = total_anomalies - pending_count - resolved_count
-                
-                # Count by severity
-                high_count = sum(1 for item in analysis_data if 'High' in item.get('Severity', ''))
-                medium_count = sum(1 for item in analysis_data if 'Mid' in item.get('Severity', ''))
-                low_count = sum(1 for item in analysis_data if 'Low' in item.get('Severity', ''))
-                
-                # Calculate percentages
-                if total_anomalies > 0:
-                    progress_data.update({
-                        'pending': round((pending_count / total_anomalies) * 100),
-                        'resolved': round((resolved_count / total_anomalies) * 100),
-                        'not_found': round((not_found_count / total_anomalies) * 100),
-                        'high': round((high_count / total_anomalies) * 100) if high_count else 20,
-                        'medium': round((medium_count / total_anomalies) * 100) if medium_count else 30,
-                        'low': round((low_count / total_anomalies) * 100) if low_count else 50
-                    })
-                
-                # Calculate power loss and revenue loss
-                analytics['power_loss'] = round(total_anomalies * 0.5, 1)  # 0.5 kW per anomaly
-                analytics['revenue_loss'] = round(analytics['power_loss'] * 8760 * 3.5, 0)  # annual calculation
-                
-    except Exception as err:
-        print("Error processing analysis_data:", err)
+        plant = plants_collection.find_one({'_id': ObjectId(plant_id)})
+        if not plant:
+            flash('Plant not found', 'error')
+            return redirect(url_for('homepage'))
         
-    get_session_user = session.get('user_role')
-    role = 1 if get_session_user == 'admin' else 0
-    audits = [make_serializable(i) for i in audits]
-    
-    print("audit length", len(audits))
-    return render_template('plant_detail_1.html', 
-                         plant=plant, 
-                         audits=audits, 
-                         analysis_data=analysis_data, 
-                         analytics=analytics,
-                         progress_data=progress_data,
-                         check_mate=role)
+        # Get audits for this plant to check if anomalies map is available
+        audits = list(audits_collection.find({'plant_id': str(plant['_id'])}).sort('_id', -1))
+        
+        plant = make_serializable(plant)
+        
+        return render_template('plant_detail_clean.html', plant=plant, audits=audits)
+    except Exception as e:
+        print(f"Error in plant_detail: {e}")
+        flash('Error loading plant details', 'error')
+        return redirect(url_for('homepage'))
 
 @app.route('/plant/<plant_id>/overview')
 @login_required
@@ -376,25 +314,72 @@ def plant_overview(plant_id):
             flash('Plant not found', 'error')
             return redirect(url_for('homepage'))
 
-        # Simple default values for now - you can enhance this later
+        # Get audits for this plant
+        audits = list(audits_collection.find({'plant_id': str(plant['_id'])}).sort('_id', -1))
+        analysis_data = []
+        
+        # Calculate analytics data and progress percentages
         analytics = {
-            'power_loss': 25.5,
-            'revenue_loss': 45000
+            'power_loss': 0,
+            'revenue_loss': 0,
         }
         
+        # Progress percentages
         progress_data = {
-            'pending': 35,
-            'resolved': 45,
-            'not_found': 20,
-            'high': 15,
-            'medium': 55,
-            'low': 30
+            'pending': 25,     # Default values
+            'resolved': 60,
+            'not_found': 15,
+            'high': 30,
+            'medium': 45,
+            'low': 25
         }
+        
+        try:
+            if audits and len(audits) > 0:
+                for audit in audits:
+                    try:
+                        anomalies = json.loads(audit['anomalies'])['features']
+                        for anomaly in anomalies:
+                            analysis_data.append(anomaly['properties'])
+                    except:
+                        continue
+                
+                # Calculate real percentages from analysis_data
+                if analysis_data:
+                    total_anomalies = len(analysis_data)
+                    
+                    # Count by status (if available)
+                    pending_count = sum(1 for item in analysis_data if item.get('status', '').lower() == 'pending')
+                    resolved_count = sum(1 for item in analysis_data if item.get('status', '').lower() == 'resolved')
+                    not_found_count = total_anomalies - pending_count - resolved_count
+                    
+                    # Count by severity
+                    high_count = sum(1 for item in analysis_data if 'High' in item.get('Severity', ''))
+                    medium_count = sum(1 for item in analysis_data if 'Mid' in item.get('Severity', ''))
+                    low_count = sum(1 for item in analysis_data if 'Low' in item.get('Severity', ''))
+                    
+                    # Calculate percentages
+                    if total_anomalies > 0:
+                        progress_data.update({
+                            'pending': round((pending_count / total_anomalies) * 100),
+                            'resolved': round((resolved_count / total_anomalies) * 100),
+                            'not_found': round((not_found_count / total_anomalies) * 100),
+                            'high': round((high_count / total_anomalies) * 100) if high_count else 20,
+                            'medium': round((medium_count / total_anomalies) * 100) if medium_count else 30,
+                            'low': round((low_count / total_anomalies) * 100) if low_count else 50
+                        })
+                    
+                    # Calculate power loss and revenue loss
+                    analytics['power_loss'] = round(total_anomalies * 0.5, 1)  # 0.5 kW per anomaly
+                    analytics['revenue_loss'] = round(analytics['power_loss'] * 8760 * 3.5, 0)  # annual calculation
+                    
+        except Exception as err:
+            print("Error processing analysis_data:", err)
         
         anomaly_data = {
-            'high': 25,
-            'medium': 35,
-            'low': 30,
+            'high': progress_data['high'],
+            'medium': progress_data['medium'],
+            'low': progress_data['low'],
             'resolved': 10
         }
         
@@ -410,6 +395,259 @@ def plant_overview(plant_id):
         flash('Error loading overview page', 'error')
         return redirect(url_for('homepage'))
 
+
+@app.route('/api/plants/update-photo', methods=['POST'])
+@login_required
+def update_plant_photo():
+    try:
+        plant_id = request.form.get('plant_id')
+        plant_photo = request.files.get('plant_photo')
+        
+        if not plant_id or not plant_photo or not plant_photo.filename:
+            return jsonify({'success': False, 'message': 'Plant ID and photo are required'})
+        
+        # Save the uploaded file
+        filename = secure_filename(plant_photo.filename)
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"plant_{timestamp}_{filename}"
+        upload_path = os.path.join(UPLOAD_FOLDER, 'plant_photos')
+        os.makedirs(upload_path, exist_ok=True)
+        file_path = os.path.join(upload_path, filename)
+        plant_photo.save(file_path)
+        plant_photo_url = f"/static/uploads/plant_photos/{filename}"
+        
+        # Update the plant document
+        result = plants_collection.update_one(
+            {'_id': ObjectId(plant_id)},
+            {'$set': {'plant_photo': plant_photo_url}}
+        )
+        
+        if result.modified_count > 0:
+            return jsonify({'success': True, 'message': 'Photo updated successfully'})
+        else:
+            return jsonify({'success': False, 'message': 'Failed to update photo'})
+    except Exception as e:
+        print(f"Error updating plant photo: {e}")
+        return jsonify({'success': False, 'message': 'Server error'})
+
+@app.route('/static/uploads/<path:filename>')
+def uploaded_file(filename):
+    """Serve uploaded files"""
+    return send_from_directory(UPLOAD_FOLDER, filename)
+
+# Import required modules for Google Drive upload
+import re
+import urllib.parse
+from upload_progress import UploadProgressTracker, upload_status
+
+# Global upload tracking
+upload_sessions = {}
+
+def extract_file_id_from_folder_url(folder_url):
+    """Extract folder ID from Google Drive folder URL"""
+    # Handle both folder and file URLs
+    patterns = [
+        r'/folders/([a-zA-Z0-9-_]+)',
+        r'/file/d/([a-zA-Z0-9-_]+)',
+        r'id=([a-zA-Z0-9-_]+)'
+    ]
+    
+    for pattern in patterns:
+        match = re.search(pattern, folder_url)
+        if match:
+            return match.group(1)
+    
+    return None
+
+@app.route('/google_drive_upload')
+@login_required
+def google_drive_upload():
+    """Render Google Drive upload page"""
+    return render_template('google_drive_upload.html')
+
+@app.route('/audi_tif/upload', methods=['POST'])
+@login_required 
+def handle_google_drive_upload():
+    """Handle Google Drive upload request"""
+    try:
+        # Get form data
+        audit_type = request.form.get('audit_type')
+        plant_id = request.form.get('plant_id')
+        audit_id = request.form.get('audit_id')
+        tif_file_name = request.form.get('tif_file_name')
+        g_url = request.form.get('g_url')
+        
+        # Validate required fields
+        if not all([audit_type, plant_id, audit_id, tif_file_name, g_url]):
+            return jsonify({
+                'success': False,
+                'error': 'All fields are required'
+            }), 400
+        
+        # Generate unique upload ID
+        import uuid
+        upload_id = str(uuid.uuid4())
+        
+        # Create progress tracker
+        tracker = UploadProgressTracker(upload_id, tif_file_name, 0)  # Size unknown initially
+        tracker.set_stage('initializing', 'Starting Google Drive download')
+        
+        # Store upload session
+        upload_sessions[upload_id] = {
+            'upload_id': upload_id,
+            'audit_type': audit_type,
+            'plant_id': plant_id,
+            'audit_id': audit_id,
+            'tif_file_name': tif_file_name,
+            'g_url': g_url,
+            'status': 'initialized',
+            'created_at': datetime.utcnow()
+        }
+        
+        # Start background upload process
+        import threading
+        thread = threading.Thread(target=process_google_drive_upload, args=(upload_id,))
+        thread.daemon = True
+        thread.start()
+        
+        return jsonify({
+            'success': True,
+            'upload_id': upload_id,
+            'message': 'Google Drive upload started'
+        })
+        
+    except Exception as e:
+        print(f"Error in Google Drive upload: {e}")
+        return jsonify({
+            'success': False,
+            'error': f'Upload failed: {str(e)}'
+        }), 500
+
+def process_google_drive_upload(upload_id):
+    """Background process to handle Google Drive download and AWS upload"""
+    try:
+        session = upload_sessions.get(upload_id)
+        if not session:
+            return
+        
+        tracker = upload_status.get(upload_id)
+        if not tracker:
+            return
+        
+        # Extract folder/file ID from URL
+        folder_id = extract_file_id_from_folder_url(session['g_url'])
+        if not folder_id:
+            tracker.set_status('failed', 'Invalid Google Drive URL')
+            return
+        
+        # Update progress
+        tracker.set_stage('downloading', 'Downloading from Google Drive')
+        
+        # Import gdown for downloading
+        import gdown
+        import tempfile
+        
+        # Create temp directory
+        temp_dir = tempfile.mkdtemp()
+        temp_file_path = os.path.join(temp_dir, session['tif_file_name'])
+        
+        try:
+            # Try downloading as a file first
+            file_url = f'https://drive.google.com/uc?id={folder_id}'
+            
+            tracker.set_stage('downloading', 'Downloading file from Google Drive')
+            
+            # Download the file
+            gdown.download(file_url, temp_file_path, quiet=False, fuzzy=True)
+            
+            # Check if file was downloaded
+            if not os.path.exists(temp_file_path):
+                raise Exception("File download failed")
+            
+            file_size = os.path.getsize(temp_file_path)
+            tracker.total_size = file_size
+            
+            # Update progress
+            tracker.set_stage('uploading', 'Uploading to AWS S3')
+            
+            # Upload to S3
+            s3_client = get_s3_resource()
+            bucket_name = get_config('bucket_name', 'sylo-energy')
+            
+            # Generate S3 key
+            s3_key = f"{session['audit_type']}/{session['plant_id']}/{session['audit_id']}/{session['tif_file_name']}"
+            
+            # Upload with progress callback
+            def upload_callback(bytes_transferred):
+                tracker.update_progress(bytes_transferred, 'uploading')
+            
+            s3_client.upload_file(
+                temp_file_path,
+                bucket_name,
+                s3_key,
+                Callback=upload_callback
+            )
+            
+            # Final S3 URL
+            s3_url = f"{get_config('s3_prefix')}/{s3_key}"
+            
+            # Save audit record to database
+            audit_data = {
+                'audit_type': session['audit_type'],
+                'plant_id': session['plant_id'],
+                'audit_id': session['audit_id'],
+                'file_name': session['tif_file_name'],
+                'google_drive_url': session['g_url'],
+                's3_url': s3_url,
+                's3_key': s3_key,
+                'file_size': file_size,
+                'upload_date': datetime.utcnow(),
+                'upload_method': 'google_drive'
+            }
+            
+            audits_collection.insert_one(audit_data)
+            
+            # Update progress as completed
+            tracker.set_status('completed', f'Upload completed successfully. File uploaded to S3: {s3_url}')
+            tracker.final_path = s3_url
+            
+        except Exception as e:
+            print(f"Error in Google Drive upload process: {e}")
+            tracker.set_status('failed', f'Upload failed: {str(e)}')
+        
+        finally:
+            # Cleanup temp files
+            try:
+                if os.path.exists(temp_file_path):
+                    os.remove(temp_file_path)
+                os.rmdir(temp_dir)
+            except:
+                pass
+                
+    except Exception as e:
+        print(f"Critical error in process_google_drive_upload: {e}")
+        if upload_id in upload_status:
+            upload_status[upload_id].set_status('failed', f'Critical error: {str(e)}')
+
+@app.route('/upload_progress/<upload_id>')
+@login_required
+def get_upload_progress(upload_id):
+    """Get upload progress for a specific upload ID"""
+    try:
+        tracker = upload_status.get(upload_id)
+        if not tracker:
+            return jsonify({'status': 'not_found'})
+        
+        return jsonify(tracker.get_progress_info())
+        
+    except Exception as e:
+        print(f"Error getting upload progress: {e}")
+        return jsonify({'status': 'error', 'error': str(e)})
+@app.route('/upload')
+@login_required
+def upload_page():
+    """Render upload page options"""
+    return render_template('data_upload.html')
 
 if __name__ == '__main__':
     app.run(port=3333)

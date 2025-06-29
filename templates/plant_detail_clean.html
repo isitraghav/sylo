@@ -369,7 +369,7 @@
         <!-- Sidebar -->
         <div class="sidebar">
             <div class="logo">
-                <img src="/static/images/logo/logo.png" alt="Logo">
+                <img src="/static/images/logo/logo1.png" alt="Logo">
             </div>
             <a href="/" class="nav-item">Home</a>
             <a href="#" class="nav-item active">Plants</a>
@@ -584,11 +584,12 @@
 
         // Anomalies map function
         function openAnomaliesMap() {
-            {% if audits and audits|length > 0 %}
+            var auditsAvailable = {{ 'true' if audits and audits|length > 0 else 'false' }};
+            if (auditsAvailable === true) {
                 window.open('/check/{{ plant.id }}', '_blank');
-            {% else %}
+            } else {
                 alert('No thermal audit data available for this plant. Please upload thermal images first.');
-            {% endif %}
+            }
         }
 
         // Animate status bars on page load
