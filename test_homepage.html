@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Homepage Test</title>
+</head>
+<body>
+    <!-- Copy the content from homepage_1.html but with mock data -->
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .main-container {
+            min-height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            margin: 20px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+            position: relative;
+        }
+
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header-title {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            margin-bottom: 2rem;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .header-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-primary {
+            background: rgba(255, 255, 255, 0.9);
+            color: #667eea;
+            border-color: rgba(255, 255, 255, 0.9);
+        }
+
+        .btn-primary:hover {
+            background: white;
+            color: #5a6fd8;
+        }
+
+        .content {
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .search-bar {
+            background: white;
+            border-radius: 15px;
+            padding: 1rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e0e7ff;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e7ff;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .plants-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .plant-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            border: 1px solid #f0f4ff;
+        }
+
+        .plant-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        .plant-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-bottom: 1px solid #f0f4ff;
+        }
+
+        .plant-content {
+            padding: 1.5rem;
+        }
+
+        .plant-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1rem;
+        }
+
+        .plant-name {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #2d3748;
+            margin-bottom: 0.25rem;
+        }
+
+        .plant-client {
+            color: #667eea;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        .edit-image-btn {
+            background: #f7fafc;
+            border: 1px solid #e2e8f0;
+            color: #4a5568;
+            padding: 0.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.8rem;
+        }
+
+        .edit-image-btn:hover {
+            background: #edf2f7;
+            border-color: #cbd5e0;
+        }
+
+        .plant-info {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .info-label {
+            font-size: 0.8rem;
+            color: #718096;
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .plant-actions {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .btn-overview {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-overview:hover {
+            background: #5a6fd8;
+            transform: translateY(-1px);
+        }
+
+        .btn-anomalies {
+            background: #f56565;
+            color: white;
+        }
+
+        .btn-anomalies:hover {
+            background: #e53e3e;
+            transform: translateY(-1px);
+        }
+
+        .no-plants {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: #718096;
+        }
+
+        .no-plants h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #4a5568;
+        }
+
+        .no-plants p {
+            font-size: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.hidden {
+            display: none;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 0;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .modal-body {
+            padding: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .modal-footer {
+            padding: 1.5rem;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: #4a5568;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e0;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                margin: 10px;
+            }
+
+            .header {
+                padding: 1.5rem;
+            }
+
+            .header-title {
+                font-size: 2rem;
+            }
+
+            .content {
+                padding: 1rem;
+            }
+
+            .plants-grid {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+            }
+
+            .plant-info {
+                grid-template-columns: 1fr;
+            }
+
+            .plant-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+
+    <div class="main-container">
+        <div class="header">
+            <div class="header-content">
+                <h1 class="header-title">Solar Plant Management</h1>
+                <p class="header-subtitle">Monitor and manage your solar installations with advanced thermal imaging analysis</p>
+                <div class="header-actions">
+                    <button onclick="showAddPlantModal()" class="header-btn btn-primary">+ Add New Plant</button>
+                    <a href="#" class="header-btn">View Reports</a>
+                    <a href="#" class="header-btn">Analytics</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="content">
+            <div class="search-bar">
+                <input type="text" class="search-input" placeholder="Search plants..." id="searchInput">
+            </div>
+
+            <div id="plantsContainer">
+                <div class="plants-grid">
+                    <!-- Mock Plant Data -->
+                    <div class="plant-card">
+                        <img src="/static/images/Photos/Plant Image.jpg" alt="Solar Plant" class="plant-image">
+                        <div class="plant-content">
+                            <div class="plant-header">
+                                <div>
+                                    <div class="plant-name">Test Solar Plant</div>
+                                    <div class="plant-client">Test Client Corp</div>
+                                </div>
+                                <button onclick="showImageEditModal('test-plant-1')" class="edit-image-btn">
+                                    📝 Edit Image
+                                </button>
+                            </div>
+                            <div class="plant-info">
+                                <div class="info-item">
+                                    <span class="info-label">AC Capacity</span>
+                                    <span class="info-value">100 MW</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">DC Capacity</span>
+                                    <span class="info-value">120 MW</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Location</span>
+                                    <span class="info-value">Gujarat, India</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Modules</span>
+                                    <span class="info-value">50,000</span>
+                                </div>
+                            </div>
+                            <div class="plant-actions">
+                                <button onclick="navigateToPlantOverview('test-plant-1')" class="action-btn btn-overview">
+                                    Site Details
+                                </button>
+                                <button onclick="navigateToAnomalies('test-plant-1')" class="action-btn btn-anomalies">
+                                    Anomalies
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Second mock plant -->
+                    <div class="plant-card">
+                        <img src="/static/images/Photos/Plant Image.jpg" alt="Solar Plant" class="plant-image">
+                        <div class="plant-content">
+                            <div class="plant-header">
+                                <div>
+                                    <div class="plant-name">Demo Solar Farm</div>
+                                    <div class="plant-client">Green Energy Ltd</div>
+                                </div>
+                                <button onclick="showImageEditModal('demo-plant-2')" class="edit-image-btn">
+                                    📝 Edit Image
+                                </button>
+                            </div>
+                            <div class="plant-info">
+                                <div class="info-item">
+                                    <span class="info-label">AC Capacity</span>
+                                    <span class="info-value">75 MW</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">DC Capacity</span>
+                                    <span class="info-value">85 MW</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Location</span>
+                                    <span class="info-value">Rajasthan, India</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Modules</span>
+                                    <span class="info-value">35,000</span>
+                                </div>
+                            </div>
+                            <div class="plant-actions">
+                                <button onclick="navigateToPlantOverview('demo-plant-2')" class="action-btn btn-overview">
+                                    Site Details
+                                </button>
+                                <button onclick="navigateToAnomalies('demo-plant-2')" class="action-btn btn-anomalies">
+                                    Anomalies
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image Edit Modal -->
+    <div id="imageEditModal" class="modal hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Edit Plant Image</h2>
+            </div>
+            <div class="modal-body">
+                <form id="imageEditForm" enctype="multipart/form-data">
+                    <input type="hidden" id="editPlantId" name="plant_id">
+                    <div class="form-group">
+                        <label for="plantPhoto" class="form-label">Select New Image</label>
+                        <input type="file" id="plantPhoto" name="plant_photo" class="form-control" accept="image/*" onchange="previewImage(this)">
+                    </div>
+                    <div class="form-group">
+                        <img id="imagePreview" style="max-width: 100%; max-height: 200px; border-radius: 8px; display: none;">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="hideImageEditModal()">Cancel</button>
+                <button type="submit" form="imageEditForm" class="header-btn btn-primary">Update Image</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mock plants data for testing
+        let plants = [
+            {
+                _id: 'test-plant-1',
+                name: 'Test Solar Plant',
+                client: 'Test Client Corp'
+            },
+            {
+                _id: 'demo-plant-2',
+                name: 'Demo Solar Farm',
+                client: 'Green Energy Ltd'
+            }
+        ];
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', function (e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const plantCards = document.querySelectorAll('.plant-card');
+
+            plantCards.forEach(card => {
+                const plantName = card.querySelector('.plant-name').textContent.toLowerCase();
+                const plantClient = card.querySelector('.plant-client').textContent.toLowerCase();
+
+                if (plantName.includes(searchTerm) || plantClient.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        });
+
+        // Modal functions
+        function showAddPlantModal() {
+            alert('Add Plant Modal - Feature not implemented in test version');
+        }
+
+        // Image editing functions
+        function showImageEditModal(plantId) {
+            document.getElementById('editPlantId').value = plantId;
+            document.getElementById('imageEditModal').classList.remove('hidden');
+        }
+
+        function hideImageEditModal() {
+            document.getElementById('imageEditModal').classList.add('hidden');
+            document.getElementById('imageEditForm').reset();
+            document.getElementById('imagePreview').style.display = 'none';
+        }
+
+        function previewImage(input) {
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const preview = document.getElementById('imagePreview');
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                };
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Navigation functions
+        function navigateToPlantOverview(plantId) {
+            alert(`Navigating to plant overview for: ${plantId}`);
+            // In actual implementation: window.location.href = `/plant_detail/${plantId}`;
+        }
+
+        function navigateToAnomalies(plantId) {
+            alert(`Navigating to anomalies for plant: ${plantId}`);
+            // In actual implementation: window.location.href = `/check/${plantId}`;
+        }
+
+        // Form submission
+        document.getElementById('imageEditForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const plantId = document.getElementById('editPlantId').value;
+            
+            try {
+                // Mock API call - in real version this would submit to the server
+                console.log('Submitting image update for plant:', plantId);
+                console.log('Form data:', formData.get('plant_photo'));
+                
+                alert('Image update submitted successfully! (Mock response)');
+                hideImageEditModal();
+                
+                // In actual implementation:
+                // const response = await fetch('/api/plants/update-image', {
+                //     method: 'POST',
+                //     body: formData
+                // });
+                // const result = await response.json();
+                // if (result.success) {
+                //     location.reload();
+                // }
+            } catch (error) {
+                console.error('Error updating image:', error);
+                alert('Error updating image');
+            }
+        });
+    </script>
+</body>
+</html>

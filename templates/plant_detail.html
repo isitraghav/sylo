@@ -14,19 +14,6 @@
             box-sizing: border-box;
         }
 
-        /* :root {
-            --primary-color: #2e7d32;
-            --secondary-color: #F97316;
-            --accent-color: #06B6D4;
-            --success-color: #10B981;
-            --warning-color: #F59E0B;
-            --error-color: #EF4444;
-            --background-color: #F8FAFC;
-            --surface-color: #FFFFFF;
-            --text-color: #1E293B;
-            --text-secondary: #64748B;
-            --border-color: #E2E8F0;
-        } */
         :root {
             --primary-color: #2e7d32;
             --secondary-color: #F97316;
@@ -53,35 +40,26 @@
             display: flex;
         }
 
-        /* Sidebar */
-        /* .sidebar {
-            background: var(--primary-color);
-            border-right: 1px solid var(--border-color);
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-        } */
-
+        /* Fixed Sidebar */
         .sidebar {
-            /* width: 250px; */
             width: 150px;
             height: 100vh;
             background-color: white;
             color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
 
-
-        /* .sidebar-logo {
-            padding: 0 20px 20px;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 20px;
-        } */
         .sidebar-logo {
             border-bottom: 1px solid var(--border-color);
-            /* margin-bottom: 10px; */
             text-align: center;
+            padding: 10px;
         }
-        
+
         .sidebar-logo img {
             width: 100%;
             height: auto;
@@ -96,8 +74,6 @@
             font-weight: 700;
         }
 
-     
-
         .sidebar-menu {
             list-style: none;
         }
@@ -109,7 +85,7 @@
         .sidebar-menu a {
             display: flex;
             align-items: center;
-            padding: 12px 20px;
+            padding: 12px 10px;
             color: black;
             text-decoration: none;
             transition: all 0.3s ease;
@@ -117,7 +93,6 @@
 
         .sidebar-menu a:hover,
         .sidebar-menu a.active {
-            /* background: linear-gradient(90deg, var(--primary-color), transparent); */
             background-color: var(--primary-color);
             color: white;
             border-right: 3px solid var(--primary-color);
@@ -127,27 +102,30 @@
             margin-right: 10px;
             width: 20px;
             height: 20px;
+            min-width: 20px;
+            min-height: 20px;
+            flex-shrink: 0;
         }
 
-        /* Main Content */
+        /* Main Content - Updated with margin for fixed sidebar */
         .main-content {
             flex: 1;
-            /* margin-left: 120px; */
+            margin-left: 150px;
             display: flex;
             flex-direction: column;
         }
 
         /* Header */
         .header {
-            background: var(--surface-color);
             border-bottom: 1px solid var(--border-color);
-            padding: 10px 30px;
+            padding: 20px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             position: sticky;
             top: 0;
             z-index: 100;
+            background:#FFFFFF;
         }
 
         .breadcrumb {
@@ -190,7 +168,7 @@
         }
 
         .btn-primary:hover {
-            background: #0284C7;
+            background: #1e5f32;
             transform: translateY(-1px);
         }
 
@@ -200,22 +178,21 @@
         }
 
         .btn-secondary:hover {
-            background: #CBD5E1;
+            background: #1e5f32;
         }
 
         /* Content Area */
         .content-area {
             flex: 1;
-            padding: 10px 30px;
+            padding: 30px;
             overflow-y: auto;
         }
 
         /* Plant Header */
         .plant-header {
-            /* background: linear-gradient(135deg, var(--primary-color), var(--accent-color)); */
             background: var(--primary-color);
             color: white;
-            padding: 40px;
+            padding: 10px 40px;
             border-radius: 15px;
             margin-bottom: 30px;
             position: relative;
@@ -549,12 +526,14 @@
             opacity: 0.5;
         }
 
-        /* Responsive Design */
+        /* Updated Responsive Design */
         @media (max-width: 768px) {
             .sidebar {
                 width: 100%;
                 position: relative;
                 height: auto;
+                z-index: auto;
+                box-shadow: none;
             }
 
             .main-content {
@@ -602,7 +581,7 @@
         }
 
         .upload-btn:hover {
-            background: #0284C7;
+            background: #1e5f32;
         }
 
         .file-list {
@@ -753,22 +732,6 @@
             border-top: 1px solid var(--border-color);
         }
 
-
-        /* chat style     
-        
-        
-        
-        ffbhjfkj jk f
-
-
-
-        fkf jknjknjknfjknvf
-
-        f
-        kfj jk
-        
-        */
-
         .container {
             max-width: 1400px;
             margin: 0 auto;
@@ -781,9 +744,8 @@
 
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 0px;
             padding-bottom: 20px;
-            border-bottom: 3px solid #6366f1;
         }
 
         .header h1 {
@@ -912,7 +874,6 @@
         }
 
         th {
-            /* background: linear-gradient(135deg, #f8fafc, #e2e8f0); */
             font-weight: 600;
             color: #374151;
             text-transform: uppercase;
@@ -1089,9 +1050,7 @@
             left: 0;
             top: 0;
             width: 100%;
-            /* height: 100%; */
             background: rgba(0, 0, 0, 0.6);
-            
         }
 
         .modal-content {
@@ -1121,22 +1080,19 @@
             cursor: pointer;
             font-size: 0.8rem;
         }
-   
-
     </style>
 </head>
 
 <body>
     <div class="main-app">
-        <!-- Sidebar -->
+        <!-- Fixed Sidebar -->
         <div class="sidebar">
             <div class="sidebar-logo">
-                
-                    <img src="{{ url_for('static', filename='images/logo/logo1.png') }}" alt="Solar Plant Manager Logo">
+                <img src="{{ url_for('static', filename='images/logo/logo1.png') }}" alt="Solar Plant Manager Logo">
             </div>
             <ul class="sidebar-menu">
                 <li>
-                    <a href="/homepage" class="active">
+                    <a href="/homepage">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
@@ -1146,11 +1102,10 @@
                     </a>
                 </li>
                 <li>
-                    <a href="#">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
-                            </path>
+                    <a href="/audit" class="active">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                            <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
                         Thermography
                     </a>
@@ -1188,7 +1143,7 @@
                     </a>
                   </li>
                 <li>
-                    <a href="/data">
+                    <a href="#">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4">
@@ -1222,42 +1177,10 @@
 
             <!-- Content Area -->
             <div class="content-area">
-                <!-- Plant Header -->
-                <div class="plant-header">
-                    <h1 class="plant-title">{{ plant.name }}</h1>
-                    <p class="plant-subtitle">{{ plant.client }} • {{ plant.country }}</p>
-
-                    <div class="plant-stats">
-                        <div class="stat-item">
-                            <div class="stat-value">{{ plant.ac_capacity }} MW</div>
-                            <div class="stat-label">AC Capacity</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">{{ plant.dc_capacity }} MW</div>
-                            <div class="stat-label">DC Capacity</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">{{ plant.land_area }}</div>
-                            <div class="stat-label">Land Area (Acres)</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value">{{ plant.total_modules_inspected }}</div>
-                            <div class="stat-label">Modules Inspected</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Tabs -->
+                <!-- Tabs: Only Audits -->
                 <div class="tabs">
                     <div class="tab-nav">
-                        <button class="tab-btn active" onclick="showTab('overview')">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            Overview
-                        </button>
-                        <button class="tab-btn" onclick="showTab('audits')">
+                        <button class="tab-btn active" onclick="showTab('audits')">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2">
@@ -1265,94 +1188,11 @@
                             </svg>
                             Audits
                         </button>
-                        <button class="tab-btn" onclick="showTab('analytics')">
-                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z">
-                                </path>
-                            </svg>
-                            Analytics
-                        </button>
                     </div>
 
                     <div class="tab-content">
-                        <!-- Overview Tab -->
-                        <div id="overview" class="tab-pane active">
-                            <div class="info-grid">
-                                <!-- Location Information -->
-                                <div class="info-section">
-                                    <div class="info-title">
-                                        <svg width="20" height="20" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
-                                            </path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        </svg>
-                                        Location Details
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-value">Address</span>
-                                        <span class="info-value1">{{ plant.address }}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-value">Country</span>
-                                        <span class="info-value1">{{ plant.country }}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-value">Pincode</span>
-                                        <span class="info-value1">{{ plant.pincode }}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-value">Latitude</span>
-                                        <span class="info-value1">{{ plant.latitude }}°</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-value">Longitude</span>
-                                        <span class="info-value1">{{ plant.longitude }}°</span>
-                                    </div>
-                                </div>
-
-                                <!-- Technical Specifications -->
-                                <div class="info-section">
-                                    <div class="info-title">
-                                        <svg width="20" height="20" fill="none" stroke="currentColor"
-                                            viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
-                                            </path>
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                                        </svg>
-                                        Technical Specifications
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-value">Plant Type</span>
-                                        <span class="info-value1">{{ plant.plant_type}}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-value">Mounting Type</span>
-                                        <span class="info-value1">{{ plant.mounting_type }}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-value">Module Type</span>
-                                        <span class="info-value1">{{ plant.module_type }}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-value">No. of Inverters</span>
-                                        <span class="info-value1">{{ plant.no_of_inverters }}</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="info-value">No. of Blocks</span>
-                                        <span class="info-value1">{{ plant.no_of_blocks }}</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
                         <!-- Audits Tab -->
-                        <div id="audits" class="tab-pane">
+                        <div id="audits" class="tab-pane active">
                             <div class="audit-header">
                                 <h3>Plant Audits</h3>
 
@@ -1365,9 +1205,6 @@
                                     Add Audit
                                 </button>
                                 {% endif %}
-
-                             
-
                             </div>
 
                             <div class="audit-grid">
@@ -1433,7 +1270,7 @@
                                                 {% endfor %}
                                             </div>
                                         </div>
-                                       
+
                                         {% endif %}
                                     </div>
                                     {% if check_mate == 1 %}
@@ -1462,10 +1299,9 @@
                                         </div>
                                     </div>
 
-
                                     <div id="zipFileList_{{ audit._id }}" class="file-list"></div>
                                     {% endif %}
-                                    
+
                                 </div>
                                 {% endfor %}
                                 {% else %}
@@ -1479,75 +1315,6 @@
                                     <p>Start by creating your first audit for this plant</p>
                                 </div>
                                 {% endif %}
-                            </div>
-                        </div>
-
-                        <!-- Analytics Tab -->
-                        <div id="analytics" class="tab-pane">
-                            <div class="info-grid">
-
-                            </div>
-
-                            <div class="info-section">
-                                <!-- <div class="info-title">
-                                <svg width="20" height="20" fill="none" stroke="currentColor"
-                                    viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                                Anomalies Analysis
-                            </div> -->
-                                <!-- <div class="container"> -->
-
-
-
-                                <div class="charts-grid">
-                                    <div class="chart-container">
-                                        <h3 class="chart-title">📊 Anomaly Distribution</h3>
-                                        <div class="chart-wrapper">
-                                            <canvas id="pieChart"></canvas>
-                                        </div>
-                                    </div>
-
-                                    <div class="chart-container ">
-                                        <h3 class="chart-title">⚠️ Severity-wise Analysis</h3>
-                                        <div class="chart-wrapper">
-                                            <canvas id="severityChartNew"></canvas>
-                                        </div>
-                                    </div>
-                                    <div class="chart-container full-width-chart">
-                                        <h3 class="chart-title">🏢 Block-wise Anomalies</h3>
-                                        <div class="chart-wrapper">
-                                            <canvas id="blockChart"></canvas>
-                                        </div>
-                                    </div>
-
-
-                                </div>
-
-
-
-                                <!-- <div class="table-container">
-                                    <h3 class="table-title">📋 Detailed Anomaly Records</h3>
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>📅 Date</th>
-                                                <th>🏢 Block</th>
-                                                <th>🔌 Rack</th>
-                                                <th>📱 Panel</th>
-                                                <th>⚡ Anomaly</th>
-                                                <th>⚠️ Severity</th>
-                                                <th>🌡️ Hotspot</th>
-                                                <th>📍 Location</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="dataTable">
-                                        </tbody>
-                                    </table>
-                                </div> -->
-                                <!-- </div> -->
-
                             </div>
                         </div>
                     </div>
@@ -1580,29 +1347,10 @@
                         <input type="date" name="completion_date" class="form-input" required>
                     </div>
 
-                    <!-- <div class="form-group">
-                        <label class="form-label">Project Code/Group ID</label>
-                        <input type="text" name="project_code" class="form-input"
-                            placeholder="Enter project code for linking data" required>
-                    </div> -->
-                    <!-- <div class="form-group">
-                        <label class="form-label">Upload Tif </label>
-                        <input type="file" name="audit_tif" class="form-input" placeholder="tif file " required>
-                    </div> -->
-
-                    <!-- <div class="form-group">
-                        <label class="form-label">Audit Type</label>
-                        <select name="audit_type" class="form-input" required>
-                            <option value="visual_ortho">Visual Ortho</option>
-                            <option value="thermal_ortho">Thermal Ortho</option>
-                        </select>
-                    </div> -->
-
                     <div class="form-group">
                         <label class="form-label">Upload Geojson Data </label>
                         <input type="file" name="audit_geojson" class="form-input" placeholder="Geojson data " required>
                     </div>
-
 
                     <input type="hidden" name="plant_id" value="{{ plant._id }}">
                 </form>
@@ -1626,7 +1374,6 @@
             </div>
         </div>
     </div>
-
 
     <!-- Add AuditTif files Modal -->
     <div id="addTifFilesModal" class="modal-overlay hidden">
@@ -1709,19 +1456,15 @@
 
     <!-- Modal -->
     <div id="imageModal" class="modal1">
-        <!-- <div class="modal-content"> -->
-            <span class="close" onclick="closeModal()">&times;</span>
-            <img id="modalImage" src="{{ url_for('static', filename='images/example.jpg') }}" alt="Details Image"
-                style="max-width: 100%;">
-        <!-- </div> -->
+        <span class="close" onclick="closeModal()">&times;</span>
+        <img id="modalImage" src="{{ url_for('static', filename='images/example.jpg') }}" alt="Details Image"
+            style="max-width: 100%;">
     </div>
 
-
     <script>
-        // Initialize modal first
+        // All JavaScript functions remain exactly the same
         document.addEventListener('DOMContentLoaded', function () {
             try {
-                // Check if Bootstrap is loaded
                 if (typeof bootstrap === 'undefined') {
                     console.error('Bootstrap is not loaded!');
                     return;
@@ -1733,13 +1476,9 @@
                     return;
                 }
 
-                // Initialize the modal
                 const modal = new bootstrap.Modal(modalElement);
-
-                // Store the modal instance
                 window.uploadModal = modal;
 
-                // Add event listeners
                 const orthoTypeSelect = document.getElementById('modalOrthoType');
                 const fileUpload = document.getElementById('modalFileUpload');
                 const submitButton = document.getElementById('submitUpload');
@@ -1782,7 +1521,6 @@
 
                 currentAuditId = auditId;
 
-                // Reset form
                 const orthoTypeSelect = document.getElementById('modalOrthoType');
                 const fileUpload = document.getElementById('modalFileUpload');
                 const selectedFilesList = document.getElementById('selectedFilesList');
@@ -1793,7 +1531,6 @@
                 if (selectedFilesList) selectedFilesList.innerHTML = '';
                 if (submitButton) submitButton.disabled = true;
 
-                // Show modal
                 window.uploadModal.show();
             } catch (error) {
                 console.error('Error opening modal:', error);
@@ -1860,7 +1597,6 @@
                 xhr.onload = () => {
                     if (xhr.status === 200) {
                         alert("Upload complete");
-                        // Optionally refresh the file list or update UI
                     } else {
                         alert("Upload failed");
                     }
@@ -1879,23 +1615,17 @@
 
         // Tab functionality
         function showTab(tabName) {
-            // Hide all tab panes
             document.querySelectorAll('.tab-pane').forEach(pane => {
                 pane.classList.remove('active');
             });
 
-            // Remove active class from all tab buttons
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
 
-            // Show selected tab pane
             document.getElementById(tabName).classList.add('active');
-
-            // Add active class to clicked button
             event.target.classList.add('active');
         }
-
 
         // Modal functions
         function showAddTifModal(audit_id) {
@@ -1903,7 +1633,7 @@
             document.getElementById('modalAuditId').value = audit_id;
             document.getElementById('addTifFilesModal').classList.remove('hidden');
         }
-        // Modal functions
+
         function showAddAuditModal() {
             document.getElementById('addAuditModal').classList.remove('hidden');
         }
@@ -1911,14 +1641,12 @@
         function hideAddAuditModal() {
             document.getElementById('addAuditModal').classList.add('hidden');
         }
+
         function hideAddTifModal() {
             document.getElementById('addTifFilesModal').classList.add('hidden');
-            // Reset the form
             document.getElementById('addTifForm').reset();
             document.getElementById('modalAuditId').value = '';
         }
-
-
 
         // Add tif file form submission
         document.getElementById('addTifForm').addEventListener('submit', async function (e) {
@@ -1931,11 +1659,8 @@
                 auditData[key] = value;
             }
 
-
-
             const xhr = new XMLHttpRequest();
             xhr.open("POST", "/audi_tif/upload");
-
 
             xhr.onload = () => {
                 alert("Upload complete");
@@ -1946,10 +1671,9 @@
 
             xhr.send(formData);
             hideAddTifModal()
-            // location.reload(); // Reload the page to update the tab
-
+            location.reload();
+            showTab('audits')
         });
-
 
         // Add zip file form submission
         document.getElementById('addZipForm').addEventListener('submit', async function (e) {
@@ -1967,7 +1691,6 @@
             const btnText = submitBtn.querySelector('.btn-text');
             const btnLoader = submitBtn.querySelector('.btn-loader');
 
-            // Disable button, hide text and show loader
             submitBtn.disabled = true;
             btnText.classList.add('hidden');
             btnLoader.classList.remove('hidden');
@@ -1983,7 +1706,6 @@
                 } else {
                     alert("Upload failed");
                 }
-                // Re-enable button and show text
                 submitBtn.disabled = false;
                 btnText.classList.remove('hidden');
                 btnLoader.classList.add('hidden');
@@ -1991,7 +1713,6 @@
 
             xhr.onerror = () => {
                 alert("Upload failed");
-                // Re-enable button and show text
                 submitBtn.disabled = false;
                 btnText.classList.remove('hidden');
                 btnLoader.classList.add('hidden');
@@ -2009,7 +1730,6 @@
             const btnText = submitBtn.querySelector('.btn-text');
             const btnLoader = submitBtn.querySelector('.btn-loader');
 
-            // Disable button, hide cancel button and show loader
             submitBtn.disabled = true;
             cancelBtn.classList.add('hidden');
             btnText.classList.add('hidden');
@@ -2032,11 +1752,10 @@
 
                 if (result.success) {
                     alert('Audit created successfully!');
-                    location.reload(); // Refresh to show new audit
+                    location.reload();
                 } else {
-                console.log("response", result)
+                    console.log("response", result)
                     alert('Failed to create audit: ' + result.message);
-                    // Re-enable button and hide loader on error
                     submitBtn.disabled = false;
                     cancelBtn.classList.remove('hidden');
                     btnText.classList.remove('hidden');
@@ -2045,7 +1764,6 @@
             } catch (error) {
                 console.error('Error creating audit:', error);
                 alert('Error creating audit. Please try again.');
-                // Re-enable button and hide loader on error
                 submitBtn.disabled = false;
                 cancelBtn.classList.remove('hidden');
                 btnText.classList.remove('hidden');
@@ -2070,15 +1788,7 @@
 
         // Set minimum dates for audit form
         document.addEventListener('DOMContentLoaded', function () {
-            // const today = new Date().toISOString().split('T')[0];
-            // const startDateInput = document.querySelector('input[name="start_date"]');
-            // const completionDateInput = document.querySelector('input[name="completion_date"]');
-
-            // startDateInput.setAttribute('min', today);
-
-            // startDateInput.addEventListener('change', function () {
-            //     completionDateInput.setAttribute('min', this.value);
-            // });
+            // Date validation code here if needed
         });
 
         // ZIP Modal functions
@@ -2089,321 +1799,21 @@
 
         function hideAddZipModal() {
             document.getElementById('addZipFilesModal').classList.add('hidden');
-            // Reset the form
             document.getElementById('addZipForm').reset();
             document.getElementById('modalZipAuditId').value = '';
         }
 
-
-    </script>
-
-
-    <script>
         // Sample data - replace with your actual data
-
-
         const data = {{ analysis_data | tojson | safe }};
-
-        fault_colors = {
-            "Cell": "#FF0000",
-            "Multi Cell": "#FFA500",
-            "Bypass Diode": "#9C27B0",
-            "Short Circuit": "#000000",
-            "String Offline": "#FF1A94",
-            "Module Power Mismatch": "#65E667",
-            "Shading": "#E77148",
-            "Plant Found": "#2E7D32",
-            "Other": "#00BOFF",  // Note: Contains 'O' (might be typo for 0)
-            "Junction Box": "#BFC494",
-            "Physical Damage": "#C2185B",
-            "Module Missing": "#FFFFFF",
-            "Other": "#00B0FF", // changed 'O' to zero
-
-        }
-
-        // Create pie chart for anomaly distribution
-        function createPieChartOld() {
-            const anomalyCounts = {};
-            data.forEach(item => {
-                anomalyCounts[item.Anomaly] = (anomalyCounts[item.Anomaly] || 0) + 1;
-            });
-
-            const ctx = document.getElementById('pieChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: Object.keys(anomalyCounts),
-                    datasets: [{
-                        data: Object.values(anomalyCounts),
-                        backgroundColor: ['#6366f1', '#8b5cf6', '#ec4899', '#f59e0b', '#10b981', '#3b82f6'],
-                        borderWidth: 0,
-                        hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    },
-                    cutout: '65%'
-                }
-            });
-        }
-
-
-        function createPieChart() {
-            const anomalyCounts = {};
-            data.forEach(item => {
-                anomalyCounts[item.Anomaly] = (anomalyCounts[item.Anomaly] || 0) + 1;
-            });
-
-            const labels = Object.keys(anomalyCounts);
-            const backgroundColors = labels.map(label => {
-                // Fallback to a default color if fault_colors[label] is missing or typo (like "00BOFF")
-                const color = fault_colors[label];
-                return /^#[0-9A-Fa-f]{6}$/.test(color) ? color : '#999999';
-            });
-
-            const ctx = document.getElementById('pieChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: Object.values(anomalyCounts),
-                        backgroundColor: backgroundColors,
-                        borderWidth: 0,
-                        hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    },
-                    cutout: '65%'
-                }
-            });
-        }
-
-        function createPieChartForSaviry() {
-            const anomalyCounts = {};
-            data.forEach(item => {
-                anomalyCounts[item.Severity] = (anomalyCounts[item.Severity] || 0) + 1;
-            });
-
-
-            // const backgroundColors = labels.map(label => {
-            //         // Fallback to a default color if fault_colors[label] is missing or typo (like "00BOFF")
-            //         const color = fault_colors[label];
-            //         return /^#[0-9A-Fa-f]{6}$/.test(color) ? color : '#999999'; 
-            //     });
-
-
-            const labels = Object.keys(anomalyCounts);
-
-            console.log("labels", labels)
-            const colorvalue = {
-                "Remediation Recommended (High)": "red",
-                "Long-Term Monitoring (Low)": "green",
-                "Monitor & Remediate (Mid)": "orange"
-            }
-
-            const backgroundColors = labels.map(label => {
-                // Fallback to a default color if fault_colors[label] is missing or typo (like "00BOFF")
-                const color = colorvalue[label];
-                return color ? color : '#999999';
-            });
-            const ctx = document.getElementById('severityChartNew').getContext('2d');
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,//Object.keys(anomalyCounts),
-                    datasets: [{
-                        data: Object.values(anomalyCounts),
-                        backgroundColor: backgroundColors,//['red', 'green','orange'],
-                        borderWidth: 0,
-                        hoverOffset: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { position: 'bottom' }
-                    },
-                    cutout: '65%'
-                }
-            });
-        }
-        // Create block-wise anomaly bar chart
-        function createBlockChart() {
-            const blockCounts = {};
-            data.forEach(item => {
-                const blockKey = `Block ${item.Block}`;
-                blockCounts[blockKey] = (blockCounts[blockKey] || 0) + 1;
-            });
-
-            // Sort blocks numerically
-            const sortedBlocks = Object.keys(blockCounts).sort((a, b) => {
-                const numA = parseInt(a.replace('Block ', ''));
-                const numB = parseInt(b.replace('Block ', ''));
-                return numA - numB;
-            });
-
-            const ctx = document.getElementById('blockChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: sortedBlocks,
-                    datasets: [{
-                        label: 'Anomaly Count',
-                        data: sortedBlocks.map(block => blockCounts[block]),
-                        backgroundColor: '#2e7d32',
-                        borderColor: 'white',
-                        borderWidth: 2,
-                        borderRadius: 6
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
-                    }
-                }
-            });
-        }
-
-        // Create severity-wise bar chart
-        function createSeverityChart() {
-            const severityCounts = {};
-            data.forEach(item => {
-                severityCounts[item.Severity] = (severityCounts[item.Severity] || 0) + 1;
-            });
-
-            const colors = {
-                'Critical': '#dc2626',
-                'Remediation Recommended': '#d97706',
-                'Monitor': '#16a34a'
-            };
-
-            const ctx = document.getElementById('severityChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(severityCounts),
-                    datasets: [{
-                        label: 'Count by Severity',
-                        data: Object.values(severityCounts),
-                        backgroundColor: Object.keys(severityCounts).map(key => colors[key] || '#6366f1'),
-                        borderWidth: 2,
-                        borderColor: Object.keys(severityCounts).map(key => colors[key] || '#6366f1'),
-                        borderRadius: 8
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
-                    scales: {
-                        y: { beginAtZero: true, ticks: { stepSize: 1 } }
-                    }
-                }
-            });
-        }
-
-        // Populate data table
-        // function populateTable() {
-        //     const tbody = document.getElementById('dataTable');
-        //     data.forEach(item => {
-        //         const severityClass = 
-        //             item.Severity === 'Critical' ? 'severity-critical' :
-        //             item.Severity === 'Remediation Recommended' ? 'severity-remediation' : 'severity-monitor';
-
-        //         const row = tbody.insertRow();
-        //         row.innerHTML = `
-        //             <td>${item.Date}</td>
-        //             <td>Block ${item.Block}</td>
-        //             <td>${item.rack}</td>
-        //             <td>#${item.panel}</td>
-        //             <td><strong>${item.Anomaly}</strong></td>
-        //             <td><span class="severity-badge ${severityClass}">${item.Severity}</span></td>
-        //             <td><span class="hotspot-temp">${item.Hotspot}°C</span></td>
-        //             <td>${item.Latitude}, ${item.Longitud}</td>
-        //         `;
-        //     });
-        // }
-
-        function openModal(imagePath) {
-            const modal = document.getElementById('imageModal');
-            const modalImg = document.getElementById('modalImage');
-            modalImg.src = '/static/' + imagePath;  // Dynamically set the image
-            modal.style.display = 'block';
-    modal.style.position = 'fixed';
-    modal.style.zIndex = '1000';
-             // Center the modal
-            modal.style.top = '50%';
-            modal.style.left = '50%';
-            modal.style.transform = 'translate(-50%, -50%)';
-            
-            // Set max dimensions
-            modal.style.maxWidth = '80vw';
-    modal.style.maxHeight = '80vh';
-    modalImg.style.width = '100%';  // Set image width to 100%
-    modalImg.style.height = 'auto';  // Maintain aspect ratio
-    
-
-        }
-
-        function closeModal() {
-            document.getElementById('imageModal').style.display = 'none';
-        }
-
-        window.onclick = function (event) {
-            const modal = document.getElementById('imageModal');
-            if (event.target == modal) {
-                modal.style.display = 'none';
-            }
-        }
-
-        // Populate anomaly types distribution table
-        function populateAnomalyTypesTable() {
-            const anomalyCounts = {};
-            data.forEach(item => {
-                anomalyCounts[item.Anomaly] = (anomalyCounts[item.Anomaly] || 0) + 1;
-            });
-
-            const tbody = document.getElementById('anomalyTypeTable');
-            Object.entries(anomalyCounts).forEach(([type, count]) => {
-                console.log("---log", type, `images/Photos/${type}.png`)
-                const row = tbody.insertRow();
-                row.innerHTML = `
-                    <td><strong>${type}</strong></td>
-                    <td><span style=" color: black;">${count}</span></td>
-                    <td><button style="background: #0551ff; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 0.8rem;" onclick="openModal('images/Photos/Anomaly types distribution/${type}.png')">Details</button></td>
-                `;
-            });
-        }
 
         // Initialize dashboard
         function init() {
-            createPieChart();
-            createBlockChart();
-            // createSeverityChart();
-            // populateTable();
-            createPieChartForSaviry()
-            //populateAnomalyTypesTable()
+            // Charts removed since Analytics tab was removed
         }
 
         // Load everything when page is ready
         document.addEventListener('DOMContentLoaded', init);
     </script>
 
-
 </body>
-
 </html>

@@ -229,16 +229,13 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             overflow: hidden;
             transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
         }
 
         .plant-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
-        }
-
-        .plant-image-container {
-            position: relative;
-            cursor: pointer;
         }
 
         .plant-image {
@@ -251,6 +248,13 @@
             color: white;
             font-size: 48px;
             position: relative;
+            overflow: hidden;
+        }
+
+        .plant-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .edit-image-btn {
@@ -260,15 +264,19 @@
             background: rgba(0, 0, 0, 0.7);
             color: white;
             border: none;
-            border-radius: 6px;
-            padding: 8px;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             opacity: 0;
             transition: all 0.3s ease;
             z-index: 10;
         }
 
-        .plant-image-container:hover .edit-image-btn {
+        .plant-card:hover .edit-image-btn {
             opacity: 1;
         }
 
@@ -279,46 +287,51 @@
 
         .plant-details {
             padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         .plant-name {
-            font-size: 18px;
-            font-weight: 600;
+            font-size: 20px;
+            font-weight: 700;
             color: var(--text-color);
             margin-bottom: 8px;
+            line-height: 1.2;
         }
 
-        .plant-capacity {
+        .plant-location {
             font-size: 14px;
             color: var(--text-secondary);
             margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
-        .plant-date {
-            font-size: 13px;
-            color: var(--primary-color);
+        .plant-capacity {
+            font-size: 16px;
+            color: var(--text-color);
             margin-bottom: 8px;
-            font-weight: 500;
+            font-weight: 600;
         }
 
-        .plant-info {
-            font-size: 13px;
+        .plant-inspection {
+            font-size: 14px;
             color: var(--text-secondary);
-            line-height: 1.4;
-            margin-bottom: 15px;
-        }
-
-        .plant-info div {
-            margin-bottom: 4px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
 
         .plant-actions {
             display: flex;
             gap: 10px;
-            margin-top: 15px;
+            margin-top: auto;
         }
 
-        .action-btn {
+        .plant-btn {
             flex: 1;
             padding: 10px 15px;
             border: none;
@@ -326,31 +339,44 @@
             font-size: 14px;
             font-weight: 500;
             cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 6px;
-            transition: all 0.3s ease;
+            gap: 5px;
         }
 
-        .overview-btn {
+        .btn-details {
             background: var(--primary-color);
             color: white;
         }
 
-        .overview-btn:hover {
-            background: #1d5e20;
-            transform: translateY(-2px);
+        .btn-details:hover {
+            background: #1e5f32;
+            transform: translateY(-1px);
         }
 
-        .anomalies-btn {
-            background: var(--warning-color);
+        .btn-anomalies {
+            background: var(--error-color);
             color: white;
         }
 
-        .anomalies-btn:hover {
-            background: #d97706;
-            transform: translateY(-2px);
+        .btn-anomalies:hover {
+            background: #dc2626;
+            transform: translateY(-1px);
+        }
+
+        .plant-info {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+            display: none; /* Hide the old info section */
+        }
+
+        .plant-info div {
+            margin-bottom: 4px;
         }
 
         /* Modal Styles */
@@ -442,6 +468,13 @@
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.1);
+        }
+
+        .form-help {
+            display: block;
+            margin-top: 5px;
+            font-size: 12px;
+            color: var(--text-secondary);
         }
 
         .form-textarea {
@@ -641,44 +674,59 @@
                     {% if plants %}
                     <div class="plants-grid">
                         {% for plant in plants %}
-                        <div class="plant-card">
-                            <div class="plant-image-container" onclick="openPlantOverview('{{ plant._id }}')">
-                                <div class="plant-image">
-                                    <img src="{{ plant.plant_photo or url_for('static', filename='images/new_plan_image.jpeg') }}" 
-                                         alt="{{ plant.name }}" 
-                                         style="width: 100%; height: 100%; object-fit: cover;">
-                                </div>
-                                <button class="edit-image-btn" onclick="event.stopPropagation(); openImageEditModal('{{ plant._id }}', '{{ plant.name }}')" title="Edit Image">
+                        <div class="plant-card" onclick="openPlantDetail('{{ plant._id }}')">
+                            <div class="plant-image">
+                                {% if plant.plant_photo %}
+                                <img src="{{ plant.plant_photo }}" alt="{{ plant.name }}">
+                                {% else %}
+                                <img src="{{ url_for('static', filename='images/new_plan_image.jpeg') }}" alt="{{ plant.name }}">
+                                {% endif %}
+                                <button class="edit-image-btn" onclick="event.stopPropagation(); editPlantImage('{{ plant._id }}')" title="Edit Image">
                                     <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                                     </svg>
                                 </button>
                             </div>
                             <div class="plant-details">
                                 <div class="plant-name">{{ plant.name }}</div>
+                                <div class="plant-location">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    </svg>
+                                    {{ plant.state }}, {{ plant.country }}
+                                </div>
                                 <div class="plant-capacity">⚡ AC: {{ plant.ac_capacity }} MW | DC: {{ plant.dc_capacity }} MW</div>
-                                {% if plant.installation_date %}
-                                <div class="plant-date">📅 Installed: {{ plant.installation_date }}</div>
-                                {% endif %}
-                                <div class="plant-info">
-                                    <div><strong>Client:</strong> {{ plant.client }}</div>
-                                    <div><strong>Location:</strong> {{ plant.state }}, {{ plant.country }}</div>
-                                    <div><strong>Module:</strong> {{ plant.module_type }}</div>
-                                    <div><strong>Mount:</strong> {{ plant.mounting_type }}</div>
+                                <div class="plant-inspection">
+                                    <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                    </svg>
+                                    Inspected: {{ plant.inspection_date or 'Not Set' }}
                                 </div>
                                 <div class="plant-actions">
-                                    <button class="action-btn overview-btn" onclick="openPlantOverview('{{ plant._id }}')">
+                                    <button class="plant-btn btn-details" onclick="event.stopPropagation(); openPlantDetail('{{ plant._id }}')">
                                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                                         </svg>
                                         Site Details
                                     </button>
-                                    <button class="action-btn anomalies-btn" onclick="openAnomalies('{{ plant._id }}')">
+                                    <button class="plant-btn btn-anomalies" onclick="event.stopPropagation(); openPlantAnomalies('{{ plant._id }}')">
                                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z"></path>
                                         </svg>
                                         Anomalies
                                     </button>
+                                </div>
+                                
+                                <!-- Hidden old info for backward compatibility -->
+                                <div class="plant-info">
+                                    <div><strong>Client:</strong> {{ plant.client }}</div>
+                                    <div><strong>Location:</strong> {{ plant.state }}, {{ plant.country }}</div>
+                                    <div><strong>Module:</strong> {{ plant.module_type }}</div>
+                                    <div><strong>Mount:</strong> {{ plant.mounting_type }}</div>
+                                    {% if plant.inspection_date %}
+                                    <div><strong>Inspection:</strong> {{ plant.inspection_date if plant.inspection_date else 'Not Set' }}</div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -688,12 +736,6 @@
                     <div class="empty-state">
                         <h3>No plants found</h3>
                         <p>Get started by adding your first solar plant</p>
-                        <!--                        <button class="header-btn btn-primary" onclick="showAddPlantModal()">-->
-                        <!--                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">-->
-                        <!--                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>-->
-                        <!--                            </svg>-->
-                        <!--                            Add Your First Plant-->
-                        <!--                        </button>-->
                     </div>
                     {% endif %}
                 </div>
@@ -709,7 +751,7 @@
                 <button class="modal-close" onclick="hideAddPlantModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="addPlantForm" enctype="multipart/form-data">
+                <form id="addPlantForm">
                     <div class="form-grid">
                         <div class="form-group full-width">
                             <label class="form-label">Plant Name</label>
@@ -720,20 +762,7 @@
                             <label class="form-label">Client</label>
                             <input type="text" name="client" class="form-input" required>
                         </div>
-
                         <div class="form-group">
-                            <label class="form-label">Installation Date (Optional)</label>
-                            <input type="date" name="installation_date" class="form-input">
-                        </div>
-
-                        <div class="form-group full-width">
-                            <label class="form-label">Plant Image (Optional)</label>
-                            <input type="file" name="plant_image" class="form-input" accept="image/*" onchange="previewAddPlantImage(this)">
-                            <div id="addPlantImagePreview" style="display: none; margin-top: 10px;">
-                                <img id="addPlantImageImg" style="max-width: 100%; max-height: 150px; border-radius: 8px;">
-                            </div>
-                        </div>
- <div class="form-group">
                             <label class="form-label">State</label>
                             <input type="text" name="state" class="form-input" required>
                         </div>
@@ -787,16 +816,6 @@
                             </select>
                         </div>
 
-                        <!-- <div class="form-group">
-                            <label class="form-label">Mounting Type</label>
-                            <select name="mounting_type" class="form-select" required>
-                                <option value="">Select Mounting Type</option>
-                                <option value="fixed">Fixed Tilt</option>
-                                <option value="tracking">Single-Axis Tracking</option>
-                                <option value="rooftop">Rooftop</option>
-                            </select>
-                        </div> -->
-
                         <div class="form-group">
                             <label class="form-label">Module Type</label>
                             <input type="text" name="module_type" class="form-input" placeholder="e.g., Polycrystalline"
@@ -820,6 +839,17 @@
                             <label class="form-label">Mounting Type</label>
                             <input type="text" name="mounting_type" class="form-input" required>
                         </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Inspection Date</label>
+                            <input type="date" name="inspection_date" class="form-input" required>
+                        </div>
+                        
+                        <div class="form-group full-width">
+                            <label class="form-label">Plant Photo</label>
+                            <input type="file" name="plant_photo" class="form-input" accept="image/*">
+                            <small class="form-help">Upload a photo of the plant (optional)</small>
+                        </div>
                     </div>
                 </form>
             </div>
@@ -830,40 +860,31 @@
         </div>
     </div>
 
-    <!-- Image Edit Modal -->
-    <div id="imageEditModal" class="modal-overlay hidden">
+    <!-- Edit Image Modal -->
+    <div id="editImageModal" class="modal-overlay hidden">
         <div class="modal">
             <div class="modal-header">
                 <h2 class="modal-title">Edit Plant Image</h2>
-                <button class="modal-close" onclick="hideImageEditModal()">&times;</button>
+                <button class="modal-close" onclick="hideEditImageModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <form id="imageEditForm" enctype="multipart/form-data">
+                <form id="editImageForm">
                     <input type="hidden" id="editPlantId" name="plant_id">
                     <div class="form-group">
-                        <label class="form-label">Plant Name</label>
-                        <input type="text" id="editPlantName" class="form-input" readonly>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label" for="plantPhoto">Select New Image</label>
-                        <input type="file" id="plantPhoto" name="plant_photo" class="form-input" accept="image/*" required>
-                    </div>
-                    <div class="form-group" id="imagePreviewContainer" style="display: none;">
-                        <label class="form-label">Preview</label>
-                        <img id="imagePreview" style="max-width: 100%; max-height: 200px; border-radius: 8px;">
+                        <label class="form-label">Select New Image</label>
+                        <input type="file" name="plant_photo" class="form-input" accept="image/*" required>
+                        <small class="form-help">Choose a new image for the plant</small>
                     </div>
                 </form>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn-secondary" onclick="hideImageEditModal()">Cancel</button>
-                <button type="submit" form="imageEditForm" class="header-btn btn-primary">Update Image</button>
+                <button type="button" class="btn-secondary" onclick="hideEditImageModal()">Cancel</button>
+                <button type="submit" form="editImageForm" class="header-btn btn-primary">Update Image</button>
             </div>
         </div>
     </div>
 
     <script>
-        let plants = {{ plants | tojson }};
-
         // Search functionality
         document.getElementById('searchInput').addEventListener('input', function (e) {
             const searchTerm = e.target.value.toLowerCase();
@@ -871,9 +892,9 @@
 
             plantCards.forEach(card => {
                 const plantName = card.querySelector('.plant-name').textContent.toLowerCase();
-                const plantClient = card.querySelector('.plant-info div').textContent.toLowerCase();
+                const plantLocation = card.querySelector('.plant-location').textContent.toLowerCase();
 
-                if (plantName.includes(searchTerm) || plantClient.includes(searchTerm)) {
+                if (plantName.includes(searchTerm) || plantLocation.includes(searchTerm)) {
                     card.style.display = 'block';
                 } else {
                     card.style.display = 'none';
@@ -884,12 +905,27 @@
         // Modal functions
         function showAddPlantModal() {
             document.getElementById('addPlantModal').classList.remove('hidden');
+            // Set today's date as default for inspection date
+            const today = new Date().toISOString().split('T')[0];
+            document.querySelector('input[name="inspection_date"]').value = today;
         }
 
         function hideAddPlantModal() {
             document.getElementById('addPlantModal').classList.add('hidden');
-            document.getElementById('addPlantForm').reset();
-            document.getElementById('addPlantImagePreview').style.display = 'none';
+        }
+
+        function showEditImageModal() {
+            document.getElementById('editImageModal').classList.remove('hidden');
+        }
+
+        function hideEditImageModal() {
+            document.getElementById('editImageModal').classList.add('hidden');
+        }
+
+        // Edit image function
+        function editPlantImage(plantId) {
+            document.getElementById('editPlantId').value = plantId;
+            showEditImageModal();
         }
 
         // Add plant form submission
@@ -901,14 +937,13 @@
             try {
                 const response = await fetch('/api/plants', {
                     method: 'POST',
-                    body: formData
+                    body: formData  // Send FormData directly for file uploads
                 });
 
                 const result = await response.json();
 
                 if (result.success) {
                     alert('Plant added successfully!');
-                    hideAddPlantModal();
                     location.reload(); // Refresh the page to show new plant
                 } else {
                     alert('Failed to add plant: ' + result.message);
@@ -919,22 +954,39 @@
             }
         });
 
-        // Image preview for add plant modal
-        function previewAddPlantImage(input) {
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('addPlantImageImg').src = e.target.result;
-                    document.getElementById('addPlantImagePreview').style.display = 'block';
-                };
-                reader.readAsDataURL(input.files[0]);
-            } else {
-                document.getElementById('addPlantImagePreview').style.display = 'none';
+        // Edit image form submission
+        document.getElementById('editImageForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(this);
+
+            try {
+                const response = await fetch('/api/plants/update-image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    alert('Plant image updated successfully!');
+                    location.reload(); // Refresh the page to show updated image
+                } else {
+                    alert('Failed to update image: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error updating image:', error);
+                alert('Error updating image. Please try again.');
             }
-        }
+        });
 
         function openPlantDetail(plantId) {
-            window.location.href = '/plant/' + plantId;
+            window.location.href = '/plant/' + plantId + '/overview';
+        }
+
+        function openPlantAnomalies(plantId) {
+            // Open the anomalies map page
+            window.location.href = '/check/' + plantId;
         }
 
         function toggleUserDropdown() {
@@ -943,85 +995,11 @@
             }
         }
 
-        // Image Edit Modal Functions
-        function openImageEditModal(plantId, plantName) {
-            document.getElementById('editPlantId').value = plantId;
-            document.getElementById('editPlantName').value = plantName;
-            document.getElementById('imageEditModal').classList.remove('hidden');
-            
-            // Reset form
-            document.getElementById('imageEditForm').reset();
-            document.getElementById('editPlantId').value = plantId;
-            document.getElementById('editPlantName').value = plantName;
-            document.getElementById('imagePreviewContainer').style.display = 'none';
-        }
-
-        function hideImageEditModal() {
-            document.getElementById('imageEditModal').classList.add('hidden');
-        }
-
-        // Image preview functionality
-        document.getElementById('plantPhoto').addEventListener('change', function(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    document.getElementById('imagePreview').src = e.target.result;
-                    document.getElementById('imagePreviewContainer').style.display = 'block';
-                };
-                reader.readAsDataURL(file);
-            } else {
-                document.getElementById('imagePreviewContainer').style.display = 'none';
-            }
-        });
-
-        // Image edit form submission
-        document.getElementById('imageEditForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            
-            try {
-                const response = await fetch('/api/plants/update-image', {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.json();
-                
-                if (result.success) {
-                    alert('Plant image updated successfully!');
-                    hideImageEditModal();
-                    location.reload(); // Refresh to show updated image
-                } else {
-                    alert('Failed to update image: ' + result.message);
-                }
-            } catch (error) {
-                console.error('Error updating plant image:', error);
-                alert('Error updating image. Please try again.');
-            }
-        });
-
-        // Plant navigation functions
-        function openPlantOverview(plantId) {
-            window.location.href = `/plant/${plantId}/overview`;
-        }
-
-        function openAnomalies(plantId) {
-            // Navigate to plant detail page where audits are listed
-            // The plant detail page contains audit information
-            window.location.href = `/plant/${plantId}`;
-        }
-
         // Close modal when clicking outside
         document.addEventListener('click', function (e) {
             if (e.target.classList.contains('modal-overlay')) {
-                if (!e.target.querySelector('#addPlantModal.hidden')) {
-                    hideAddPlantModal();
-                }
-                if (!e.target.querySelector('#imageEditModal.hidden')) {
-                    hideImageEditModal();
-                }
+                hideAddPlantModal();
+                hideEditImageModal();
             }
         });
     </script>

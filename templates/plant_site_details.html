@@ -1,0 +1,1409 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ plant.name }} - Site Details</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo/logo1.png') }}">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-color: #2e7d32;
+            --secondary-color: #F97316;
+            --accent-color: #06B6D4;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --error-color: #EF4444;
+            --background-color: #F8FAFC;
+            --surface-color: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .main-app {
+            min-height: 100vh;
+            display: flex;
+            max-width: 100vw;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 200px;
+            background: white;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            position: fixed;
+            height: 100vh;
+            z-index: 50;
+            flex-shrink: 0;
+        }
+
+        .sidebar-logo {
+            padding: 12px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .sidebar-logo img {
+            width: 100%;
+            height: auto;
+            max-width: 150px;
+            display: block;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 10px;
+            color: black;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: var(--primary-color);
+            color: white;
+            border-right: 3px solid var(--primary-color);
+        }
+
+        .sidebar-menu svg {
+            margin-right: 10px;
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            min-height: 20px;
+            flex-shrink: 0;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 200px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            background: var(--surface-color);
+            border-bottom: 1px solid var(--border-color);
+            padding: 10px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--text-secondary);
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .top-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .top-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .top-btn:hover {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .top-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+
+        .top-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .back-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-color);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+
+        .back-button:hover {
+            background: var(--border-color);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex: 1;
+            padding: 30px;
+            overflow-y: auto;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-color);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .page-title svg {
+            width: 32px;
+            height: 32px;
+            color: var(--primary-color);
+        }
+
+        /* Plant Image Section */
+        .plant-image-section {
+            background: var(--surface-color);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .section-header {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .section-header h2 {
+            color: var(--text-color);
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .section-header p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .plant-image-container {
+            position: relative;
+            display: inline-block;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .plant-image {
+            width: 100%;
+            height: 300px;
+            object-fit: cover;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .plant-image:hover {
+            transform: scale(1.02);
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 300px;
+            background: #F8FAFC;
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            border: 2px dashed var(--border-color);
+            transition: all 0.3s ease;
+        }
+
+        .image-placeholder:hover {
+            background: #F0FDF4;
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .image-actions {
+            margin-top: 16px;
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .image-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .image-btn:hover {
+            background: #1e7b31;
+        }
+
+        .image-btn.secondary {
+            background: var(--secondary-color);
+        }
+
+        .image-btn.secondary:hover {
+            background: #d97706;
+        }
+
+        .image-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Admin Upload Section Styles */
+        .admin-upload-section {
+            background: var(--surface-color);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .admin-upload-section h2 {
+            color: var(--text-color);
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .admin-upload-section p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .upload-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .upload-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            background: #F8FAFC;
+        }
+
+        .upload-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        /* Client View Section Styles */
+        .client-view-section {
+            background: var(--surface-color);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .client-view-section h2 {
+            color: var(--text-color);
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            text-align: center;
+        }
+
+        .client-view-section p {
+            color: var(--text-secondary);
+            font-size: 14px;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .images-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+        }
+
+        .image-view-card {
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            background: #F8FAFC;
+            text-align: center;
+        }
+
+        .image-view-card h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 15px;
+        }
+
+        .image-view-card .plant-image-container {
+            position: relative;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            border-radius: 12px;
+            cursor: pointer;
+        }
+
+        .image-view-card:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .image-overlay svg {
+            width: 32px;
+            height: 32px;
+            margin-bottom: 8px;
+        }
+
+        .image-overlay span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .image-placeholder.no-upload {
+            cursor: default;
+            border-style: solid;
+            background: #F1F5F9;
+            color: var(--text-secondary);
+        }
+
+        .image-placeholder.no-upload:hover {
+            background: #F1F5F9;
+            border-color: var(--border-color);
+            color: var(--text-secondary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .upload-grid,
+            .images-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .admin-upload-section,
+            .client-view-section {
+                padding: 20px;
+            }
+
+            .upload-card,
+            .image-view-card {
+                padding: 15px;
+            }
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: var(--surface-color);
+            border-radius: 12px;
+            padding: 24px;
+            max-width: 90vw;
+            max-height: 90vh;
+            overflow: auto;
+            position: relative;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: var(--text-secondary);
+            padding: 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+
+        .close-btn:hover {
+            background: var(--border-color);
+        }
+
+        .modal-image {
+            max-width: 100%;
+            max-height: 70vh;
+            object-fit: contain;
+            border-radius: 8px;
+        }
+
+        .upload-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .file-input-container {
+            position: relative;
+        }
+
+        .file-input {
+            display: none;
+        }
+
+        .file-input-label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 200px;
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #F8FAFC;
+        }
+
+        .file-input-label:hover,
+        .file-input-label.dragover {
+            border-color: var(--primary-color);
+            background: #F0FDF4;
+        }
+
+        .file-preview {
+            max-width: 300px;
+            max-height: 200px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-top: 12px;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 12px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e7b31;
+        }
+
+        .btn-secondary {
+            background: var(--border-color);
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background: #D1D5DB;
+        }
+
+        /* Info Grid */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .info-section {
+            background: var(--surface-color);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+            border: 1px solid var(--border-color);
+        }
+
+        .info-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--text-color);
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .info-title svg {
+            width: 20px;
+            height: 20px;
+            color: var(--primary-color);
+        }
+
+        .info-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .info-item:last-child {
+            border-bottom: none;
+        }
+
+        .info-label {
+            font-weight: 500;
+            color: var(--text-secondary);
+            flex: 1;
+        }
+
+        .info-value {
+            font-weight: 600;
+            color: var(--text-color);
+            text-align: right;
+            flex: 1;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .sidebar {
+                width: 150px;
+            }
+
+            .main-content {
+                margin-left: 150px;
+            }
+
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 100%;
+                position: relative;
+                height: auto;
+                z-index: auto;
+                box-shadow: none;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .top-buttons {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="main-app">
+        <!-- Fixed Sidebar -->
+        <div class="sidebar">
+            <div class="sidebar-logo">
+                <img src="{{ url_for('static', filename='images/logo/logo1.png') }}" alt="Solar Plant Manager Logo">
+            </div>
+            <ul class="sidebar-menu">
+                <li>
+                    <a href="/homepage">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
+                            </path>
+                        </svg>
+                        Home
+                    </a>
+                </li>
+                <li>
+                    <a href="/audit" class="active">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+                            <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                            <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        </svg>
+                        Thermography
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 20 V4 H21" />
+                            <path d="M3 18 C6 14, 12 8, 21 4" />
+                        </svg>
+                        IV Curve Testing
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
+                            <path d="M4 10h16M4 14h16" />
+                            <path d="M10 4v16" />
+                        </svg>
+                        EL Testing
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 3v18" />
+                            <path d="M6 6h12M4 10h16M6 14h12" />
+                            <path d="M6 6l-2 4M18 6l2 4M6 14l-2-4M18 14l2-4" />
+                        </svg>
+                        Transmission Line
+                    </a>
+                </li>
+                <li>
+                    <a href="#">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4">
+                            </path>
+                        </svg>
+                        Data
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Header -->
+            <div class="header">
+                <div class="breadcrumb">
+                    <a href="/homepage">Plants</a>
+                    <span>›</span>
+                    <a href="/plant/{{ plant._id }}">{{ plant.name }}</a>
+                    <span>›</span>
+                    <span>Site Details</span>
+                </div>
+                <div class="header-actions">
+                    <div class="top-buttons">
+                        <button class="top-btn" onclick="openOverview()">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                            </svg>
+                            Overview
+                        </button>
+                        <button class="top-btn" onclick="openAnomaliesMap()">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                            </svg>
+                            Anomalies Map
+                        </button>
+                        <button class="top-btn active">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Site Details
+                        </button>
+                        <button class="top-btn">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                            </svg>
+                            Report
+                        </button>
+                    </div>
+                    <a href="/plant/{{ plant._id }}/overview" class="back-button">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                        </svg>
+                        Back to Overview
+                    </a>
+                </div>
+            </div>
+
+            <!-- Content Area -->
+            <div class="content-area">
+                <h1 class="page-title">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    </svg>
+                    {{ plant.name }} - Site Details
+                </h1>
+
+                <!-- Plant Images Section -->
+                {% if check_mate == 1 %}
+                <!-- Admin View: Upload options at top, side by side -->
+                <div class="admin-upload-section">
+                    <h2>Plant Images Management</h2>
+                    <p>Upload and manage plant images for documentation</p>
+                    
+                    <div class="upload-grid">
+                        <!-- Main Image Upload -->
+                        <div class="upload-card">
+                            <h3>Main Plant Image</h3>
+                            <div class="plant-image-container">
+                                {% if plant.image %}
+                                    <img src="{{ plant.image }}" alt="{{ plant.name }}" class="plant-image" id="plantImage" onclick="openImageModal()">
+                                {% else %}
+                                    <div class="image-placeholder" onclick="openEditImageModal()">
+                                        <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <span>Click to upload main image</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="image-actions">
+                                {% if plant.image %}
+                                    <button class="image-btn" onclick="openImageModal()">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                        </svg>
+                                        View Full Size
+                                    </button>
+                                {% endif %}
+                                <button class="image-btn secondary" onclick="openEditImageModal()">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    {% if plant.image %}Edit Image{% else %}Upload Image{% endif %}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Additional Image Upload -->
+                        <div class="upload-card">
+                            <h3>Additional Plant Image</h3>
+                            <div class="plant-image-container">
+                                {% if plant.additional_image %}
+                                    <img src="{{ plant.additional_image }}" alt="{{ plant.name }} - Additional" class="plant-image" id="additionalPlantImage" onclick="openAdditionalImageModal()">
+                                {% else %}
+                                    <div class="image-placeholder" onclick="openEditAdditionalImageModal()">
+                                        <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <span>Click to upload additional image</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            <div class="image-actions">
+                                {% if plant.additional_image %}
+                                    <button class="image-btn" onclick="openAdditionalImageModal()">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                        </svg>
+                                        View Full Size
+                                    </button>
+                                {% endif %}
+                                <button class="image-btn secondary" onclick="openEditAdditionalImageModal()">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                    </svg>
+                                    {% if plant.additional_image %}Edit Additional Image{% else %}Upload Additional Image{% endif %}
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <!-- Client View: View-only images side by side -->
+                <div class="client-view-section">
+                    <h2>Plant Images</h2>
+                    <p>View plant documentation images</p>
+                    
+                    <div class="images-grid">
+                        <!-- Main Image View -->
+                        <div class="image-view-card">
+                            <h3>Main Plant Image</h3>
+                            <div class="plant-image-container">
+                                {% if plant.image %}
+                                    <img src="{{ plant.image }}" alt="{{ plant.name }}" class="plant-image" id="plantImage" onclick="openImageModal()">
+                                    <div class="image-overlay" onclick="openImageModal()">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                                        </svg>
+                                        <span>Click to view full size</span>
+                                    </div>
+                                {% else %}
+                                    <div class="image-placeholder no-upload">
+                                        <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <span>No main image available</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <!-- Additional Image View -->
+                        <div class="image-view-card">
+                            <h3>Additional Plant Image</h3>
+                            <div class="plant-image-container">
+                                {% if plant.additional_image %}
+                                    <img src="{{ plant.additional_image }}" alt="{{ plant.name }} - Additional" class="plant-image" id="additionalPlantImage" onclick="openAdditionalImageModal()">
+                                    <div class="image-overlay" onclick="openAdditionalImageModal()">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
+                                        </svg>
+                                        <span>Click to view full size</span>
+                                    </div>
+                                {% else %}
+                                    <div class="image-placeholder no-upload">
+                                        <svg width="40" height="40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                                        </svg>
+                                        <span>No additional image available</span>
+                                    </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                <div class="info-grid">
+                    <!-- Location Information -->
+                    <div class="info-section">
+                        <div class="info-title">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Location Details
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Address</span>
+                            <span class="info-value">{{ plant.address or 'Not specified' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Country</span>
+                            <span class="info-value">{{ plant.country or 'Not specified' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">State</span>
+                            <span class="info-value">{{ plant.state or 'Not specified' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Pincode</span>
+                            <span class="info-value">{{ plant.pincode or 'Not specified' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Latitude</span>
+                            <span class="info-value">{{ plant.latitude }}°</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Longitude</span>
+                            <span class="info-value">{{ plant.longitude }}°</span>
+                        </div>
+                    </div>
+
+                    <!-- Technical Specifications -->
+                    <div class="info-section">
+                        <div class="info-title">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z">
+                                </path>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                            </svg>
+                            Technical Specifications
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Plant Type</span>
+                            <span class="info-value">{{ plant.plant_type or 'Not specified' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Mounting Type</span>
+                            <span class="info-value">{{ plant.mounting_type or 'Not specified' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Module Type</span>
+                            <span class="info-value">{{ plant.module_type or 'Not specified' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">AC Capacity</span>
+                            <span class="info-value">{{ plant.ac_capacity or '0' }} MW</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">DC Capacity</span>
+                            <span class="info-value">{{ plant.dc_capacity or '0' }} MW</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">No. of Inverters</span>
+                            <span class="info-value">{{ plant.no_of_inverters or '0' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">No. of Blocks</span>
+                            <span class="info-value">{{ plant.no_of_blocks or '0' }}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Land Area</span>
+                            <span class="info-value">{{ plant.land_area or '0' }} Acres</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Total Modules Inspected</span>
+                            <span class="info-value">{{ plant.total_modules_inspected or '0' }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Image View Modal -->
+    <div id="imageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Plant Image - {{ plant.name }}</h3>
+                <button class="close-btn" onclick="closeModal('imageModal')">&times;</button>
+            </div>
+            {% if plant.image %}
+                <img src="{{ plant.image }}" alt="{{ plant.name }}" class="modal-image">
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Image Edit Modal - Admin Only -->
+    {% if check_mate == 1 %}
+    <div id="editImageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">{% if plant.image %}Edit{% else %}Upload{% endif %} Plant Image</h3>
+                <button class="close-btn" onclick="closeModal('editImageModal')">&times;</button>
+            </div>
+            <form class="upload-form" id="imageUploadForm" enctype="multipart/form-data">
+                <div class="file-input-container">
+                    <input type="file" id="imageInput" name="image" accept="image/*" class="file-input" onchange="handleFileSelect(event)">
+                    <label for="imageInput" class="file-input-label" id="fileInputLabel">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span>Click to select image or drag and drop</span>
+                        <small>Supports: JPG, PNG, GIF (Max: 10MB)</small>
+                    </label>
+                    <img id="filePreview" class="file-preview" style="display: none;">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editImageModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="uploadBtn">
+                        {% if plant.image %}Update Image{% else %}Upload Image{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Additional Image View Modal -->
+    <div id="additionalImageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Additional Plant Image - {{ plant.name }}</h3>
+                <button class="close-btn" onclick="closeModal('additionalImageModal')">&times;</button>
+            </div>
+            {% if plant.additional_image %}
+                <img src="{{ plant.additional_image }}" alt="{{ plant.name }} - Additional" class="modal-image">
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Additional Image Edit Modal - Admin Only -->
+    {% if check_mate == 1 %}
+    <div id="editAdditionalImageModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">{% if plant.additional_image %}Edit{% else %}Upload{% endif %} Additional Plant Image</h3>
+                <button class="close-btn" onclick="closeModal('editAdditionalImageModal')">&times;</button>
+            </div>
+            <form class="upload-form" id="additionalImageUploadForm" enctype="multipart/form-data">
+                <div class="file-input-container">
+                    <input type="file" id="additionalImageInput" name="additional_image" accept="image/*" class="file-input" onchange="handleAdditionalFileSelect(event)">
+                    <label for="additionalImageInput" class="file-input-label" id="additionalFileInputLabel">
+                        <svg width="48" height="48" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+                        </svg>
+                        <span>Click to select additional image or drag and drop</span>
+                        <small>Supports: JPG, PNG, GIF (Max: 10MB)</small>
+                    </label>
+                    <img id="additionalFilePreview" class="file-preview" style="display: none;">
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('editAdditionalImageModal')">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="additionalUploadBtn">
+                        {% if plant.additional_image %}Update Additional Image{% else %}Upload Additional Image{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    {% endif %}
+
+    <script>
+        // User role check
+        const isAdmin = {% if check_mate == 1 %}true{% else %}false{% endif %};
+
+        // Modal functions
+        function openImageModal() {
+            document.getElementById('imageModal').classList.add('active');
+        }
+
+        function openEditImageModal() {
+            if (isAdmin) {
+                document.getElementById('editImageModal').classList.add('active');
+            } else {
+                alert('Only administrators can upload/edit images.');
+            }
+        }
+
+        function openAdditionalImageModal() {
+            document.getElementById('additionalImageModal').classList.add('active');
+        }
+
+        function openEditAdditionalImageModal() {
+            if (isAdmin) {
+                document.getElementById('editAdditionalImageModal').classList.add('active');
+            } else {
+                alert('Only administrators can upload/edit images.');
+            }
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Close modal on background click
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('modal')) {
+                e.target.classList.remove('active');
+            }
+        });
+
+        // File handling
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('filePreview');
+            const label = document.getElementById('fileInputLabel');
+            
+            if (file) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                        label.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    alert('Please select a valid image file.');
+                    event.target.value = '';
+                }
+            }
+        }
+
+        // Additional file handling
+        function handleAdditionalFileSelect(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('additionalFilePreview');
+            const label = document.getElementById('additionalFileInputLabel');
+            
+            if (file) {
+                if (file.type.startsWith('image/')) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                        label.style.display = 'none';
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    alert('Please select a valid image file.');
+                    event.target.value = '';
+                }
+            }
+        }
+
+        // Drag and drop functionality
+        const fileInputLabel = document.getElementById('fileInputLabel');
+        
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            fileInputLabel.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            fileInputLabel.addEventListener(eventName, highlight, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            fileInputLabel.addEventListener(eventName, unhighlight, false);
+        });
+
+        function highlight(e) {
+            fileInputLabel.classList.add('dragover');
+        }
+
+        function unhighlight(e) {
+            fileInputLabel.classList.remove('dragover');
+        }
+
+        fileInputLabel.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                document.getElementById('imageInput').files = files;
+                handleFileSelect({ target: { files: files } });
+            }
+        }
+
+        // Form submission
+        document.getElementById('imageUploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            const fileInput = document.getElementById('imageInput');
+            
+            if (fileInput.files.length === 0) {
+                alert('Please select an image to upload.');
+                return;
+            }
+            
+            formData.append('image', fileInput.files[0]);
+            
+            // Show loading state
+            const uploadBtn = document.getElementById('uploadBtn');
+            const originalText = uploadBtn.textContent;
+            uploadBtn.textContent = 'Uploading...';
+            uploadBtn.disabled = true;
+            
+            // Send to backend
+            fetch('/api/plants/{{ plant._id }}/image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the plant image on the page
+                    location.reload(); // Reload to show the new image
+                } else {
+                    alert('Error uploading image: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error uploading image: ' + error.message);
+            })
+            .finally(() => {
+                uploadBtn.textContent = originalText;
+                uploadBtn.disabled = false;
+            });
+        });
+
+        // Additional image upload form submission
+        document.getElementById('additionalImageUploadForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData();
+            const fileInput = document.getElementById('additionalImageInput');
+            
+            if (fileInput.files.length === 0) {
+                alert('Please select an image to upload.');
+                return;
+            }
+            
+            formData.append('additional_image', fileInput.files[0]);
+            
+            // Show loading state
+            const uploadBtn = document.getElementById('additionalUploadBtn');
+            const originalText = uploadBtn.textContent;
+            uploadBtn.textContent = 'Uploading...';
+            uploadBtn.disabled = true;
+            
+            // Send to backend
+            fetch('/api/plants/{{ plant._id }}/additional-image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Update the additional plant image on the page
+                    location.reload(); // Reload to show the new image
+                } else {
+                    alert('Error uploading additional image: ' + (data.message || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error uploading additional image: ' + error.message);
+            })
+            .finally(() => {
+                uploadBtn.textContent = originalText;
+                uploadBtn.disabled = false;
+            });
+        });
+
+        // Navigation functions
+        function openOverview() {
+            const plantId = '{{ plant._id }}';
+            window.location.href = '/plant/' + plantId + '/overview';
+        }
+
+        function openAnomaliesMap() {
+            const plantId = '{{ plant._id }}';
+            window.location.href = '/plant/' + plantId;
+        }
+    </script>
+</body>
+
+</html>

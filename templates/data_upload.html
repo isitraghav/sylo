@@ -273,6 +273,29 @@
             padding-top: 1px;
         }
 
+        .gdrive-help {
+            background: rgba(66, 133, 244, 0.1);
+            border: 1px solid rgba(66, 133, 244, 0.3);
+            border-radius: 8px;
+            padding: 10px;
+            margin-top: 8px;
+            font-size: 12px;
+            color: #1e40af;
+            line-height: 1.4;
+        }
+
+        .gdrive-help strong {
+            color: #1e3a8a;
+        }
+
+        .upload-status.status-error {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            padding: 10px;
+            border-radius: 6px;
+            margin-top: 10px;
+        }
+
         .success-icon {
             position: absolute;
             top: 10px;
@@ -443,6 +466,13 @@
                                 <button class="upload-btn gdrive-upload" onclick="startGoogleDriveUpload('visual_ortho')">
                                     ☁️ Upload from Google Drive
                                 </button>
+                                <div class="gdrive-help">
+                                    📋 <strong>Setup Instructions:</strong><br>
+                                    1. Right-click file/folder in Google Drive → Share<br>
+                                    2. Change permission to "Anyone with the link"<br>
+                                    3. Copy the sharing URL and paste above<br>
+                                    4. Enter exact filename when prompted
+                                </div>
                             </div>
                         </div>
                         
@@ -473,6 +503,13 @@
                                 <button class="upload-btn gdrive-upload" onclick="startGoogleDriveUpload('thermal_ortho')">
                                     ☁️ Upload from Google Drive
                                 </button>
+                                <div class="gdrive-help">
+                                    📋 <strong>Setup Instructions:</strong><br>
+                                    1. Right-click file/folder in Google Drive → Share<br>
+                                    2. Change permission to "Anyone with the link"<br>
+                                    3. Copy the sharing URL and paste above<br>
+                                    4. Enter exact filename when prompted
+                                </div>
                             </div>
                         </div>
                         
@@ -751,13 +788,51 @@
 
             } catch (error) {
                 console.error('Google Drive upload error:', error);
-                statusElement.textContent = `Upload failed: ${error.message}`;
+                
+                let errorMessage = error.message;
+                let troubleshootingSteps = '';
+                
+                // Parse server response for detailed error info
+                if (error.response) {
+                    try {
+                        const errorData = await error.response.json();
+                        errorMessage = errorData.error || errorData.message || errorMessage;
+                        
+                        if (errorData.troubleshooting) {
+                            troubleshootingSteps = '\n\nTroubleshooting:\n';
+                            if (typeof errorData.troubleshooting === 'object') {
+                                Object.values(errorData.troubleshooting).forEach(step => {
+                                    troubleshootingSteps += `• ${step}\n`;
+                                });
+                            } else {
+                                troubleshootingSteps += `• ${errorData.troubleshooting}\n`;
+                            }
+                        }
+                        
+                        if (errorData.available_files) {
+                            troubleshootingSteps += '\nAvailable files:\n';
+                            errorData.available_files.forEach(file => {
+                                troubleshootingSteps += `• ${file}\n`;
+                            });
+                        }
+                    } catch (parseError) {
+                        console.error('Error parsing server response:', parseError);
+                    }
+                }
+                
+                const fullErrorMessage = `${errorMessage}${troubleshootingSteps}`;
+                statusElement.textContent = fullErrorMessage;
                 statusElement.className = 'upload-status status-error';
+                statusElement.style.whiteSpace = 'pre-line';
+                statusElement.style.fontSize = '12px';
                 progressBar.style.display = 'none';
                 
                 // Re-enable upload button
                 uploadButton.disabled = false;
                 uploadButton.textContent = '☁️ Upload from Google Drive';
+                
+                // Show helpful alert
+                alert(`Upload Error: ${errorMessage}\n\nCommon Solutions:\n1. Set Google Drive permission to 'Anyone with the link'\n2. Use folder URL (not direct file URL)\n3. Check file name spelling and case\n4. Ensure stable internet connection`);
             }
         }
 
@@ -844,8 +919,37 @@
 
         function handleUploadError(fileType, data, statusElement, progressBar, uploadButton) {
             const errorMsg = data.error || 'Upload failed';
-            statusElement.textContent = `❌ Upload failed: ${errorMsg}`;
+            
+            // Create detailed error message
+            let detailedError = `❌ Upload failed: ${errorMsg}`;
+            
+            // Add troubleshooting info if available
+            if (data.troubleshooting) {
+                detailedError += '\n\nTroubleshooting Steps:';
+                if (typeof data.troubleshooting === 'object') {
+                    Object.values(data.troubleshooting).forEach(step => {
+                        detailedError += `\n• ${step}`;
+                    });
+                } else {
+                    detailedError += `\n• ${data.troubleshooting}`;
+                }
+            }
+            
+            // Show available files if provided
+            if (data.available_files && data.available_files.length > 0) {
+                detailedError += '\n\nAvailable files in folder:';
+                data.available_files.forEach(file => {
+                    detailedError += `\n• ${file}`;
+                });
+                if (data.total_files > data.available_files.length) {
+                    detailedError += `\n• ... and ${data.total_files - data.available_files.length} more files`;
+                }
+            }
+            
+            statusElement.textContent = detailedError;
             statusElement.className = 'upload-status status-error';
+            statusElement.style.whiteSpace = 'pre-line'; // Preserve line breaks
+            statusElement.style.fontSize = '12px'; // Smaller font for detailed error
             
             // Reset upload button
             uploadButton.disabled = false;
@@ -857,6 +961,13 @@
             }, 3000);
             
             currentUploadId = null;
+            
+            // Show alert with instructions
+            if (data.troubleshooting) {
+                setTimeout(() => {
+                    alert(`Upload Failed: ${errorMsg}\n\nPlease:\n1. Right-click your file in Google Drive\n2. Click 'Share'\n3. Change to 'Anyone with the link'\n4. Try uploading again`);
+                }, 1000);
+            }
         }
     </script>
 </body>

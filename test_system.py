@@ -7,14 +7,14 @@ import json
 
 def test_login_page():
     """Test the login page and show terminal output"""
-    print("🌐 Testing Sylo Energy Login Page...")
+    print("🌐 Testing SYLO Energy Login Page...")
     
     try:
         response = requests.get('http://127.0.0.1:3333/login')
         print(f"✅ Login page loaded successfully (Status: {response.status_code})")
         
         # Check if the page contains our updated content
-        if 'Sylo Energy' in response.text and 'login_back.jpeg' in response.text:
+        if 'SYLO ENERGY' in response.text and 'login_back.jpeg' in response.text:
             print("✅ Updated design with logo and background image loaded")
         else:
             print("⚠️  Updated design may not be fully loaded")
@@ -71,7 +71,7 @@ def test_upload_progress_page():
         print(f"❌ Error accessing upload progress page: {e}")
 
 if __name__ == "__main__":
-    print("🔧 Sylo Energy System Test Suite")
+    print("🔧 SYLO Energy System Test Suite")
     print("=" * 50)
     
     test_login_page()

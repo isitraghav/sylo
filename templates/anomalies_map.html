@@ -459,6 +459,39 @@
                 margin: 10% auto;
             }
         }
+
+        .audit-header {
+            cursor: pointer;
+        }
+
+        .audit-actions {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #E2E8F0;
+        }
+
+        .btn-view-details {
+            width: 100%;
+            padding: 8px 12px;
+            background: #16A34A;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-view-details:hover {
+            background: #15803D;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
     </style>
 </head>
 
@@ -487,16 +520,24 @@
                     
                     <div class="audit-list">
                         {% for audit in audits %}
-                        <div class="audit-item" onclick="loadAuditMap('{{ audit._id }}', '{{ audit.s3_url }}')" data-audit-id="{{ audit._id }}">
-                            <div class="audit-name">{{ audit.tif_file_name }}</div>
-                            <div class="audit-meta">
-                                <span class="audit-date">
-                                    <i class="fas fa-calendar"></i>
-                                    {{ audit.upload_date }}
-                                </span>
-                                <span class="audit-status status-{{ audit.status }}">
-                                    {{ audit.status.title() }}
-                                </span>
+                        <div class="audit-item" data-audit-id="{{ audit._id }}">
+                            <div class="audit-header" onclick="loadAuditMap('{{ audit._id }}', '{{ audit.s3_url }}')">
+                                <div class="audit-name">{{ audit.tif_file_name }}</div>
+                                <div class="audit-meta">
+                                    <span class="audit-date">
+                                        <i class="fas fa-calendar"></i>
+                                        {{ audit.upload_date }}
+                                    </span>
+                                    <span class="audit-status status-{{ audit.status }}">
+                                        {{ audit.status.title() }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="audit-actions">
+                                <button class="btn-view-details" onclick="viewAuditDetails('{{ audit._id }}')">
+                                    <i class="fas fa-eye"></i>
+                                    View Details
+                                </button>
                             </div>
                         </div>
                         {% endfor %}
@@ -1014,6 +1055,12 @@
                 }
             });
         });
+
+        // View audit details in detail page
+        function viewAuditDetails(auditId) {
+            // Open audit details page in new tab
+            window.open('/audit/' + auditId + '/details', '_blank');
+        }
     </script>
 </body>
 </html>

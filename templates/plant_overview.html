@@ -1,13 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ plant.name }} - Overview</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo/logo1.png') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
     <style>
+        :root {
+            --primary-green: #16A34A;
+            --light-gray-bg: #F8FAFC;
+            --border-color: #EAF0F6;
+            --text-primary: #0D1A2B;
+            --text-secondary: #64748B;
+            --white: #FFFFFF;
+        }
+
         * {
             margin: 0;
             padding: 0;
@@ -15,51 +24,63 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #F8FAFC;
-            color: #1E293B;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            background-color: var(--light-gray-bg);
+            color: var(--text-primary);
+            font-size: 14px;
             line-height: 1.6;
         }
 
         .main-app {
-            min-height: 100vh;
             display: flex;
+            min-height: 100vh;
             max-width: 100vw;
             overflow-x: hidden;
         }
 
-        /* Sidebar */
+        /* Sidebar Styles */
         .sidebar {
-            width: 200px;
-            background: white;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            position: fixed;
+            width: 220px;
+            background-color: var(--white);
             height: 100vh;
-            z-index: 50;
-            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            z-index: 100;
+            border-right: 1px solid var(--border-color);
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar.mobile-hidden {
+            transform: translateX(-100%);
         }
 
         .sidebar-logo {
-            padding: 16px;
-            border-bottom: 1px solid #E2E8F0;
+            padding: 22px 24px;
+            border-bottom: 1px solid var(--border-color);
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 10px;
         }
 
         .sidebar-logo img {
-            height: 110px;
+            height: 40px;
+            width: auto;
+            max-width: 100%;
+            object-fit: contain;
         }
-
+        
         .logo-text {
-            font-weight: bold;
-            color: #16A34A;
-            font-size: 18px;
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--primary-green);
         }
 
         .sidebar-menu {
             list-style: none;
-            margin-top: 20px;
+            margin-top: 24px;
+            padding: 0 16px;
         }
 
         .sidebar-menu li a {
@@ -68,75 +89,122 @@
             padding: 12px 16px;
             text-decoration: none;
             color: #374151;
-            transition: all 0.2s;
             font-size: 14px;
+            font-weight: 600;
+            border-radius: 6px;
+            margin-bottom: 8px;
+            transition: all 0.2s;
         }
 
-        .sidebar-menu li a:hover,
-        .sidebar-menu li a.active {
-            background: #16A34A;
+        .sidebar-menu li a:hover { 
+            background-color: #F1F5F9; 
+        }
+
+        .sidebar-menu li a.active { 
+            background-color: var(--primary-green); 
+            color: var(--white); 
+        }
+
+        .sidebar-menu li a svg { 
+            width: 20px; 
+            height: 20px; 
+            margin-right: 12px; 
+        }
+
+        /* Sidebar Toggle Button */
+        .sidebar-toggle {
+            display: none;
+            position: fixed;
+            top: 15px;
+            left: 15px;
+            z-index: 200;
+            background: var(--primary-green);
             color: white;
-            border-right: 2px solid #16A34A;
+            border: none;
+            border-radius: 6px;
+            padding: 8px;
+            cursor: pointer;
         }
 
-        .sidebar-menu li a svg {
+        .sidebar-toggle svg {
             width: 20px;
             height: 20px;
-            margin-right: 12px;
         }
 
-        /* Main Content */
+        /* Main Content Styles */
         .main-content {
-            flex: 1;
-            margin-left: 200px;
-            max-width: calc(100vw - 200px);
-            overflow-x: hidden;
+            flex-grow: 1;
+            margin-left: 220px;
+            padding: 24px 32px;
+            overflow-y: auto;
+            height: 100vh;
         }
 
-        /* Header */
+        /* Header Styles */
         .header {
-            background: white;
-            border-bottom: 1px solid #E2E8F0;
-            padding: 12px 24px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
+            margin-bottom: 24px;
+            position: sticky;
+            top: 0;
+            background: var(--light-gray-bg);
+            z-index: 10;
+            padding: 16px 0;
         }
 
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 16px;
+        .header-left p { 
+            font-size: 14px; 
+            color: var(--text-secondary); 
         }
 
-        .breadcrumb {
-            display: flex;
-            align-items: center;
+        .header-left strong { 
+            color: var(--text-primary); 
+        }
+
+        .header-center {
+            display: flex; 
+            align-items: center; 
             gap: 6px;
-            font-size: 13px;
-            color: #64748B;
+            background-color: #F1F5F9;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
 
-        .breadcrumb a {
-            color: #64748B;
-            text-decoration: none;
+        .top-btn {
+            padding: 6px 14px; 
+            background: transparent; 
+            border: none;
+            border-radius: 6px; 
+            font-size: 14px; 
+            font-weight: 600;
+            color: #334155; 
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .breadcrumb .current {
-            color: #111827;
+        .top-btn.active { 
+            background: var(--primary-green); 
+            color: var(--white); 
+        }
+
+        .top-btn:hover {
+            background: var(--primary-green);
+            color: var(--white);
         }
 
         .back-button {
-            display: flex;
-            align-items: center;
-            padding: 8px 16px;
-            background: #16A34A;
-            color: white;
-            border: none;
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+            padding: 9px 16px; 
+            background: var(--primary-green);
+            color: var(--white); 
+            border: none; 
             border-radius: 8px;
-            font-size: 14px;
+            font-size: 14px; 
+            font-weight: 500; 
             cursor: pointer;
             transition: background 0.2s;
         }
@@ -145,323 +213,368 @@
             background: #15803D;
         }
 
-        /* Top Buttons */
-        .top-buttons {
+        /* Main two-column layout for the top section */
+        .top-section-layout {
             display: flex;
-            gap: 6px;
-        }
-
-        .top-btn {
-            display: flex;
-            align-items: center;
-            padding: 6px 12px;
-            background: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 6px;
-            font-size: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            white-space: nowrap;
-        }
-
-        .top-btn:hover {
-            background: #F1F5F9;
-        }
-
-        .top-btn.active {
-            background: #16A34A;
-            color: white;
-            border-color: #16A34A;
-        }
-
-        .top-btn svg {
-            width: 14px;
-            height: 14px;
-            margin-right: 6px;
-        }
-
-        /* Content Layout */
-        .content-area {
-            padding: 24px;
-            display: flex;
+            flex-direction: row;
             gap: 24px;
-            max-width: 100%;
-            overflow: hidden;
+            align-items: flex-start;
+            margin-bottom: 24px;
         }
 
-        .left-column {
-            flex: 2;
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
-            max-width: calc(100% - 300px);
-        }
-
-        .right-column {
-            flex: 0 0 280px;
-            width: 280px;
-            min-width: 280px;
-        }
-
-        /* Analytics Cards */
-        .analytics-card {
-            background: white;
-            border-radius: 6px;
-            padding: 8px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #E2E8F0;
-            min-height: 62px;
-        }
-
-        .analytics-content {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .analytics-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            flex-shrink: 0;
-        }
-
-        .analytics-icon svg {
-            width: 14px;
-            height: 14px;
-        }
-
-        .analytics-info {
-            flex: 1;
+        .top-section-left {
+            flex: 2; /* Takes up 2/3 of the space */
             min-width: 0;
         }
 
-        .analytics-title {
-            font-size: 9px;
-            color: #64748B;
-            margin-bottom: 1px;
-            line-height: 1.1;
+        .top-section-right {
+            flex: 1; /* Takes up 1/3 of the space */
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            min-width: 0;
+        }
+        
+        /* DC Capacity Grid */
+        .dc-capacity-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 24px;
+        }
+
+        .dc-card {
+            background-color: var(--white); 
+            border: 1px solid var(--border-color);
+            border-radius: 8px; 
+            padding: 16px; 
+            display: flex;
+            align-items: center; 
+            gap: 16px;
+        }
+
+        .dc-card-info { 
+            flex-grow: 1; 
+        }
+
+        .dc-card-info p { 
+            font-size: 13px; 
+            color: var(--text-secondary); 
+            margin: 0; 
+        }
+
+        .dc-card-info h3 { 
+            font-size: 18px; 
+            font-weight: 600; 
+            color: var(--text-primary); 
+            margin-top: 4px; 
+        }
+
+        .dc-card-icon { 
+            color: #94A3B8; 
+        }
+        
+        /* Anomaly Summary Cards */
+        .anomaly-summary-card {
+            background-color: var(--white); 
+            border: 1px solid var(--border-color);
+            border-radius: 8px; 
+            padding: 35px 27px; 
+            margin-bottom: 0;
+        }
+        
+        .summary-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 8px; 
+        }
+        
+        .summary-title { 
+            font-size: 13px; 
+            font-weight: 600; 
+            color: var(--text-secondary); 
+            text-transform: uppercase; 
+        }
+        
+        .summary-total-container { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            margin-bottom: 12px; 
+        }
+
+        .summary-total-label { 
+            font-size: 14px; 
+            font-weight: 500; 
+        }
+
+        .summary-total-value { 
+            font-size: 24px; 
+            font-weight: 700; 
+        }
+        
+        .summary-header-right { 
+            display: flex; 
+            align-items: center; 
+            gap: 16px; 
+            font-size: 13px; 
+            font-weight: 500; 
+            color: var(--text-secondary); 
+        }
+
+        .summary-header-right span { 
+            cursor: pointer; 
+        }
+
+        .summary-header-right span.active { 
+            color: var(--text-primary); 
+            font-weight: 600; 
+        }
+        
+        .horizontal-progress-bar { 
+            width: 100%; 
+            height: 8px; 
+            border-radius: 4px; 
+            overflow: hidden; 
+            display: flex; 
+            background-color: #F1F5F9; 
+            margin-bottom: 16px; 
+        }
+        
+        .progress-segment { 
+            height: 100%; 
+            transition: width 0.5s ease;
+        }
+        
+        .summary-legend { 
+            display: flex; 
+            gap: 24px; 
+            align-items: center; 
+            flex-wrap: wrap; 
+        }
+
+        .legend-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            font-size: 13px; 
+        }
+        
+        .legend-color { 
+            width: 10px; 
+            height: 10px; 
+            border-radius: 2px; 
+        }
+        
+        .legend-item span { 
+            font-weight: 500; 
+            color: var(--text-primary); 
+        }
+        
+        .legend-item .value { 
+            color: var(--text-secondary); 
+            margin-left: 2px;
+        }
+        
+        /* Severity by Type Section */
+        .severity-analysis-section {
+            margin-bottom: 24px;
+        }
+        
+        .severity-card {
+            background: var(--white);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .severity-tabs {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .severity-tab {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 14px;
             font-weight: 500;
         }
-
-        .analytics-value {
-            font-size: 12px;
-            font-weight: 600;
-            color: #16A34A;
-            margin-bottom: 1px;
-            line-height: 1.1;
-        }
-
-        .analytics-subtitle {
-            font-size: 8px;
-            color: #94A3B8;
-            line-height: 1.0;
-        }
-
-        /* Progress Cards */
-        .progress-card {
-            background: white;
-            border-radius: 8px;
-            padding: 16px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #E2E8F0;
-            margin-bottom: 16px;
-        }
-
-        .progress-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        .horizontal-progress-bar {
-            width: 100%;
-            height: 16px;
-            border-radius: 8px;
-            overflow: hidden;
-            display: flex;
-            box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.08);
-            margin-bottom: 8px;
-        }
-
-        .progress-segment {
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        
+        .severity-tab.active {
+            background: var(--primary-color);
             color: white;
-            font-size: 10px;
+            border-color: var(--primary-color);
+        }
+        
+        .severity-tab:hover:not(.active) {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+        
+        .severity-view {
+            display: none;
+            padding: 20px;
+        }
+        
+        .severity-view.active {
+            display: block;
+        }
+        
+        .severity-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .severity-row {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+            gap: 16px;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .severity-header {
             font-weight: 600;
-            position: relative;
-            transition: width 0.5s ease;
-            width: 0%;
+            color: var(--text-primary);
+            background: var(--surface-color);
+            padding: 16px 0;
+            border-radius: 6px 6px 0 0;
         }
-
-        .progress-text {
-            font-size: 9px;
-            font-weight: 600;
-        }
-
-        .progress-legend {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 8px;
-        }
-
-        .legend-item {
+        
+        .severity-col {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 12px;
+            padding: 0 12px;
+            font-size: 14px;
+        }
+        
+        .severity-type {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .severity-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        
+        .severity-row:not(.severity-header) .severity-col {
+            color: var(--text-secondary);
+        }
+        
+        .severity-row:not(.severity-header):hover {
+            background: var(--surface-hover);
         }
 
-        .legend-color {
-            width: 10px;
-            height: 10px;
-            border-radius: 2px;
-        }
-
-        /* Charts */
-        .chart-container {
-            background: white;
-            border-radius: 6px;
-            padding: 12px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-            border: 1px solid #E2E8F0;
-            margin-top: 8px;
-            grid-column: span 2;
-            max-width: 100%;
-            overflow: hidden;
+        /* Anomaly Distribution Section (Doughnut + Table) */
+        .anomaly-distribution-section {
+            display: grid; 
+            grid-template-columns: 3fr 4fr;
+            gap: 24px; 
+            margin-bottom: 24px; 
+            align-items: start;
         }
 
         .pie-chart-container {
-            display: flex;
-            gap: 16px;
-            align-items: flex-start;
-        }
-
-        .pie-chart-section {
-            flex: 1;
-            min-width: 300px;
-        }
-
-        .pie-chart-wrapper {
+            background: var(--white); 
+            border: 1px solid var(--border-color);
+            border-radius: 8px; 
+            padding: 24px; 
             position: relative;
-            width: 100%;
-            height: 280px;
-            margin-bottom: 16px;
         }
-
-        .pie-chart-wrapper canvas {
-            max-width: 100% !important;
-            max-height: 280px !important;
+        
+        .pie-chart-wrapper { 
+            max-width: 250px; 
+            max-height: 250px; 
+            margin: 0 auto; 
+            position: relative; 
         }
-
-        .chart-center-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
+        
+        .chart-center-text { 
+            position: absolute; 
+            top: 34%; 
+            left: 50%; 
+            transform: translate(-50%, -50%); 
+            text-align: center; 
             pointer-events: none;
         }
-
-        .center-value {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1E293B;
-            line-height: 1;
+        
+        .center-value { 
+            font-size: 40px; 
+            font-weight: 700; 
+            color: var(--text-primary); 
         }
 
-        .center-label {
-            font-size: 12px;
-            color: #64748B;
-            margin-top: 4px;
+        .center-label { 
+            font-size: 14px; 
+            color: var(--text-secondary); 
+            margin-top: -5px; 
+        }
+        
+        .pie-chart-legend { 
+            display: flex; 
+            justify-content: center; 
+            flex-wrap: wrap; 
+            gap: 8px 16px; 
+            margin-top: 24px; 
+        }
+        
+        .anomaly-table-wrapper { 
+            padding-top: 12px; 
+        }
+        
+        .table-header { 
+            margin-bottom: 16px; 
+            padding: 0 8px; 
         }
 
-        .custom-legend {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 8px;
-            font-size: 11px;
+        .table-header h3 { 
+            font-size: 16px; 
+            font-weight: 600; 
         }
-
-        .legend-item-pie {
-            display: flex;
-            align-items: center;
-            gap: 6px;
+        
+        .anomaly-table { 
+            width: 100%; 
+            border-collapse: collapse; 
         }
-
-        .legend-color-pie {
-            width: 10px;
-            height: 10px;
-            border-radius: 2px;
-            flex-shrink: 0;
+        
+        .anomaly-table th, .anomaly-table td { 
+            text-align: left; 
+            font-size: 14px; 
+            border-bottom: 1px solid var(--border-color); 
         }
-
-        .legend-text-pie {
-            color: #374151;
-            font-weight: 500;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+        
+        .anomaly-table tr:last-child td { 
+            border-bottom: none; 
         }
-
-        .pie-table-section {
-            flex: 0 0 280px;
-            min-width: 280px;
+        
+        .anomaly-table th { 
+            color: var(--text-secondary); 
+            font-weight: 500; 
+            text-transform: uppercase; 
         }
-
-        .anomaly-table-container {
-            background: #F8FAFC;
-            border: 1px solid #E2E8F0;
-            border-radius: 6px;
-            padding: 12px;
-            max-height: 320px;
-            overflow-y: auto;
+        
+        .anomaly-table td { 
+            color: #334155; 
+            font-weight: 500; 
         }
-
-        .anomaly-table {
-            width: 100%;
-            font-size: 11px;
-            border-collapse: collapse;
-        }
-
-        .anomaly-table th {
-            text-align: left;
-            padding: 8px 4px;
-            font-weight: 600;
-            color: #374151;
-            border-bottom: 2px solid #E2E8F0;
-            position: sticky;
-            top: 0;
-            background: #F8FAFC;
-        }
-
-        .anomaly-table th:nth-child(2),
-        .anomaly-table th:nth-child(3) {
-            text-align: right;
-        }
-
-        .anomaly-table td {
-            padding: 6px 4px;
-            color: #374151;
-            border-bottom: 1px solid #F3F4F6;
-        }
-
-        .anomaly-table td:nth-child(2),
-        .anomaly-table td:nth-child(3) {
-            text-align: right;
-            font-weight: 600;
+        
+        .anomaly-table th:nth-child(n+2), .anomaly-table td:nth-child(n+2) { 
+            text-align: right; 
+            font-weight: 600; 
         }
 
         .table-anomaly-type {
-            display: flex;
             align-items: center;
             gap: 6px;
         }
@@ -472,220 +585,169 @@
             border-radius: 50%;
             flex-shrink: 0;
         }
+        
+        /* Bar Chart Section */
+        .bar-chart-container { 
+            background: var(--white); 
+            border: 1px solid var(--border-color); 
+            border-radius: 8px; 
+            padding: 24px; 
+            margin-bottom: 24px;
+        }
+        
+        .bar-chart-header { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            margin-bottom: 16px; 
+        }
+        
+        .bar-chart-tabs { 
+            display: flex; 
+            gap: 16px; 
+        }
 
-        .chart-title {
+        .bar-chart-tabs span { 
+            font-size: 14px; 
+            font-weight: 600; 
+            color: var(--text-secondary); 
+            cursor: pointer; 
+            padding: 12px 20px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .bar-chart-tabs span:hover {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+
+        .bar-chart-tabs span.active { 
+            color: var(--primary-color); 
+            border-bottom: 3px solid var(--primary-color); 
+            background: var(--surface-color);
+        }
+
+        .severity-type-tab .severity-badge {
+            background: linear-gradient(135deg, #FF6B6B, #FF8E53);
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
             font-size: 12px;
             font-weight: 600;
-            margin-bottom: 8px;
-            color: #1E293B;
+            margin-left: 4px;
+        }
+        
+        .chart-filters { 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
         }
 
-        .chart {
-            width: 100% !important;
-            height: 160px !important;
-            max-width: 100% !important;
-            max-height: 160px !important;
+        .chart-filters button {
+            background: var(--white); 
+            border: 1px solid var(--border-color);
+            padding: 8px 16px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            transition: all 0.2s ease;
         }
 
-        .chart canvas {
-            max-width: 100% !important;
-            max-height: 160px !important;
+        .chart-filters button:hover {
+            background: var(--surface-hover);
+            color: var(--text-primary);
+        }
+        
+        .chart-container { 
+            height: 250px; 
+            margin-bottom: 24px; 
+        }
+        
+        .bar-chart-legend { 
+            display: flex; 
+            flex-wrap: wrap; 
+            gap: 12px 24px; 
+            justify-content: flex-start; 
         }
 
         /* Responsive */
         @media (max-width: 1200px) {
-            .content-area {
-                flex-direction: column;
-                gap: 16px;
-            }
-            
-            .left-column {
-                order: 2;
-                max-width: 100%;
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            }
-            
-            .right-column {
-                order: 1;
-                display: flex;
-                gap: 16px;
-                width: 100%;
-                min-width: auto;
-                flex: none;
-            }
-            
-            .progress-card {
-                flex: 1;
-                margin-bottom: 0;
-                min-width: 250px;
-            }
-
-            .pie-chart-container {
-                flex-direction: column;
-                gap: 16px;
-            }
-
-            .pie-table-section {
-                flex: none;
-                width: 100%;
-                min-width: auto;
-            }
-        }
-
-        @media (max-width: 900px) {
-            .pie-chart-container {
+            .top-section-layout {
                 flex-direction: column;
             }
 
-            .pie-chart-section {
-                min-width: auto;
+            .anomaly-distribution-section {
+                grid-template-columns: 1fr;
+                gap: 16px;
             }
 
-            .pie-table-section {
-                flex: none;
-                width: 100%;
-                min-width: auto;
-            }
-
-            .custom-legend {
-                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            .dc-capacity-grid {
+                grid-template-columns: repeat(2, 1fr);
             }
         }
 
         @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                position: relative;
-                height: auto;
+            .sidebar-toggle {
+                display: block;
             }
-            
+
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.mobile-visible {
+                transform: translateX(0);
+            }
+
             .main-content {
                 margin-left: 0;
-                max-width: 100vw;
+                padding: 16px;
             }
 
             .header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 12px;
+                padding-left: 60px;
             }
 
-            .header-actions {
+            .header-center {
                 width: 100%;
-                justify-content: space-between;
+                justify-content: center;
             }
 
-            .top-buttons {
-                flex-wrap: wrap;
-                gap: 4px;
-            }
-
-            .top-btn {
-                padding: 4px 8px;
-                font-size: 11px;
-            }
-
-            .top-btn svg {
-                width: 12px;
-                height: 12px;
-                margin-right: 4px;
-            }
-            
-            .left-column {
+            .dc-capacity-grid {
                 grid-template-columns: 1fr;
-                gap: 8px;
+                gap: 16px;
             }
-            
-            .right-column {
+
+            .top-section-layout {
                 flex-direction: column;
-                gap: 8px;
-            }
-            
-            .progress-card {
-                min-width: auto;
-            }
-            
-            .chart-container {
-                margin-top: 0;
-            }
-
-            .pie-chart-wrapper {
-                height: 240px;
-            }
-
-            .center-value {
-                font-size: 20px;
-            }
-
-            .center-label {
-                font-size: 10px;
-            }
-
-            .custom-legend {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 6px;
-            }
-
-            .anomaly-table {
-                font-size: 10px;
-            }
-
-            .anomaly-table th,
-            .anomaly-table td {
-                padding: 4px 2px;
+                gap: 16px;
             }
         }
-
-        @media (max-width: 480px) {
-            .content-area {
-                padding: 12px;
-            }
-            
-            .analytics-card {
-                padding: 8px;
-                min-height: 62px;
-            }
-            
-            .analytics-icon {
-                width: 28px;
-                height: 28px;
-            }
-            
-            .analytics-value {
-                font-size: 12px;
-            }
-
-            .pie-chart-wrapper {
-                height: 200px;
-            }
-
-            .center-value {
-                font-size: 18px;
-            }
-
-            .center-label {
-                font-size: 9px;
-            }
-
-            .custom-legend {
-                grid-template-columns: 1fr;
-                gap: 4px;
-            }
-
-            .anomaly-table-container {
-                padding: 8px;
-            }
-
-            .anomaly-table {
-                font-size: 9px;
-            }
-        }
+    </style>
     </style>
 </head>
 
 <body>
     <div class="main-app">
-        <!-- Fixed Sidebar -->
+        <!-- Sidebar Toggle Button -->
+        <button class="sidebar-toggle" onclick="toggleSidebar()">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
+            </svg>
+        </button>
+
         <div class="sidebar">
             <div class="sidebar-logo">
                 <img src="{{ url_for('static', filename='images/logo/logo1.png') }}" alt="Solar Plant Manager Logo">
@@ -695,57 +757,53 @@
                 <li>
                     <a href="/homepage">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6">
-                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                         </svg>
                         Home
                     </a>
                 </li>
                 <li>
                     <a href="/homepage" class="active">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
-                            <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
-                            <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                        <svg fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M2 6a2 2 0 012-2h5l2 2h5a2 2 0 012 2v6a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"></path>
                         </svg>
                         Thermography
                     </a>
                 </li>
                 <li>
                     <a href="#">
-                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M3 20 V4 H21" />
-                        <path d="M3 18 C6 14, 12 8, 21 4" />
-                      </svg>
-                      IV Curve Testing
+                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path d="M3 20 V4 H21" />
+                            <path d="M3 18 C6 14, 12 8, 21 4" />
+                        </svg>
+                        IV Curve Testing
                     </a>
                 </li>
                 <li>
                     <a href="#">
-                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
-                        <path d="M4 10h16M4 14h16" />
-                        <path d="M10 4v16" />
-                      </svg>
-                      EL Testing
+                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                            <path d="M3 9h18M3 15h18" />
+                            <path d="M9 3v18" />
+                            <path d="M15 3v18" />
+                        </svg>
+                        EL Testing
                     </a>
                 </li>
                 <li>
                     <a href="#">
-                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M12 3v18" />
-                        <path d="M6 6h12M4 10h16M6 14h12" />
-                        <path d="M6 6l-2 4M18 6l2 4M6 14l-2-4M18 14l2-4" />
-                      </svg>
-                      Transmission Line
+                        <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                            <path d="M12 3v18" />
+                            <path d="M6 6h12M4 10h16M6 14h12" />
+                            <path d="M6 6l-2 4M18 6l2 4M6 14l-2-4M18 14l2-4" />
+                        </svg>
+                        Transmission Line
                     </a>
                 </li>
                 <li>
                     <a href="#">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4">
-                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"></path>
                         </svg>
                         Data
                     </a>
@@ -753,304 +811,305 @@
             </ul>
         </div>
 
-        <!-- Main Content -->
         <div class="main-content">
-            <!-- Header -->
             <div class="header">
-                <div class="breadcrumb">
-                    <a href="/homepage">Plants</a>
-                    <span>›</span>
-                    <a href="/plant/{{ plant._id }}">{{ plant.name }}</a>
-                    <span>›</span>
-                    <span>Overview</span>
+                <div class="header-left">
+                    <p>Plants / <strong>{{ plant.name }}</strong></p>
                 </div>
-                <div class="header-actions">
-                    <div class="top-buttons">
-                        <button class="top-btn active">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                            </svg>
-                            Overview
-                        </button>
-                        <button class="top-btn" onclick="openAnomaliesMap()">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-                            </svg>
-                            Anomalies Map
-                        </button>
-                        <button class="top-btn">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                            </svg>
-                            Site Details
-                        </button>
-                        <button class="top-btn">
-                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-                            </svg>
-                            Report
-                        </button>
+                <div class="header-center">
+                    <button class="top-btn active">Overview</button>
+                    <button class="top-btn" onclick="openAnomaliesMap()">Anomalies</button>
+                    <button class="top-btn" onclick="openSiteDetails()">Site Details</button>
+                    <button class="top-btn">Report</button>
+                </div>
+                <button class="back-button" onclick="window.history.back()">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                    </svg>
+                    Back to Plants
+                </button>
+            </div>
+
+            <div class="top-section-layout">
+                <div class="top-section-left">
+                    <div class="dc-capacity-grid">
+                        <div class="dc-card">
+                            <div class="dc-card-icon">
+                                <div class="dc-color-symbol" style="background: linear-gradient(135deg, #EF4444, #DC2626); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" fill="white" viewBox="0 0 20 20">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="dc-card-info">
+                                <p>Power Loss</p>
+                                <h3>{{ analytics.power_loss or '0' }} kW</h3>
+                            </div>
+                        </div>
+                        <div class="dc-card">
+                            <div class="dc-card-icon">
+                                <div class="dc-color-symbol" style="background: linear-gradient(135deg, #10B981, #059669); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" fill="white" viewBox="0 0 20 20">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="dc-card-info">
+                                <p>Revenue Loss/yr</p>
+                                <h3>₹{{ analytics.revenue_loss or '0' }}</h3>
+                            </div>
+                        </div>
+                        <div class="dc-card">
+                            <div class="dc-card-icon">
+                                <div class="dc-color-symbol" style="background: linear-gradient(135deg, #3B82F6, #2563EB); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" fill="white" viewBox="0 0 20 20">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="dc-card-info">
+                                <p>AC Capacity</p>
+                                <h3>{{ plant.ac_capacity or '0' }} MW</h3>
+                            </div>
+                        </div>
+                        <div class="dc-card">
+                            <div class="dc-card-icon">
+                                <div class="dc-color-symbol" style="background: linear-gradient(135deg, #F59E0B, #D97706); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" fill="white" viewBox="0 0 20 20">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="dc-card-info">
+                                <p>DC Capacity</p>
+                                <h3>{{ plant.dc_capacity or '0' }} MW</h3>
+                            </div>
+                        </div>
+                        <div class="dc-card">
+                            <div class="dc-card-icon">
+                                <div class="dc-color-symbol" style="background: linear-gradient(135deg, #8B5CF6, #7C3AED); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" fill="white" viewBox="0 0 20 20">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="dc-card-info">
+                                <p>Total Modules</p>
+                                <h3>{{ plant.total_modules_inspected or '0' }}</h3>
+                            </div>
+                        </div>
+                        <div class="dc-card">
+                            <div class="dc-card-icon">
+                                <div class="dc-color-symbol" style="background: linear-gradient(135deg, #06B6D4, #0891B2); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" fill="white" viewBox="0 0 20 20">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h10a2 2 0 002-2v-4a2 2 0 00-2-2h-2m-4-6H3m4 6h4m-4 0V5"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="dc-card-info">
+                                <p>Land Area</p>
+                                <h3>{{ plant.land_area or '0' }}</h3>
+                            </div>
+                        </div>
+                        <div class="dc-card">
+                            <div class="dc-card-icon">
+                                <div class="dc-color-symbol" style="background: linear-gradient(135deg, #EC4899, #DB2777); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" fill="white" viewBox="0 0 20 20">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="dc-card-info">
+                                <p>Inverters</p>
+                                <h3>{{ plant.no_of_inverters or '0' }}</h3>
+                            </div>
+                        </div>
+                        <div class="dc-card">
+                            <div class="dc-card-icon">
+                                <div class="dc-color-symbol" style="background: linear-gradient(135deg, #84CC16, #65A30D); width: 40px; height: 40px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                                    <svg width="20" height="20" fill="white" viewBox="0 0 20 20">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
+                                    </svg>
+                                </div>
+                            </div>
+                            <div class="dc-card-info">
+                                <p>Blocks</p>
+                                <h3>{{ plant.no_of_blocks or '0' }}</h3>
+                            </div>
+                        </div>
                     </div>
-                    <button class="back-button" onclick="window.history.back()">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                        </svg>
-                        Back to Plant
-                    </button>
+                </div>
+                <div class="top-section-right">
+                    <div class="anomaly-summary-card">
+                        <div class="summary-header">
+                            <h3 class="summary-title">Anomalies</h3>
+                            <div class="summary-header-right">
+                                <span class="active" onclick="switchSummaryTab('status')">Status</span>
+                                <span onclick="switchSummaryTab('severity')">Severity</span>
+                                <span onclick="switchSummaryTab('iec')">IEC</span>
+                                <span onclick="switchSummaryTab('cqa')">CQA</span>
+                            </div>
+                        </div>
+                        <div class="summary-total-container">
+                            <span class="summary-total-label">Total</span>
+                            <span class="summary-total-value" id="statusTotal">0</span>
+                        </div>
+                        <div class="horizontal-progress-bar" id="statusProgressBar"></div>
+                        <div class="summary-legend" id="statusLegend"></div>
+                    </div>
+                    <div class="anomaly-summary-card">
+                        <div class="summary-header">
+                            <h3 class="summary-title">Anomalies</h3>
+                            <div class="summary-header-right">
+                                <span onclick="switchSummaryTab('status')">Status</span>
+                                <span class="active" onclick="switchSummaryTab('severity')">Severity</span>
+                                <span onclick="switchSummaryTab('iec')">IEC</span>
+                                <span onclick="switchSummaryTab('cqa')">CQA</span>
+                            </div>
+                        </div>
+                        <div class="summary-total-container">
+                            <span class="summary-total-label">Total</span>
+                            <span class="summary-total-value" id="severityTotal">0</span>
+                        </div>
+                        <div class="horizontal-progress-bar" id="severityProgressBar"></div>
+                        <div class="summary-legend" id="severityLegend"></div>
+                    </div>
                 </div>
             </div>
 
-            <!-- Content Area -->
-            <div class="content-area">
-                <!-- Left Column - Analytics Cards -->
-                <div class="left-column">
-                    <!-- Row 1 -->
-                    <div class="analytics-card">
-                        <div class="analytics-content">
-                            <div class="analytics-icon" style="background: linear-gradient(135deg, #EF4444, #DC2626);">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-info">
-                                <h4 class="analytics-title">Power Loss</h4>
-                                <p class="analytics-value">{{ analytics.power_loss or '0' }} kW</p>
-                                <p class="analytics-subtitle">Total power loss</p>
-                            </div>
-                        </div>
+            <div class="anomaly-distribution-section">
+                <div class="pie-chart-container">
+                    <div class="pie-chart-wrapper">
+                        <canvas id="anomalyDoughnutChart"></canvas>
                     </div>
-                    <div class="analytics-card">
-                        <div class="analytics-content">
-                            <div class="analytics-icon" style="background: linear-gradient(135deg, #F59E0B, #D97706);">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-info">
-                                <h4 class="analytics-title">Revenue Loss/yr</h4>
-                                <p class="analytics-value">₹{{ analytics.revenue_loss or '0' }}</p>
-                                <p class="analytics-subtitle">Annual impact</p>
-                            </div>
-                        </div>
+                    <div class="chart-center-text">
+                        <div class="center-value" id="chartCenterValue">0</div>
+                        <div class="center-label">Anomalies</div>
                     </div>
-                    <!-- Row 2 -->
-                    <div class="analytics-card">
-                        <div class="analytics-content">
-                            <div class="analytics-icon" style="background: linear-gradient(135deg, #06B6D4, #0891B2);">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-info">
-                                <h4 class="analytics-title">AC Capacity</h4>
-                                <p class="analytics-value">{{ plant.ac_capacity or '0' }} MW</p>
-                                <p class="analytics-subtitle">AC power</p>
-                            </div>
-                        </div>
+                    <div id="doughnut-legend" class="pie-chart-legend"></div>
+                </div>
+                <div class="anomaly-table-wrapper">
+                    <div class="table-header">
+                        <h3>Anomaly Type</h3>
                     </div>
-                    <div class="analytics-card">
-                        <div class="analytics-content">
-                            <div class="analytics-icon" style="background: linear-gradient(135deg, #8B5CF6, #7C3AED);">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-info">
-                                <h4 class="analytics-title">DC Capacity</h4>
-                                <p class="analytics-value">{{ plant.dc_capacity or '0' }} MW</p>
-                                <p class="analytics-subtitle">DC power</p>
-                            </div>
-                        </div>
+                    <table class="anomaly-table">
+                        <thead>
+                            <tr>
+                                <th>Type</th>
+                                <th>Count</th>
+                                <th>% of Total</th>
+                            </tr>
+                        </thead>
+                        <tbody id="anomalyTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+            
+            <div class="bar-chart-container">
+                <div class="bar-chart-header">
+                    <div class="bar-chart-tabs">
+                        <span class="chart-tab active" onclick="switchChartTab('anomalies')">
+                            <i class="fas fa-chart-column"></i>
+                            Anomalies vs Categories
+                        </span>
+                        <span class="chart-tab severity-type-tab" onclick="switchChartTab('severity')">
+                            <i class="fas fa-chart-bar"></i>
+                            <span class="severity-badge">Severity by Type</span>
+                        </span>
                     </div>
-                    <!-- Row 3 -->
-                    <div class="analytics-card">
-                        <div class="analytics-content">
-                            <div class="analytics-icon" style="background: linear-gradient(135deg, #10B981, #059669);">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-info">
-                                <h4 class="analytics-title">Total Modules</h4>
-                                <p class="analytics-value">{{ plant.total_modules_inspected or '0' }}</p>
-                                <p class="analytics-subtitle">Modules</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="analytics-card">
-                        <div class="analytics-content">
-                            <div class="analytics-icon" style="background: linear-gradient(135deg, #6366F1, #4F46E5);">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h10a2 2 0 002-2v-4a2 2 0 00-2-2h-2m-4-6H3m4 6h4m-4 0V5"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-info">
-                                <h4 class="analytics-title">Land Area</h4>
-                                <p class="analytics-value">{{ plant.land_area or '0' }}</p>
-                                <p class="analytics-subtitle">Acres</p>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- Row 4 -->
-                    <div class="analytics-card">
-                        <div class="analytics-content">
-                            <div class="analytics-icon" style="background: linear-gradient(135deg, #EC4899, #DB2777);">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-info">
-                                <h4 class="analytics-title">Inverters</h4>
-                                <p class="analytics-value">{{ plant.no_of_inverters or '0' }}</p>
-                                <p class="analytics-subtitle">Count</p>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="analytics-card">
-                        <div class="analytics-content">
-                            <div class="analytics-icon" style="background: linear-gradient(135deg, #F97316, #EA580C);">
-                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-                                </svg>
-                            </div>
-                            <div class="analytics-info">
-                                <h4 class="analytics-title">Blocks</h4>
-                                <p class="analytics-value">{{ plant.no_of_blocks or '0' }}</p>
-                                <p class="analytics-subtitle">Count</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Charts -->
-                    <div class="chart-container pie-chart-container">
-                        <div class="pie-chart-section">
-                            <h3 class="chart-title">Anomaly Distribution</h3>
-                            <div class="pie-chart-wrapper">
-                                <canvas id="pieChart"></canvas>
-                                <div id="chartCenterText" class="chart-center-text">
-                                    <div class="center-value">0</div>
-                                    <div class="center-label">Total Anomalies</div>
-                                </div>
-                            </div>
-                            <!-- Custom Legend -->
-                            <div id="customLegend" class="custom-legend">
-                                <!-- Legend items will be populated by JavaScript -->
-                            </div>
-                        </div>
-                        <div class="pie-table-section">
-                            <div class="anomaly-table-container">
-                                <table class="anomaly-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Anomaly Type</th>
-                                            <th>Count</th>
-                                            <th>%</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="anomalyTableBody">
-                                        <!-- Table rows will be populated by JavaScript -->
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="chart-container">
-                        <h3 class="chart-title">Anomalies vs Categories</h3>
-                        <canvas id="anomalyVsChart" class="chart"></canvas>
-                    </div>
-                    <div class="chart-container">
-                        <h3 class="chart-title">Severity by Type</h3>
-                        <canvas id="barChart" class="chart"></canvas>
+                    <div class="chart-filters">
+                        <button class="filter-btn">
+                            <i class="fas fa-filter"></i>
+                            Filters
+                        </button>
+                        <button class="download-btn">
+                            <i class="fas fa-download"></i>
+                        </button>
                     </div>
                 </div>
-
-                <!-- Right Column - Progress Bars -->
-                <div class="right-column">
-                    <!-- Anomaly Status -->
-                    <div class="progress-card">
-                        <h3 class="progress-title">Anomaly Status</h3>
-                        <div class="horizontal-progress-bar">
-                            <div class="progress-segment" style="background: #F59E0B;" data-width="{{ progress_data.pending or 25 }}">
-                                <span class="progress-text"></span>
-                            </div>
-                            <div class="progress-segment" style="background: #10B981;" data-width="{{ progress_data.resolved or 60 }}">
-                                <span class="progress-text"></span>
-                            </div>
-                            <div class="progress-segment" style="background: #EF4444;" data-width="{{ progress_data.not_found or 15 }}">
-                                <span class="progress-text"></span>
-                            </div>
-                        </div>
-                        <div class="progress-legend">
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: #F59E0B;"></div>
-                                <span>Pending {{ progress_data.pending or 25 }}%</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: #10B981;"></div>
-                                <span>Resolved {{ progress_data.resolved or 60 }}%</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: #EF4444;"></div>
-                                <span>Not Found {{ progress_data.not_found or 15 }}%</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Severity Levels -->
-                    <div class="progress-card">
-                        <h3 class="progress-title">Severity Levels</h3>
-                        <div class="horizontal-progress-bar">
-                            <div class="progress-segment" style="background: #EF4444;" data-width="{{ progress_data.high or 30 }}">
-                                <span class="progress-text"></span>
-                            </div>
-                            <div class="progress-segment" style="background: #F59E0B;" data-width="{{ progress_data.medium or 45 }}">
-                                <span class="progress-text"></span>
-                            </div>
-                            <div class="progress-segment" style="background: #10B981;" data-width="{{ progress_data.low or 25 }}">
-                                <span class="progress-text"></span>
-                            </div>
-                        </div>
-                        <div class="progress-legend">
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: #EF4444;"></div>
-                                <span>High {{ progress_data.high or 30 }}%</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: #F59E0B;"></div>
-                                <span>Medium {{ progress_data.medium or 45 }}%</span>
-                            </div>
-                            <div class="legend-item">
-                                <div class="legend-color" style="background: #10B981;"></div>
-                                <span>Low {{ progress_data.low or 25 }}%</span>
-                            </div>
-                        </div>
-                    </div>
+                <div id="stackedBarChartContainer" class="chart-container">
+                    <canvas id="stackedBarChart"></canvas>
                 </div>
+                <div id="severityBarChartContainer" class="chart-container" style="display: none;">
+                    <canvas id="severityBarChart"></canvas>
+                </div>
+                <div id="bar-chart-legend" class="bar-chart-legend"></div>
             </div>
         </div>
     </div>
 
     <script>
-        // Initialize Charts and Progress Bars
         document.addEventListener('DOMContentLoaded', function() {
             try {
-                // Set progress bar widths
-                const progressSegments = document.querySelectorAll('.progress-segment[data-width]');
-                progressSegments.forEach(segment => {
-                    const width = segment.getAttribute('data-width');
-                    const textSpan = segment.querySelector('.progress-text');
-                    
-                    setTimeout(() => {
-                        segment.style.width = width + '%';
-                        if (width > 15) {
-                            textSpan.textContent = width + '%';
-                        }
-                    }, 300);
-                });
+                // Progress Data for Status
+                const statusData = {
+                    pending: {{ progress_data.pending or 25 }},
+                    resolved: {{ progress_data.resolved or 60 }},
+                    notFound: {{ progress_data.not_found or 15 }}
+                };
 
-                // Pie Chart Data
+                // Progress Data for Severity
+                const severityData = {
+                    high: {{ progress_data.high or 30 }},
+                    medium: {{ progress_data.medium or 45 }},
+                    low: {{ progress_data.low or 25 }}
+                };
+
+                // Set up Status Progress Bar
+                const statusTotal = statusData.pending + statusData.resolved + statusData.notFound;
+                document.getElementById('statusTotal').textContent = statusTotal;
+                
+                const statusProgressBar = document.getElementById('statusProgressBar');
+                statusProgressBar.innerHTML = `
+                    <div class="progress-segment" style="width: ${statusData.pending}%; background: #F59E0B;"></div>
+                    <div class="progress-segment" style="width: ${statusData.resolved}%; background: #10B981;"></div>
+                    <div class="progress-segment" style="width: ${statusData.notFound}%; background: #EF4444;"></div>
+                `;
+
+                const statusLegend = document.getElementById('statusLegend');
+                statusLegend.innerHTML = `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #F59E0B;"></div>
+                        <span>Pending <span class="value">${statusData.pending}%</span></span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #10B981;"></div>
+                        <span>Resolved <span class="value">${statusData.resolved}%</span></span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #EF4444;"></div>
+                        <span>Not Found <span class="value">${statusData.notFound}%</span></span>
+                    </div>
+                `;
+
+                // Set up Severity Progress Bar
+                const severityTotal = severityData.high + severityData.medium + severityData.low;
+                document.getElementById('severityTotal').textContent = severityTotal;
+                
+                const severityProgressBar = document.getElementById('severityProgressBar');
+                severityProgressBar.innerHTML = `
+                    <div class="progress-segment" style="width: ${severityData.high}%; background: #EF4444;"></div>
+                    <div class="progress-segment" style="width: ${severityData.medium}%; background: #F59E0B;"></div>
+                    <div class="progress-segment" style="width: ${severityData.low}%; background: #10B981;"></div>
+                `;
+
+                const severityLegend = document.getElementById('severityLegend');
+                severityLegend.innerHTML = `
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #EF4444;"></div>
+                        <span>High <span class="value">${severityData.high}%</span></span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #F59E0B;"></div>
+                        <span>Medium <span class="value">${severityData.medium}%</span></span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background: #10B981;"></div>
+                        <span>Low <span class="value">${severityData.low}%</span></span>
+                    </div>
+                `;
+
+                // Anomaly Data for Charts
                 const anomalyData = {
                     labels: [
                         'Bypass Diode',
@@ -1066,249 +1125,188 @@
                         'Module Offline'
                     ],
                     counts: [125, 87, 63, 42, 38, 29, 56, 34, 18, 25, 33],
-                    backgroundColor: [
-                        '#EF4444', '#F59E0B', '#10B981', '#3B82F6', '#8B5CF6',
-                        '#EC4899', '#F97316', '#06B6D4', '#84CC16', '#6366F1', '#14B8A6'
-                    ]
+                    colors: ['#F5A623', '#219653', '#9013FE', '#000000', '#BD10E0', '#4A4A4A', '#D8D8D8', '#F2994A', '#EB5757', '#2F80ED', '#56CCF2']
                 };
 
-                // Calculate total and percentages
-                const total = anomalyData.counts.reduce((sum, count) => sum + count, 0);
-                const percentages = anomalyData.counts.map(count => 
-                    Math.round((count / total) * 100)
-                );
+                const totalAnomalies = anomalyData.counts.reduce((a, b) => a + b, 0);
+                document.getElementById('chartCenterValue').textContent = totalAnomalies;
 
-                // Update center text with total
-                document.querySelector('.center-value').textContent = total;
-
-                // Create Pie Chart
-                const pieCtx = document.getElementById('pieChart');
-                if (pieCtx) {
-                    const pieChart = new Chart(pieCtx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: anomalyData.labels,
-                            datasets: [{
-                                data: anomalyData.counts,
-                                backgroundColor: anomalyData.backgroundColor,
-                                borderWidth: 2,
-                                borderColor: '#ffffff',
-                                offset: anomalyData.counts.map((_, index) => index === 0 ? 10 : 0) // Explode first slice
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            cutout: '60%',
-                            layout: {
-                                padding: 10
-                            },
-                            plugins: {
-                                legend: {
-                                    display: false
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            const label = context.label || '';
-                                            const value = context.raw || 0;
-                                            const percentage = Math.round((value / total) * 100);
-                                            return `${label}: ${value} (${percentage}%)`;
-                                        }
-                                    }
-                                }
-                            },
-                            animation: {
-                                animateScale: true,
-                                animateRotate: true
-                            }
-                        }
-                    });
-                }
-
-                // Create custom legend
-                const customLegend = document.getElementById('customLegend');
-                if (customLegend) {
-                    customLegend.innerHTML = '';
-                    anomalyData.labels.forEach((label, index) => {
-                        const legendItem = document.createElement('div');
-                        legendItem.className = 'legend-item-pie';
-                        legendItem.innerHTML = `
-                            <div class="legend-color-pie" style="background-color: ${anomalyData.backgroundColor[index]};"></div>
-                            <span class="legend-text-pie">${label}</span>
-                        `;
-                        customLegend.appendChild(legendItem);
-                    });
-                }
-
-                // Populate anomaly table
+                // Populate Anomaly Table
                 const tableBody = document.getElementById('anomalyTableBody');
                 if (tableBody) {
                     tableBody.innerHTML = '';
                     anomalyData.labels.forEach((label, index) => {
+                        const percentage = ((anomalyData.counts[index] / totalAnomalies) * 100).toFixed(1);
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>
                                 <div class="table-anomaly-type">
-                                    <div class="table-color-dot" style="background-color: ${anomalyData.backgroundColor[index]};"></div>
+                                    <div class="table-color-dot" style="background-color: ${anomalyData.colors[index]};"></div>
                                     <span>${label}</span>
                                 </div>
                             </td>
                             <td>${anomalyData.counts[index]}</td>
-                            <td>${percentages[index]}%</td>
+                            <td>${percentage}%</td>
                         `;
                         tableBody.appendChild(row);
                     });
                 }
 
-                // Anomalies vs Categories Bar Chart
-                const anomalyVsCtx = document.getElementById('anomalyVsChart');
-                if (anomalyVsCtx) {
-                    const anomalyVsData = {
-                        labels: [
-                            'Block 1-5', 'Block 6-10', 'Block 11-15', 'Block 16-19', 'Block 20-25',
-                            'Block 26-30', 'Block 31-36', 'Foreign Object', 'Junction Box',
-                            'Isolated Module', 'Bypass Diode', 'Multi Hotspot', 'Vegetation',
-                            'Short Circuit', 'Substring SC', 'Missing Module', 'Single Hotspot', 'LA/TP Shadow'
-                        ],
-                        counts: [8, 12, 15, 7, 10, 6, 9, 3, 5, 14, 11, 8, 4, 2, 6, 1, 13, 7]
-                    };
+                // Create Doughnut Chart
+                const doughnutCtx = document.getElementById('anomalyDoughnutChart');
+                if (doughnutCtx) {
+                    const doughnutLegend = document.getElementById('doughnut-legend');
+                    doughnutLegend.innerHTML = '';
+                    anomalyData.labels.forEach((label, i) => {
+                        doughnutLegend.innerHTML += `<div class="legend-item"><div class="legend-color" style="background-color: ${anomalyData.colors[i]}"></div><span>${label}</span></div>`;
+                    });
 
-                    new Chart(anomalyVsCtx, {
-                        type: 'bar',
+                    new Chart(doughnutCtx, {
+                        type: 'doughnut',
                         data: {
-                            labels: anomalyVsData.labels,
                             datasets: [{
-                                label: 'Anomaly Count',
-                                data: anomalyVsData.counts,
-                                backgroundColor: [
-                                    '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6',
-                                    '#06B6D4', '#84CC16', '#F97316', '#EC4899', '#6366F1',
-                                    '#14B8A6', '#F59E0B', '#EF4444', '#8B5CF6', '#06B6D4',
-                                    '#84CC16', '#F97316', '#EC4899'
-                                ],
-                                borderWidth: 1,
-                                borderColor: 'rgba(255, 255, 255, 0.8)',
-                                borderRadius: 4
+                                data: anomalyData.counts,
+                                backgroundColor: anomalyData.colors,
+                                borderColor: '#FFFFFF',
+                                borderWidth: 2,
+                                cutout: '85%',
+                                offset: [12, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                             }]
                         },
+                        options: { 
+                            responsive: true, 
+                            maintainAspectRatio: false, 
+                            plugins: { 
+                                legend: { display: false }, 
+                                tooltip: { enabled: true } 
+                            } 
+                        }
+                    });
+                }
+
+                // Create Stacked Bar Chart
+                const stackedBarCtx = document.getElementById('stackedBarChart');
+                if (stackedBarCtx) {
+                    const stackedBarData = {
+                        labels: ['Block 1-5', 'Block 6-10', 'Block 11-15', 'Block 16-19', 'Block 20-25', 'Block 26-30', 'Block 31-36', 'Block 36-40'],
+                        datasets: [
+                            { label: 'Bypass Diode', data: [15, 12, 8, 20, 6, 15, 8, 11], backgroundColor: '#5D9CFC' },
+                            { label: 'Multi Hotspot', data: [10, 8, 12, 6, 8, 10, 12, 8], backgroundColor: '#9867F1' },
+                            { label: 'Cell Hotspot', data: [8, 6, 10, 4, 6, 8, 10, 6], backgroundColor: '#EC61A6' },
+                            { label: 'Vegetation', data: [5, 3, 6, 2, 3, 5, 6, 3], backgroundColor: '#F58700' },
+                            { label: 'Physical Damage', data: [3, 2, 4, 1, 2, 3, 4, 2], backgroundColor: '#F2C94C' },
+                            { label: 'Short Circuit', data: [2, 1, 2, 3, 1, 2, 1, 2], backgroundColor: '#47C878' },
+                            { label: 'String Offline', data: [3, 2, 3, 4, 2, 3, 2, 3], backgroundColor: '#dc3545' },
+                            { label: 'Module Offline', data: [4, 3, 4, 5, 3, 4, 3, 4], backgroundColor: '#17a2b8' }
+                        ]
+                    };
+
+                    const barLegend = document.getElementById('bar-chart-legend');
+                    if (barLegend) {
+                        barLegend.innerHTML = '';
+                        stackedBarData.datasets.forEach(d => {
+                            barLegend.innerHTML += `<div class="legend-item"><div class="legend-color" style="background-color: ${d.backgroundColor}"></div><span>${d.label}</span></div>`;
+                        });
+                    }
+
+                    new Chart(stackedBarCtx, {
+                        type: 'bar',
+                        data: stackedBarData,
                         options: {
-                            responsive: true,
+                            responsive: true, 
                             maintainAspectRatio: false,
-                            layout: {
-                                padding: 5
+                            plugins: { 
+                                legend: { display: false }, 
+                                tooltip: { mode: 'index', intersect: false } 
                             },
-                            scales: {
-                                x: {
-                                    ticks: {
-                                        font: {
-                                            size: 8
-                                        },
-                                        maxRotation: 45,
-                                        minRotation: 45
-                                    },
-                                    grid: {
-                                        display: false
-                                    }
-                                },
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        font: {
-                                            size: 9
-                                        }
-                                    },
-                                    grid: {
-                                        color: 'rgba(0,0,0,0.1)'
-                                    }
-                                }
+                            scales: { 
+                                x: { stacked: true, grid: { display: false } }, 
+                                y: { stacked: true, beginAtZero: true, ticks: { stepSize: 10 } } 
                             },
-                            plugins: {
-                                legend: {
-                                    display: false
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        title: function(context) {
-                                            return context[0].label;
-                                        },
-                                        label: function(context) {
-                                            return `Count: ${context.raw}`;
-                                        }
-                                    }
-                                }
+                            elements: { 
+                                bar: { borderRadius: { topLeft: 3, topRight: 3 } } 
                             }
                         }
                     });
                 }
 
-                // Severity by Type Bar Chart
-                const barCtx = document.getElementById('barChart');
-                if (barCtx) {
-                    new Chart(barCtx, {
-                        type: 'bar',
-                        data: {
-                            labels: ['Hotspot', 'Shading', 'Soiling', 'Damage', 'Other'],
-                            datasets: [{
-                                label: 'High',
-                                data: [12, 8, 15, 5, 3],
+                // Create Severity Bar Chart
+                const severityBarCtx = document.getElementById('severityBarChart');
+                if (severityBarCtx) {
+                    const severityBarData = {
+                        labels: ['Hot Spots', 'Crack/Damage', 'Soiling', 'Bypass Diode', 'Vegetation', 'Module Offline'],
+                        datasets: [
+                            { 
+                                label: 'High', 
+                                data: [12, 6, 3, 9, 4, 2], 
                                 backgroundColor: '#EF4444',
                                 borderRadius: 4
-                            }, {
-                                label: 'Medium',
-                                data: [18, 12, 22, 8, 6],
+                            },
+                            { 
+                                label: 'Medium', 
+                                data: [8, 15, 12, 7, 8, 5], 
                                 backgroundColor: '#F59E0B',
                                 borderRadius: 4
-                            }, {
-                                label: 'Low',
-                                data: [25, 18, 30, 12, 10],
+                            },
+                            { 
+                                label: 'Low', 
+                                data: [5, 10, 20, 4, 12, 8], 
                                 backgroundColor: '#10B981',
                                 borderRadius: 4
-                            }]
-                        },
+                            }
+                        ]
+                    };
+
+                    new Chart(severityBarCtx, {
+                        type: 'bar',
+                        data: severityBarData,
                         options: {
-                            responsive: true,
+                            responsive: true, 
                             maintainAspectRatio: false,
-                            layout: {
-                                padding: 5
-                            },
-                            scales: {
-                                x: {
-                                    stacked: true,
-                                    ticks: {
-                                        font: {
-                                            size: 9
-                                        }
-                                    },
-                                    grid: {
-                                        display: false
-                                    }
-                                },
-                                y: {
-                                    stacked: true,
-                                    beginAtZero: true,
-                                    ticks: {
-                                        font: {
-                                            size: 9
-                                        }
-                                    },
-                                    grid: {
-                                        color: 'rgba(0,0,0,0.1)'
-                                    }
-                                }
-                            },
-                            plugins: {
-                                legend: {
+                            plugins: { 
+                                legend: { 
+                                    display: true,
                                     position: 'bottom',
                                     labels: {
-                                        padding: 8,
+                                        padding: 20,
                                         usePointStyle: true,
-                                        font: {
-                                            size: 9
-                                        },
-                                        boxWidth: 8
+                                        pointStyle: 'rect'
                                     }
-                                }
+                                }, 
+                                tooltip: { 
+                                    mode: 'index', 
+                                    intersect: false,
+                                    callbacks: {
+                                        title: function(context) {
+                                            return context[0].label + ' Severity';
+                                        }
+                                    }
+                                } 
+                            },
+                            scales: { 
+                                x: { 
+                                    stacked: true, 
+                                    grid: { display: false },
+                                    ticks: {
+                                        font: { size: 12 }
+                                    }
+                                }, 
+                                y: { 
+                                    stacked: true, 
+                                    beginAtZero: true, 
+                                    ticks: { 
+                                        stepSize: 5,
+                                        font: { size: 12 }
+                                    },
+                                    grid: {
+                                        color: '#f0f0f0'
+                                    }
+                                } 
+                            },
+                            elements: { 
+                                bar: { 
+                                    borderRadius: { topLeft: 3, topRight: 3 } 
+                                } 
                             }
                         }
                     });
@@ -1319,22 +1317,74 @@
             }
         });
 
-        // Open anomalies map function
-        function openAnomaliesMap() {
-            const plantId = '{{ plant._id }}';
-            // Open the thermal inspection map for this plant
-            window.open('/check/' + plantId, '_blank');
+        // Chart Tab Switching Function
+        function switchChartTab(tabType) {
+            const anomaliesContainer = document.getElementById('stackedBarChartContainer');
+            const severityContainer = document.getElementById('severityBarChartContainer');
+            const tabs = document.querySelectorAll('.bar-chart-tabs span');
+            
+            // Remove active class from all tabs
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            if (tabType === 'anomalies') {
+                anomaliesContainer.style.display = 'block';
+                severityContainer.style.display = 'none';
+                tabs[0].classList.add('active');
+            } else if (tabType === 'severity') {
+                anomaliesContainer.style.display = 'none';
+                severityContainer.style.display = 'block';
+                tabs[1].classList.add('active');
+            }
         }
 
-        // Tab switching functionality
-        function switchTab(tabName) {
-            document.querySelectorAll('.top-btn').forEach(btn => {
-                btn.classList.remove('active');
+        // Summary Tab Switching Function (for the existing summary cards)
+        function switchSummaryTab(tabType) {
+            // This function handles switching between Status, Severity, IEC, CQA tabs
+            const summaryCards = document.querySelectorAll('.anomaly-summary-card');
+            summaryCards.forEach(card => {
+                const tabs = card.querySelectorAll('.summary-header-right span');
+                tabs.forEach(tab => tab.classList.remove('active'));
+                
+                const targetTab = Array.from(tabs).find(tab => 
+                    tab.textContent.toLowerCase().includes(tabType.toLowerCase())
+                );
+                if (targetTab) {
+                    targetTab.classList.add('active');
+                }
             });
-            
-            if (event && event.target) {
-                event.target.classList.add('active');
+        }
+
+        // Ensure chart center value is always visible and updated
+        function updateChartCenterValue() {
+            const centerValue = document.getElementById('chartCenterValue');
+            if (centerValue && centerValue.textContent === '0') {
+                // Calculate total from anomaly data
+                const anomalyData = {
+                    counts: [125, 87, 63, 42, 38, 29, 56, 34, 18, 25, 33]
+                };
+                const total = anomalyData.counts.reduce((a, b) => a + b, 0);
+                centerValue.textContent = total;
             }
+        }
+
+        // Call update function periodically to ensure center value stays visible
+        setInterval(updateChartCenterValue, 1000);
+
+        // Sidebar toggle function
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('mobile-visible');
+        }
+
+        // Navigation functions
+        function openAnomaliesMap() {
+            const plantId = '{{ plant._id }}';
+            window.location.href = '/plant/' + plantId;
+        }
+
+        function openSiteDetails() {
+            const plantId = '{{ plant._id }}';
+            window.location.href = '/plant/' + plantId + '/site-details';
         }
 
         // Handle window resize for responsive charts
