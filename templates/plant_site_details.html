@@ -43,22 +43,22 @@
 
         /* Sidebar */
         .sidebar {
-            width: 200px;
-            background: white;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-            position: fixed;
+            width: 150px;
             height: 100vh;
-            z-index: 50;
-            flex-shrink: 0;
+            background-color: white;
+            color: white;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 1000;
+            overflow-y: auto;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
 
         .sidebar-logo {
-            padding: 12px;
             border-bottom: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
+            text-align: center;
+            padding: 10px;
         }
 
         .sidebar-logo img {
@@ -66,6 +66,13 @@
             height: auto;
             max-width: 150px;
             display: block;
+            margin: 0 auto;
+        }
+
+        .sidebar-logo h2 {
+            color: var(--primary-color);
+            font-size: 20px;
+            font-weight: 700;
         }
 
         .sidebar-menu {
@@ -104,7 +111,7 @@
         /* Main Content */
         .main-content {
             flex: 1;
-            margin-left: 200px;
+            margin-left: 150px;
             display: flex;
             flex-direction: column;
         }
@@ -140,8 +147,64 @@
 
         .header-actions {
             display: flex;
-            align-items: center;
             gap: 15px;
+            align-items: center;
+        }
+
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-btn {
+            background: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-btn:hover {
+            background: var(--border-color);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: none;
+            min-width: 150px;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 10px 15px;
+            text-align: left;
+            color: var(--text-color);
+            text-decoration: none;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background: var(--background-color);
         }
 
         .top-buttons {
@@ -763,38 +826,41 @@
                             <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                             <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
-                        Thermography
+                        <span>Thermography</span>
                     </a>
                 </li>
                 <li>
                     <a href="#">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M3 20 V4 H21" />
-                            <path d="M3 18 C6 14, 12 8, 21 4" />
-                        </svg>
-                        IV Curve Testing
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                        <path d="M3 20 V4 H21" /> <!-- Axes -->
+                        <path d="M3 18 C6 14, 12 8, 21 4" /> <!-- IV Curve -->
+                      </svg>
+                      <span>IV Curve Testing</span>
                     </a>
-                </li>
-                <li>
+                  </li>
+
+                  <li>
                     <a href="#">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                            <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
-                            <path d="M4 10h16M4 14h16" />
-                            <path d="M10 4v16" />
-                        </svg>
-                        EL Testing
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                        <!-- Simple glowing cell icon -->
+                        <rect x="4" y="4" width="16" height="16" rx="2" ry="2" />
+                        <path d="M4 10h16M4 14h16" />
+                        <path d="M10 4v16" />
+                      </svg>
+                      <span>EL Testing</span>
                     </a>
-                </li>
-                <li>
+                  </li>
+                  <li>
                     <a href="#">
-                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M12 3v18" />
-                            <path d="M6 6h12M4 10h16M6 14h12" />
-                            <path d="M6 6l-2 4M18 6l2 4M6 14l-2-4M18 14l2-4" />
-                        </svg>
-                        Transmission Line
+                      <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5">
+                        <!-- Transmission pole with cross arms and wires -->
+                        <path d="M12 3v18" /> <!-- Vertical pole -->
+                        <path d="M6 6h12M4 10h16M6 14h12" /> <!-- Cross arms -->
+                        <path d="M6 6l-2 4M18 6l2 4M6 14l-2-4M18 14l2-4" /> <!-- Wires -->
+                      </svg>
+                      <span>Transmission Line</span>
                     </a>
-                </li>
+                  </li>
                 <li>
                     <a href="#">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -802,7 +868,7 @@
                                 d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4">
                             </path>
                         </svg>
-                        Data
+                        <span>Data</span>
                     </a>
                 </li>
             </ul>
@@ -846,6 +912,23 @@
                             </svg>
                             Report
                         </button>
+                    </div>
+                    <div class="user-dropdown">
+                        <button class="user-btn" onclick="toggleUserDropdown()">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            <span>{{ session.user_name or 'User' }}</span>
+                        </button>
+                        <div class="dropdown-menu" id="userDropdown">
+                            <a href="/logout" class="dropdown-item">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 8px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                                Logout
+                            </a>
+                        </div>
                     </div>
                     <a href="/plant/{{ plant._id }}/overview" class="back-button">
                         <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1403,6 +1486,22 @@
             const plantId = '{{ plant._id }}';
             window.location.href = '/plant/' + plantId;
         }
+
+        // Toggle user dropdown
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const userBtn = event.target.closest('.user-btn');
+            
+            if (!userBtn && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
     </script>
 </body>
 

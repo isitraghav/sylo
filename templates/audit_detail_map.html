@@ -70,9 +70,105 @@
             color: #64748B;
         }
 
+        .header-center {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-button {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            text-decoration: none;
+            color: #1E293B;
+            transition: all 0.3s;
+        }
+
+        .nav-button:hover {
+            background: #F1F5F9;
+            color: #16A34A;
+            border-color: #16A34A;
+        }
+
+        .nav-button.active {
+            background: #16A34A;
+            color: white;
+            border-color: #16A34A;
+        }
+
         .header-actions {
             display: flex;
             gap: 10px;
+            align-items: center;
+        }
+
+        .user-profile {
+            position: relative;
+            display: inline-block;
+        }
+
+        .profile-btn {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: #F8FAFC;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .profile-btn:hover {
+            background: #F1F5F9;
+        }
+
+        .profile-dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #E2E8F0;
+            border-radius: 6px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            min-width: 180px;
+            z-index: 1000;
+        }
+
+        .profile-dropdown.show {
+            display: block;
+        }
+
+        .profile-dropdown a {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 15px;
+            color: #1E293B;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .profile-dropdown a:hover {
+            background: #F8FAFC;
+        }
+
+        .profile-dropdown a:first-child {
+            border-top-left-radius: 6px;
+            border-top-right-radius: 6px;
+        }
+
+        .profile-dropdown a:last-child {
+            border-bottom-left-radius: 6px;
+            border-bottom-right-radius: 6px;
         }
 
         .action-btn {
@@ -305,6 +401,22 @@
                 <p>{{ plant.name }} - {{ audit.audit_type.title() }} Inspection</p>
             </div>
         </div>
+        
+        <div class="header-center">
+            <a href="javascript:void(0)" onclick="openOverview()" class="nav-button">
+                <i class="fas fa-chart-bar"></i>
+                <span>Overview</span>
+            </a>
+            <a href="javascript:void(0)" onclick="openAnomaliesMap()" class="nav-button active">
+                <i class="fas fa-exclamation-triangle"></i>
+                <span>Anomalies</span>
+            </a>
+            <a href="javascript:void(0)" onclick="openSiteDetails()" class="nav-button">
+                <i class="fas fa-info-circle"></i>
+                <span>Site Details</span>
+            </a>
+        </div>
+
         <div class="header-actions">
             <button class="action-btn" onclick="downloadAudit()">
                 <i class="fas fa-download"></i>
@@ -318,6 +430,28 @@
                 <i class="fas fa-file-pdf"></i>
                 Generate Report
             </button>
+            
+            <div class="user-profile">
+                <div class="profile-btn" onclick="toggleProfileDropdown()">
+                    <i class="fas fa-user-circle"></i>
+                    <span>{{ session.get('username', 'User') }}</span>
+                    <i class="fas fa-chevron-down"></i>
+                </div>
+                <div class="profile-dropdown" id="profileDropdown">
+                    <a href="/profile">
+                        <i class="fas fa-user"></i>
+                        Profile
+                    </a>
+                    <a href="/settings">
+                        <i class="fas fa-cog"></i>
+                        Settings
+                    </a>
+                    <a href="/logout">
+                        <i class="fas fa-sign-out-alt"></i>
+                        Logout
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -449,6 +583,36 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
     
     <script>
+        // Navigation functions
+        function openOverview() {
+            window.location.href = `/plant_overview/${auditData.plantId}`;
+        }
+
+        function openAnomaliesMap() {
+            // Already on anomalies page
+            return;
+        }
+
+        function openSiteDetails() {
+            window.location.href = `/plant_site_details/${auditData.plantId}`;
+        }
+
+        // Profile dropdown functions
+        function toggleProfileDropdown() {
+            const dropdown = document.getElementById('profileDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        window.addEventListener('click', function(event) {
+            if (!event.target.matches('.profile-btn') && !event.target.closest('.profile-btn')) {
+                const dropdown = document.getElementById('profileDropdown');
+                if (dropdown.classList.contains('show')) {
+                    dropdown.classList.remove('show');
+                }
+            }
+        });
+
         let map;
         let currentLayer = null;
         let thermalOverlay = null;

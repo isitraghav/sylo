@@ -27,6 +27,147 @@
         .main-container {
             display: flex;
             height: 100vh;
+            padding-top: 65px; /* Account for fixed header */
+        }
+
+        /* Header Styles */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #F8FAFC;
+            padding: 16px 32px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1001;
+            border-bottom: 1px solid #EAF0F6;
+            height: 65px;
+            box-sizing: border-box;
+        }
+
+        .header-left p { 
+            font-size: 14px; 
+            color: #64748B; 
+            margin: 0;
+        }
+
+        .header-left strong { 
+            color: #0D1A2B; 
+        }
+
+        .header-right-buttons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-center {
+            display: flex; 
+            align-items: center; 
+            gap: 6px;
+            background-color: #F1F5F9;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid #EAF0F6;
+        }
+
+        .top-btn {
+            padding: 6px 14px; 
+            background: transparent; 
+            border: none;
+            border-radius: 6px; 
+            font-size: 14px; 
+            font-weight: 600;
+            color: #334155; 
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .top-btn.active { 
+            background: #16A34A; 
+            color: #FFFFFF; 
+        }
+
+        .top-btn:hover {
+            background: #16A34A;
+            color: #FFFFFF;
+        }
+
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-btn {
+            background: #F8FAFC;
+            color: #0D1A2B;
+            border: 1px solid #EAF0F6;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-btn:hover {
+            background: #EAF0F6;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #EAF0F6;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: none;
+            min-width: 150px;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 10px 15px;
+            text-align: left;
+            color: #0D1A2B;
+            text-decoration: none;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background: #F8FAFC;
+        }
+
+        .back-button {
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+            padding: 9px 16px; 
+            background: #16A34A;
+            color: #FFFFFF; 
+            border: none; 
+            border-radius: 8px;
+            font-size: 14px; 
+            font-weight: 500; 
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .back-button:hover {
+            background: #15803D;
         }
 
         /* Sidebar */
@@ -496,6 +637,43 @@
 </head>
 
 <body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-left">
+            <p>Plants / <strong>{{ plant.name }}</strong> / <strong>Anomalies Map</strong></p>
+        </div>
+        <div class="header-right-buttons"> 
+            <div class="header-center">
+                <button class="top-btn" onclick="openOverview()">Overview</button>
+                <button class="top-btn active">Anomalies</button>
+                <button class="top-btn" onclick="openSiteDetails()">Site Details</button>
+                <button class="top-btn">Report</button>
+            </div>
+            <div class="user-dropdown">
+                <button class="user-btn" onclick="toggleUserDropdown()">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                    </svg>
+                    <span>{{ session.user_name or 'User' }}</span>
+                </button>
+                <div class="dropdown-menu" id="userDropdown">
+                    <a href="/logout" class="dropdown-item">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 8px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                        </svg>
+                        Logout
+                    </a>
+                </div>
+            </div>
+            <button class="back-button" onclick="window.history.back()">
+                <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
     <div class="main-container">
         <!-- Sidebar -->
         <div class="sidebar">
@@ -1061,6 +1239,31 @@
             // Open audit details page in new tab
             window.open('/audit/' + auditId + '/details', '_blank');
         }
+
+        // Navigation functions
+        function openOverview() {
+            window.location.href = `/plant/{{ plant.id }}/overview`;
+        }
+
+        function openSiteDetails() {
+            window.location.href = `/plant/{{ plant.id }}/site-details`;
+        }
+
+        // User dropdown functionality
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const userBtn = document.querySelector('.user-btn');
+            
+            if (!userBtn.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
     </script>
 </body>
 </html>
