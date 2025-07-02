@@ -150,7 +150,7 @@
         }
 
         .header-left p { 
-            font-size: 14px; 
+            font-size: 23px; 
             color: var(--text-secondary); 
             margin: 0;
         }
@@ -298,14 +298,14 @@
             flex-direction: row;
             align-items: center;
             gap: 8px;
-            text-align: left;
+            text-align: center;
             box-shadow: 0 1px 2px rgba(0,0,0,0.03);
             height: 70px;
         }
 
         .metric-icon-wrapper {
             width: 20px;
-            height: 20px;
+            height: 25px;
             border-radius: 4px;
             display: flex;
             align-items: center;
@@ -335,21 +335,21 @@
 
         .metric-info { 
             flex-grow: 1; 
-            text-align: left;
+            text-align: center;
             order: 1;
         }
 
         .metric-info p { 
-            font-size: 9px; 
-            color: var(--text-secondary); 
-            margin: 0; 
+            font-size: 16px; 
+            color: #334155; 
+            margin: 6; 
             line-height: 1.0;
         }
 
         .metric-info h3 { 
-            font-size: 12px; 
+            font-size: 16px; 
             font-weight: 600; 
-            color: var(--text-primary); 
+            color: black; 
             margin: 1px 0; 
             line-height: 1.0;
         }
@@ -394,12 +394,12 @@
             position: relative;
         }
 
-        .status-segment.pending { background-color: #FF0000; }
-        .status-segment.resolved { background-color: #008000; }
-        .status-segment.not-found { background-color: #808080; }
+        .status-segment.pending { background-color: #7173e4; }
+        .status-segment.resolved { background-color: #7ed957; }
+        .status-segment.not-found { background-color: #a6a6a6; }
         
         .status-segment.high { background-color: #FF0000; }
-        .status-segment.medium { background-color: #808080; }
+        .status-segment.medium { background-color: #FF914D; }
         .status-segment.low { background-color: #008000; }
 
         .status-labels {
@@ -447,7 +447,7 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-            height: 350px;
+            height: 450px;
             box-sizing: border-box;
         }
 
@@ -460,12 +460,12 @@
             display: flex; 
             flex-direction: column;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-            height: 350px;
+            height: 450px;
             box-sizing: border-box;
         }
 
         .table-title {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 12px;
@@ -475,11 +475,11 @@
         .anomaly-table-container {
             flex: 1;
             overflow-y: auto;
-            max-height: 300px;
+            max-height: 450px;
         }
 
         .pie-chart-title {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: 600;
             color: var(--text-primary);
             margin-bottom: 12px;
@@ -538,9 +538,7 @@
             align-items: center;
             gap: 4px;
             font-size: 10px;
-            background: #F8FAFC;
             border-radius: 4px;
-            border: 1px solid #E2E8F0;
             white-space: nowrap;
         }
 
@@ -641,7 +639,7 @@
 
         .anomaly-table th, .anomaly-table td { 
             padding: 8px 0px;
-            text-align: left; 
+            text-align: center; 
             font-size: 13px;
             border-bottom: 1px solid #F1F5F9;
         }
@@ -1280,7 +1278,7 @@
                             </svg>
                         </div>
                         <div class="metric-info">
-                            <p>Number of Inverters</p>
+                            <p>No. of Inverters</p>
                             <h3>{{ plant.no_of_inverters or '' }}</h3>
                         </div>
                     </div>
@@ -1291,14 +1289,14 @@
                             </svg>
                         </div>
                         <div class="metric-info">
-                            <p>No of Blocks</p>
+                            <p>No. of Blocks</p>
                             <h3>{{ plant.no_of_blocks or '' }}</h3>
                         </div>
                     </div>
                 </div>
                 <div class="status-bars-container"> 
                     <div class="status-section">
-                        <h3>Anomaly Status(Total 100)</h3>
+                        <h3>Anomaly Status (Total 100)</h3>
                         <div class="single-status-bar" id="statusBar">
                             <div class="status-segment pending" id="pendingSegment"></div>
                             <div class="status-segment resolved" id="resolvedSegment"></div>
@@ -1306,16 +1304,16 @@
                         </div>
                         <div class="status-labels">
                             <div class="status-item">
-                                <div class="status-dot" style="background-color: #FF0000;"></div>
-                                <span>Pending <span id="pendingPercent">25</span></span>
+                                <div class="status-dot" style="background-color: #7173e4;"></div>
+                                <span>Pending 25 <span id="pendingPercent">25</span></span>
                             </div>
                             <div class="status-item">
-                                <div class="status-dot" style="background-color: #008000;"></div>
-                                <span>Corrected Anomalies <span id="resolvedPercent">60</span></span>
+                                <div class="status-dot" style="background-color: #7ed957;"></div>
+                                <span>Corrected Anomalies 60 <span id="resolvedPercent">60</span></span>
                             </div>
                             <div class="status-item">
-                                <div class="status-dot" style="background-color: #808080;"></div>
-                                <span>Not Found <span id="notFoundPercent">15</span></span>
+                                <div class="status-dot" style="background-color: #a6a6a6;"></div>
+                                <span>Not Found 15 <span id="notFoundPercent">15</span></span>
                             </div>
                         </div>
                     </div>
@@ -1332,7 +1330,7 @@
                                 <span>High <span id="highPercent">30</span></span>
                             </div>
                             <div class="status-item">
-                                <div class="status-dot" style="background-color: #808080;"></div>
+                                <div class="status-dot" style="background-color: #FF914D;"></div>
                                 <span>Medium <span id="mediumPercent">45</span></span>
                             </div>
                             <div class="status-item">
@@ -1479,20 +1477,20 @@
                     ])|tojson }},
                     counts: {{ anomaly_data.counts|default([125, 87, 63, 42, 38, 29, 56, 34, 18, 25, 33, 15, 12, 8])|tojson }},
                     colors: [
-                        '#800080',  // Bypass Diode - Purple
-                        '#D2B48C',  // Multi Cell - Tan/Brown
-                        '#008000',  // Cell - Green
-                        '#FFB6C1',  // Partial String Offline - Light Pink
-                        '#006400',  // Vegetation - Dark Green
-                        '#808080',  // Physical Damage - Grey
-                        '#98FF98',  // Module Power Mismatch - Light Green
-                        '#FF0000',  // Shading - Red
-                        '#00008B',  // Short Circuit - Dark Blue
-                        '#FFA500',  // String Offline - Orange
-                        '#000000',  // Module Offline - Black
-                        '#8B4513',  // Junction Box - Brown
-                        '#FFC0CB',  // Module Missing - Pink
-                        '#0000FF'   // Other - Blue
+                        '#9C27B0',  // Bypass Diode
+                        '#FFA500',  // Multi Cell
+                        '#FF0000',  // Cell
+                        '#FF66C4',  // Partial String Offline
+                        '#2E7D32',  // Vegetation
+                        '#C2185B',  // Physical Damage
+                        '#65E667',  // Module Power Mismatch
+                        '#E77148',  // Shading
+                        '#506E9A',  // Short Circuit
+                        '#FF1A94',  // String Offline
+                        '#545454',  // Module Offline
+                        '#BFC494',  // Junction Box
+                        '#5CE1E6',  // Module Missing
+                        '#8C52FF'   // Other
                     ]
                 };
 
@@ -1728,17 +1726,17 @@
                         { 
                             label: 'High Severity', 
                             data: [8, 6, 4, 12, 3, 8, 4, 6], 
-                            backgroundColor: '#DC2626' 
+                            backgroundColor: '#FF0000' 
                         },
                         { 
                             label: 'Medium Severity', 
                             data: [12, 9, 8, 15, 7, 12, 8, 10], 
-                            backgroundColor: '#F59E0B' 
+                            backgroundColor: '#FF914D' 
                         },
                         { 
                             label: 'Low Severity', 
                             data: [6, 4, 5, 8, 3, 6, 5, 4], 
-                            backgroundColor: '#16A34A' 
+                            backgroundColor: '#008000' 
                         }
                     ]
                 };
