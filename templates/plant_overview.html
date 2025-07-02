@@ -295,10 +295,10 @@
             border-radius: 6px; 
             padding: 8px;
             display: flex;
-            flex-direction: column;
+            flex-direction: row;
             align-items: center;
-            gap: 4px;
-            text-align: center;
+            gap: 8px;
+            text-align: left;
             box-shadow: 0 1px 2px rgba(0,0,0,0.03);
             height: 70px;
         }
@@ -311,6 +311,8 @@
             align-items: center;
             justify-content: center;
             flex-shrink: 0;
+            order: 2;
+            margin-left: auto;
         }
 
         .metric-icon-wrapper.red { background-color: #FEF2F2; }
@@ -333,7 +335,8 @@
 
         .metric-info { 
             flex-grow: 1; 
-            text-align: center;
+            text-align: left;
+            order: 1;
         }
 
         .metric-info p { 
@@ -356,7 +359,7 @@
             display: flex;
             flex-direction: column;
             gap: 16px;
-            width: 100%;
+            width: 98%;
         }
 
         .status-section {
@@ -391,13 +394,13 @@
             position: relative;
         }
 
-        .status-segment.pending { background-color: #ef9f1e; }
-        .status-segment.resolved { background-color: #10B981; }
-        .status-segment.not-found { background-color: #f03b3bf2; }
+        .status-segment.pending { background-color: #FF0000; }
+        .status-segment.resolved { background-color: #008000; }
+        .status-segment.not-found { background-color: #808080; }
         
-        .status-segment.high { background-color: #DC2626; }
-        .status-segment.medium { background-color: #eba00c; }
-        .status-segment.low { background-color: #16A34A; }
+        .status-segment.high { background-color: #FF0000; }
+        .status-segment.medium { background-color: #808080; }
+        .status-segment.low { background-color: #008000; }
 
         .status-labels {
             display: flex;
@@ -520,22 +523,25 @@
         
         .pie-chart-legend { 
             display: flex; 
-            flex-direction: column;
-            gap: 3px;
+            flex-wrap: wrap;
+            gap: 8px;
             flex: 1;
-            overflow-y: auto;
-            max-height: 120px;
+            max-height: none;
             padding-right: 4px;
+            justify-content: center;
         }
         
         .pie-chart-legend .legend-item {
-            justify-content: space-between;
-            width: 100%;
-            padding: 4px 0;
+            justify-content: flex-start;
+            padding: 3px 6px;
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 11px;
+            gap: 4px;
+            font-size: 10px;
+            background: #F8FAFC;
+            border-radius: 4px;
+            border: 1px solid #E2E8F0;
+            white-space: nowrap;
         }
 
         .pie-chart-legend .legend-item span {
@@ -543,14 +549,9 @@
             font-weight: 500;
         }
 
-        .pie-chart-legend .legend-item .value {
-            font-weight: 600;
-            margin-left: auto;
-        }
-
         .legend-color {
-            width: 8px;
-            height: 8px;
+            width: 6px;
+            height: 6px;
             border-radius: 2px;
             flex-shrink: 0;
         }
@@ -1297,7 +1298,7 @@
                 </div>
                 <div class="status-bars-container"> 
                     <div class="status-section">
-                        <h3>Anomaly Status</h3>
+                        <h3>Anomaly Status(Total 100)</h3>
                         <div class="single-status-bar" id="statusBar">
                             <div class="status-segment pending" id="pendingSegment"></div>
                             <div class="status-segment resolved" id="resolvedSegment"></div>
@@ -1305,21 +1306,21 @@
                         </div>
                         <div class="status-labels">
                             <div class="status-item">
-                                <div class="status-dot" style="background-color: #F59E0B;"></div>
-                                <span>Pending <span id="pendingPercent">25%</span></span>
+                                <div class="status-dot" style="background-color: #FF0000;"></div>
+                                <span>Pending <span id="pendingPercent">25</span></span>
                             </div>
                             <div class="status-item">
-                                <div class="status-dot" style="background-color: #10B981;"></div>
-                                <span>Corrected Anomalies <span id="resolvedPercent">60%</span></span>
+                                <div class="status-dot" style="background-color: #008000;"></div>
+                                <span>Corrected Anomalies <span id="resolvedPercent">60</span></span>
                             </div>
                             <div class="status-item">
-                                <div class="status-dot" style="background-color: #EF4444;"></div>
-                                <span>Not Found <span id="notFoundPercent">15%</span></span>
+                                <div class="status-dot" style="background-color: #808080;"></div>
+                                <span>Not Found <span id="notFoundPercent">15</span></span>
                             </div>
                         </div>
                     </div>
                     <div class="status-section">
-                        <h3>Severity Levels</h3>
+                        <h3>Severity Levels(Total 100)</h3>
                         <div class="single-status-bar" id="severityBar">
                             <div class="status-segment high" id="highSegment"></div>
                             <div class="status-segment medium" id="mediumSegment"></div>
@@ -1327,16 +1328,16 @@
                         </div>
                         <div class="status-labels">
                             <div class="status-item">
-                                <div class="status-dot" style="background-color: #DC2626;"></div>
-                                <span>High <span id="highPercent">30%</span></span>
+                                <div class="status-dot" style="background-color: #FF0000;"></div>
+                                <span>High <span id="highPercent">30</span></span>
                             </div>
                             <div class="status-item">
-                                <div class="status-dot" style="background-color: #F59E0B;"></div>
-                                <span>Medium <span id="mediumPercent">45%</span></span>
+                                <div class="status-dot" style="background-color: #808080;"></div>
+                                <span>Medium <span id="mediumPercent">45</span></span>
                             </div>
                             <div class="status-item">
-                                <div class="status-dot" style="background-color: #16A34A;"></div>
-                                <span>Low <span id="lowPercent">25%</span></span>
+                                <div class="status-dot" style="background-color: #008000;"></div>
+                                <span>Low <span id="lowPercent">25</span></span>
                             </div>
                         </div>
                     </div>
@@ -1462,8 +1463,8 @@
                 const anomalyData = {
                     labels: {{ anomaly_data.labels|default([
                         'Bypass Diode',
-                        'Multi-Cell Hotspot',
-                        'Cell Hotspot',
+                        'Multi Cell',
+                        'Cell',
                         'Partial String Offline',
                         'Vegetation',
                         'Physical Damage',
@@ -1471,10 +1472,28 @@
                         'Shading',
                         'Short Circuit',
                         'String Offline',
-                        'Module Offline'
+                        'Module Offline',
+                        'Junction Box',
+                        'Module Missing',
+                        'Other'
                     ])|tojson }},
-                    counts: {{ anomaly_data.counts|default([125, 87, 63, 42, 38, 29, 56, 34, 18, 25, 33])|tojson }},
-                    colors: {{ anomaly_data.colors|default(['#F5A623', '#219653', '#9013FE', '#000000', '#BD10E0', '#4A4A4A', '#D8D8D8', '#F2994A', '#EB5757', '#2F80ED', '#56CCF2'])|tojson }}
+                    counts: {{ anomaly_data.counts|default([125, 87, 63, 42, 38, 29, 56, 34, 18, 25, 33, 15, 12, 8])|tojson }},
+                    colors: [
+                        '#800080',  // Bypass Diode - Purple
+                        '#D2B48C',  // Multi Cell - Tan/Brown
+                        '#008000',  // Cell - Green
+                        '#FFB6C1',  // Partial String Offline - Light Pink
+                        '#006400',  // Vegetation - Dark Green
+                        '#808080',  // Physical Damage - Grey
+                        '#98FF98',  // Module Power Mismatch - Light Green
+                        '#FF0000',  // Shading - Red
+                        '#00008B',  // Short Circuit - Dark Blue
+                        '#FFA500',  // String Offline - Orange
+                        '#000000',  // Module Offline - Black
+                        '#8B4513',  // Junction Box - Brown
+                        '#FFC0CB',  // Module Missing - Pink
+                        '#0000FF'   // Other - Blue
+                    ]
                 };
 
                 const totalAnomalies = anomalyData.counts.reduce((a, b) => a + b, 0);
@@ -1507,12 +1526,10 @@
                     const doughnutLegend = document.getElementById('doughnut-legend');
                     doughnutLegend.innerHTML = '';
                     anomalyData.labels.forEach((label, i) => {
-                        const percentage = ((anomalyData.counts[i] / totalAnomalies) * 100).toFixed(1);
                         doughnutLegend.innerHTML += `
                             <div class="legend-item">
                                 <div class="legend-color" style="background-color: ${anomalyData.colors[i]}"></div>
                                 <span>${label}</span>
-                                <span class="value">${anomalyData.counts[i]} (${percentage}%)</span>
                             </div>`;
                     });
 
