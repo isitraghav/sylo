@@ -93,7 +93,7 @@
 
         .sidebar-menu a:hover,
         .sidebar-menu a.active {
-            background-color: var(--primary-color);
+            background: var(--primary-color);
             color: white;
             border-right: 3px solid var(--primary-color);
         }
@@ -117,36 +117,122 @@
 
         /* Header */
         .header {
-            border-bottom: 1px solid var(--border-color);
-            padding: 20px 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
+            margin-bottom: 24px;
+            background-color: var(--background-color);
+            padding: 16px 32px;
+            position: fixed;
             top: 0;
-            z-index: 100;
-            background:#FFFFFF;
+            left: 150px;
+            right: 0;
+            z-index: 50;
+            border-bottom: 1px solid var(--border-color);
         }
 
-        .breadcrumb {
+        .header-left p { 
+            font-size: 23px; 
+            color: var(--text-secondary); 
+            margin: 0;
+        }
+
+        .header-left strong { 
+            color: var(--text-color); 
+        }
+
+        .header-right-buttons {
             display: flex;
             align-items: center;
-            gap: 10px;
-            color: var(--text-secondary);
+            gap: 16px;
         }
 
-        .breadcrumb a {
-            color: var(--primary-color);
-            text-decoration: none;
+        .header-center {
+            display: flex; 
+            align-items: center; 
+            gap: 6px;
+            background-color: #F1F5F9;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
 
-        .breadcrumb a:hover {
-            text-decoration: underline;
+        .top-btn {
+            padding: 6px 14px; 
+            background: transparent; 
+            border: none;
+            border-radius: 6px; 
+            font-size: 14px; 
+            font-weight: 600;
+            color: #334155; 
+            cursor: pointer;
+            transition: all 0.2s;
         }
 
-        .header-actions {
+        .top-btn.active { 
+            background: var(--primary-color); 
+            color: white; 
+        }
+
+        .top-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .user-dropdown {
+            position: relative;
+        }
+
+        .user-btn {
+            background: var(--background-color);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
             display: flex;
-            gap: 15px;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .user-btn:hover {
+            background: var(--border-color);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: none;
+            min-width: 150px;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 10px 15px;
+            text-align: left;
+            color: var(--text-color);
+            text-decoration: none;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .dropdown-item:hover {
+            background: var(--background-color);
         }
 
         .btn {
@@ -1107,7 +1193,7 @@
                             <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                             <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
                         </svg>
-                        Thermography
+                        <span>Thermography</span>
                     </a>
                 </li>
                 <li>
@@ -1116,7 +1202,7 @@
                         <path d="M3 20 V4 H21" /> <!-- Axes -->
                         <path d="M3 18 C6 14, 12 8, 21 4" /> <!-- IV Curve -->
                       </svg>
-                      IV Curve Testing
+                      <span>IV Curve Testing</span>
                     </a>
                   </li>
 
@@ -1128,7 +1214,7 @@
                         <path d="M4 10h16M4 14h16" />
                         <path d="M10 4v16" />
                       </svg>
-                      EL Testing
+                      <span>EL Testing</span>
                     </a>
                   </li>
                   <li>
@@ -1139,7 +1225,7 @@
                         <path d="M6 6h12M4 10h16M6 14h12" /> <!-- Cross arms -->
                         <path d="M6 6l-2 4M18 6l2 4M6 14l-2-4M18 14l2-4" /> <!-- Wires -->
                       </svg>
-                      Transmission Line
+                      <span>Transmission Line</span>
                     </a>
                   </li>
                 <li>
@@ -1149,7 +1235,7 @@
                                 d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4">
                             </path>
                         </svg>
-                        Data
+                        <span>Data</span>
                     </a>
                 </li>
             </ul>
@@ -1159,19 +1245,39 @@
         <div class="main-content">
             <!-- Header -->
             <div class="header">
-                <div class="breadcrumb">
-                    <a href="/homepage">Plants</a>
-                    <span>›</span>
-                    <span>{{ plant.name }}</span>
+                <div class="header-left">
+                    <p>Plants / <strong>{{ plant.name }}</strong></p>
                 </div>
-                <div class="header-actions">
-                    <a href="/homepage" class="btn btn-secondary">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                <div class="header-right-buttons">
+                    <div class="header-center">
+                        <button class="top-btn" onclick="openOverview()">Overview</button>
+                        <button class="top-btn active">Anomalies</button>
+                        <button class="top-btn" onclick="openSiteDetails()">Site Details</button>
+                        <button class="top-btn">Report</button>
+                    </div>
+                    <div class="user-dropdown">
+                        <button class="user-btn" onclick="toggleUserDropdown()">
+                            <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                            </svg>
+                            <span>{{ session.user_name or 'User' }}</span>
+                        </button>
+                        <div class="dropdown-menu" id="userDropdown">
+                            <a href="/logout" class="dropdown-item">
+                                <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 8px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                                </svg>
+                                Logout
+                            </a>
+                        </div>
+                    </div>
+                    <button class="back-button" onclick="window.location.href='/homepage'">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
                         </svg>
                         Back to Plants
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -1806,6 +1912,22 @@
         // Sample data - replace with your actual data
         const data = {{ analysis_data | tojson | safe }};
 
+        // Toggle user dropdown
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const userBtn = event.target.closest('.user-btn');
+            
+            if (!userBtn && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
+
         // Initialize dashboard
         function init() {
             // Charts removed since Analytics tab was removed
@@ -1813,6 +1935,55 @@
 
         // Load everything when page is ready
         document.addEventListener('DOMContentLoaded', init);
+
+        // Navigation functions
+        function openOverview() {
+            const plantId = '{{ plant._id }}';
+            window.location.href = '/plant/' + plantId + '/overview';
+        }
+
+        function openSiteDetails() {
+            const plantId = '{{ plant._id }}';
+            window.location.href = '/plant/' + plantId + '/site-details';
+        }
+
+        // Function for opening the anomalies page (this page)
+        function openAnomaliesMap() {
+            const plantId = '{{ plant._id }}';
+            // Try to get the first audit for this plant and redirect to its anomalies
+            fetch(`/api/plants/${plantId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.plant.audits && data.plant.audits.length > 0) {
+                        // Redirect to the first audit's detail page
+                        window.location.href = '/audit/' + data.plant.audits[0];
+                    } else {
+                        // Fallback to plant detail page
+                        window.location.href = '/plant/' + plantId;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching plant data:', error);
+                    // Fallback to plant detail page
+                    window.location.href = '/plant/' + plantId;
+                });
+        }
+
+        // User dropdown functionality (already exists)
+        function toggleUserDropdown() {
+            const dropdown = document.getElementById('userDropdown');
+            dropdown.classList.toggle('show');
+        }
+
+        // Close dropdown when clicking outside (already exists)
+        document.addEventListener('click', function(event) {
+            const dropdown = document.getElementById('userDropdown');
+            const userBtn = document.querySelector('.user-btn');
+            
+            if (userBtn && dropdown && !userBtn.contains(event.target) && !dropdown.contains(event.target)) {
+                dropdown.classList.remove('show');
+            }
+        });
     </script>
 
 </body>

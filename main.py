@@ -1761,8 +1761,8 @@ def plant_overview(plant_id):
     anomaly_data = {
         'labels': [
             'Bypass Diode',
-            'Multi-Cell Hotspot', 
-            'Cell Hotspot',
+            'Multi-Cell', 
+            'Cell',
             'Partial String Offline',
             'Vegetation',
             'Physical Damage',
@@ -1773,21 +1773,24 @@ def plant_overview(plant_id):
             'Module Offline'
         ],
         'counts': [125, 87, 63, 42, 38, 29, 56, 34, 18, 25, 33],
-        'colors': ['#F5A623', '#219653', '#9013FE', '#000000', '#BD10E0', '#4A4A4A', '#D8D8D8', '#F2994A', '#EB5757', '#2F80ED', '#56CCF2']
+        'colors': ['#9C27B0', '#FFA500', '#FF0000', '#FF66C4', '#2E7D32', '#C2185B', '#65E667', '#E77148', '#506E9A', '#FF1A94', '#545454']
     }
     
     # Bar chart data 
     bar_chart_data = {
         'labels': ['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6', 'Block 7', 'Block 8'],
         'datasets': [
-            {'label': 'Bypass Diode', 'data': [15, 12, 8, 20, 6, 15, 8, 11], 'backgroundColor': '#5D9CFC'},
-            {'label': 'Multi Hotspot', 'data': [10, 8, 12, 6, 8, 10, 12, 8], 'backgroundColor': '#9867F1'},
-            {'label': 'Cell Hotspot', 'data': [8, 6, 10, 4, 6, 8, 10, 6], 'backgroundColor': '#EC61A6'},
-            {'label': 'Vegetation', 'data': [5, 3, 6, 2, 3, 5, 6, 3], 'backgroundColor': '#F58700'},
-            {'label': 'Physical Damage', 'data': [3, 2, 4, 1, 2, 3, 4, 2], 'backgroundColor': '#F2C94C'},
-            {'label': 'Short Circuit', 'data': [2, 1, 2, 3, 1, 2, 1, 2], 'backgroundColor': '#47C878'},
-            {'label': 'String Offline', 'data': [3, 2, 3, 4, 2, 3, 2, 3], 'backgroundColor': '#dc3545'},
-            {'label': 'Module Offline', 'data': [4, 3, 4, 5, 3, 4, 3, 4], 'backgroundColor': '#17a2b8'}
+            {'label': 'Bypass Diode', 'data': [15, 12, 8, 20, 6, 15, 8, 11], 'backgroundColor': '#9C27B0'},
+            {'label': 'Multi-Cell', 'data': [10, 8, 12, 6, 8, 10, 12, 8], 'backgroundColor': '#FFA500'},
+            {'label': 'Cell', 'data': [8, 6, 10, 4, 6, 8, 10, 6], 'backgroundColor': '#FF0000'},
+            {'label': 'Partial String Offline', 'data': [6, 4, 7, 3, 5, 6, 7, 4], 'backgroundColor': '#FF66C4'},
+            {'label': 'Vegetation', 'data': [5, 3, 6, 2, 3, 5, 6, 3], 'backgroundColor': '#2E7D32'},
+            {'label': 'Physical Damage', 'data': [3, 2, 4, 1, 2, 3, 4, 2], 'backgroundColor': '#C2185B'},
+            {'label': 'Module Power Mismatch', 'data': [7, 5, 8, 6, 7, 9, 6, 8], 'backgroundColor': '#65E667'},
+            {'label': 'Shading', 'data': [4, 3, 5, 2, 4, 5, 6, 5], 'backgroundColor': '#E77148'},
+            {'label': 'Short Circuit', 'data': [2, 1, 2, 3, 1, 2, 1, 2], 'backgroundColor': '#506E9A'},
+            {'label': 'String Offline', 'data': [3, 2, 3, 4, 2, 3, 2, 3], 'backgroundColor': '#FF1A94'},
+            {'label': 'Module Offline', 'data': [4, 3, 4, 5, 3, 4, 3, 4], 'backgroundColor': '#545454'}
         ]
     }
     
