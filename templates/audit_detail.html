@@ -168,15 +168,18 @@
 
         /* Header */
         .header {
-            background: var(--surface-color);
-            border-bottom: 1px solid var(--border-color);
-            padding: 16px 32px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            position: sticky;
+            margin-bottom: 24px;
+            background-color: var(--light-gray-bg);
+            padding: 16px 32px;
+            position: fixed;
             top: 0;
-            z-index: 100;
+            left: 150px;
+            right: 0;
+            z-index: 50;
+            border-bottom: 1px solid var(--border-color);
         }
 
         .breadcrumb {
