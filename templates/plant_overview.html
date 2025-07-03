@@ -6,6 +6,9 @@
     <title>{{ plant.name }} - Overview</title>
     <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo/logo1.png') }}">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
     <style>
         :root {
@@ -531,12 +534,33 @@
             box-sizing: border-box;
         }
 
+        .table-title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 12px;
+        }
+        
         .table-title {
             font-size: 16px;
             font-weight: 600;
             color: var(--text-primary);
-            margin-bottom: 12px;
             text-align: center;
+            margin-bottom: 0;
+            margin-right: 8px;
+        }
+        
+        .pdf-icon-container {
+            cursor: pointer;
+            color: #e74c3c;
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            transition: transform 0.2s ease;
+        }
+        
+        .pdf-icon-container:hover {
+            transform: scale(1.2);
         }
 
         .anomaly-table-container {
@@ -881,7 +905,7 @@
         }
         
         #stackedBarChartContainer, #severityBarChartContainer { 
-          height: 260px;
+          height: 600px;
           margin-bottom: 16px;
           max-width: 100%;
           margin-left: 0;
@@ -1501,7 +1525,12 @@
                     <div id="doughnut-legend" class="pie-chart-legend"></div>
                 </div>
                 <div class="anomaly-table-section">
-                    <h3 class="table-title">Anomaly Details</h3>
+                    <div class="table-title-container">
+                        <h3 class="table-title">Anomaly Details</h3>
+                        <a href="{{ url_for('static', filename='pagehowle.pdf') }}" target="_blank" class="pdf-icon-container" title="View Anomaly Report PDF">
+                            <i class="fas fa-file-pdf"></i>
+                        </a>
+                    </div>
                     <div class="anomaly-table-container">
                         <table class="anomaly-table">
                             <thead>
