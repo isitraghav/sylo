@@ -379,7 +379,7 @@
             font-size: 14px;
             font-weight: 600;
             color: var(--text-primary);
-            margin: 0 0 20px 0;
+            margin: 0 0 12px 0; /* Increased bottom margin from 20px to 40px to create 20px extra gap */
         }
 
         .single-status-bar {
@@ -440,8 +440,13 @@
             margin-left: 4px;
             color: var(--text-secondary);
             cursor: pointer;
-            transition: color 0.2s ease;
+            transition: all 0.2s ease;
             height: 24px; /* Match the height to align vertically with the heading */
+            width: 24px;
+            background-color: #e2e8f0;
+            border-radius: 50%;
+            font-size: 14px;
+            font-weight: bold;
         }
         
         .info-icon:not(#severityInfoBtn) {
@@ -450,11 +455,18 @@
             justify-content: center;
             color: var(--text-secondary);
             cursor: pointer;
-            transition: color 0.2s ease;
+            transition: all 0.2s ease;
+            width: 18px;
+            height: 18px;
+            background-color: #e2e8f0;
+            border-radius: 50%;
+            font-size: 12px;
+            font-weight: bold;
         }
         
         .info-icon:hover {
             color: var(--primary-color);
+            background-color: #d1d8e0; /* Darker background on hover for better visibility */
         }
         
         .popup-overlay {
@@ -498,7 +510,6 @@
         .popup-content p {
             margin-bottom: 12px;
             line-height: 1.5;
-        }
         }
 
         .status-dot {
