@@ -710,7 +710,7 @@
 
         .anomaly-table th, .anomaly-table td { 
             padding: 8px 0px;
-            text-align: center; 
+            text-align: center; /* All cells are center-aligned by default */
             font-size: 13px;
             border-bottom: 1px solid #F1F5F9;
         }
@@ -731,13 +731,11 @@
         }
         
         .anomaly-table th:nth-child(2), .anomaly-table td:nth-child(2) {
-            text-align: center;
             font-weight: 600; 
             min-width: 50px;
         }
 
         .anomaly-table th:nth-child(3), .anomaly-table td:nth-child(3) {
-            text-align: right;
             font-weight: 600; 
             min-width: 70px;
         }
@@ -746,6 +744,14 @@
             display: flex;
             align-items: center;
             gap: 6px;
+        }
+
+        .table-anomaly-type {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin: 0 auto;
         }
 
         .table-color-dot {
@@ -1686,7 +1692,7 @@
                         const row = document.createElement('tr');
                         row.innerHTML = `
                             <td>
-                                <div class="table-anomaly-type" style="display: flex; align-items: center; gap: 8px;">
+                                <div class="table-anomaly-type" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 auto;">
                                     <div class="table-color-dot" style="background-color: ${anomalyData.colors[index]}; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;"></div>
                                     <span>${label}</span>
                                 </div>
