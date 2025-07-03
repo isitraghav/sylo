@@ -12,6 +12,7 @@
 
     <style>
         :root {
+            --primary-color: #2e7d32; /* Added primary-color to match homepage */
             --primary-green: #16A34A;
             --light-gray-bg: #F8FAFC;
             --border-color: #EAF0F6;
@@ -27,10 +28,10 @@
         }
 
         body {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: var(--light-gray-bg);
             color: var(--text-primary);
-            font-size: 14px;
+            line-height: 1.6;
             margin: 0;
         }
 
@@ -67,7 +68,7 @@
         }
 
         .sidebar-logo h2 {
-            color: var(--primary-green);
+            color: var(--primary-color);
             font-size: 20px;
             font-weight: 700;
         }
@@ -91,9 +92,9 @@
 
         .sidebar-menu a:hover,
         .sidebar-menu a.active {
-            background: var(--primary-green);
+            background: var(--primary-color);
             color: white;
-            border-right: 3px solid var(--primary-green);
+            border-right: 3px solid var(--primary-color);
         }
 
         .sidebar-menu svg {
@@ -112,7 +113,7 @@
             top: 15px;
             left: 15px;
             z-index: 200;
-            background: var(--primary-green);
+            background: var(--primary-color);
             color: white;
             border: none;
             border-radius: 6px;
@@ -247,12 +248,12 @@
         }
 
         .top-btn.active { 
-            background: var(--primary-green); 
+            background: var(--primary-color); 
             color: var(--white); 
         }
 
         .top-btn:hover {
-            background: var(--primary-green);
+            background: var(--primary-color);
             color: var(--white);
         }
 
@@ -261,7 +262,7 @@
             align-items: center; 
             gap: 8px;
             padding: 9px 16px; 
-            background: var(--primary-green);
+            background: var(--primary-color);
             color: var(--white); 
             border: none; 
             border-radius: 8px;
@@ -272,7 +273,7 @@
         }
 
         .back-button:hover {
-            background: #15803D;
+            background: #1f5f23; /* Matches the other hover states */
         }
 
         /* Top Section Layout - 40% left metrics, 60% right status bars */
@@ -378,7 +379,7 @@
             font-size: 14px;
             font-weight: 600;
             color: var(--text-primary);
-            margin: 0 0 12px 0;
+            margin: 0 0 20px 0;
         }
 
         .single-status-bar {
@@ -453,7 +454,7 @@
         }
         
         .info-icon:hover {
-            color: var(--primary-green);
+            color: var(--primary-color);
         }
         
         .popup-overlay {
@@ -490,7 +491,7 @@
         
         .popup-content h3 {
             margin-top: 0;
-            color: var(--primary-green);
+            color: var(--primary-color);
             margin-bottom: 16px;
         }
         
@@ -533,7 +534,7 @@
             display: flex;
             flex-direction: column;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-            height: 450px;
+            height: 400px;
             box-sizing: border-box;
             padding-bottom: 80px; /* Add padding at the bottom for the legend */
         }
@@ -547,7 +548,7 @@
             display: flex; 
             flex-direction: column;
             box-shadow: 0 1px 3px rgba(0,0,0,0.04);
-            height: 450px;
+            height: 400px;
             box-sizing: border-box;
         }
 
@@ -638,7 +639,7 @@
             padding: 0 4px;
             justify-content: center;
             position: absolute;
-            bottom: 10px;
+            bottom: 23px;
             left: 0;
             right: 0;
         }
@@ -693,7 +694,7 @@
             align-items: center;
             gap: 8px;
             padding: 12px 24px;
-            background: var(--primary-green);
+            background: var(--primary-color);
             color: white;
             border: none;
             border-radius: 6px;
@@ -704,7 +705,7 @@
         }
 
         .severity-map-btn:hover {
-            background: #15803D;
+            background: #1f5f23; /* Slightly darker variant of --primary-color */
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
@@ -834,13 +835,13 @@
         }
 
         .chart-toggle-btn.active {
-            background: var(--primary-green);
+            background: var(--primary-color);
             color: white;
-            border-color: var(--primary-green);
+            border-color: var(--primary-color);
         }
 
         .chart-toggle-btn:hover {
-            border-color: var(--primary-green);
+            border-color: var(--primary-color);
         }
 
         #anomalyChartSection, #severityChartSection {
@@ -888,7 +889,7 @@
 
         .bar-chart-tabs span.active { 
             color: var(--text-primary); 
-            border-bottom: 2px solid var(--primary-green);
+            border-bottom: 2px solid var(--primary-color);
         }
         
         .chart-filters { 
@@ -911,7 +912,7 @@
 
         .chart-filters button:hover {
             background: var(--light-gray-bg);
-            border-color: var(--primary-green);
+            border-color: var(--primary-color);
         }
 
         .chart-filters button svg {
@@ -922,7 +923,7 @@
         }
         
         #stackedBarChartContainer, #severityBarChartContainer { 
-          height: 600px;
+          height: 450px;
           margin-bottom: 16px;
           max-width: 100%;
           margin-left: 0;
@@ -962,7 +963,7 @@
             align-items: center;
             gap: 8px;
             padding: 10px 15px;
-            background: var(--primary-green);
+            background: var(--primary-color);
             color: white;
             border: none;
             border-radius: 8px;
@@ -973,7 +974,7 @@
         }
 
         .severity-map-btn:hover {
-            background: #15803D;
+            background: #1f5f23; /* Slightly darker variant of --primary-color */
             transform: translateY(-1px);
             box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
