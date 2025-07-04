@@ -112,6 +112,5 @@ docker compose up -d --build
 ```
 
 ## Support
-- Developer: Dharmendra Bajiya
-- Email: bajiya2024@gmail.com
-- Contact: +91-9785540104
+- Developer: Debayan Pratihar
+- Email: debayanpratihar1234@gmail.com
