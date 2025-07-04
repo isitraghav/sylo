@@ -814,8 +814,8 @@
             flex-shrink: 0;
         }
         
-        /* Bar Chart Section - Bottom area with toggle */
-        .bar-chart-container { 
+        /* Lollipop Chart Section - Bottom area with toggle */
+        .lollipop-chart-container { 
             background: var(--white); 
             border: 1px solid var(--border-color); 
             border-radius: 8px; 
@@ -863,7 +863,7 @@
             display: block;
         }
         
-        .bar-chart-header { 
+        .lollipop-chart-header { 
             display: flex; 
             justify-content: space-between; 
             align-items: center; 
@@ -872,33 +872,33 @@
             padding-bottom: 12px;
         }
 
-        .bar-chart-title-wrapper {
+        .lollipop-chart-title-wrapper {
             display: flex;
             align-items: center;
             gap: 16px;
         }
 
-        .bar-chart-title {
+        .lollipop-chart-title {
             font-size: 16px;
             font-weight: 700;
             color: var(--text-primary);
         }
 
-        .bar-chart-tabs { 
+        .lollipop-chart-tabs { 
             display: flex; 
             gap: 20px;
             font-size: 14px;
             font-weight: 600;
         }
 
-        .bar-chart-tabs span { 
+        .lollipop-chart-tabs span { 
             cursor: pointer; 
             padding-bottom: 8px;
             color: var(--text-secondary);
             transition: all 0.2s;
         }
 
-        .bar-chart-tabs span.active { 
+        .lollipop-chart-tabs span.active { 
             color: var(--text-primary); 
             border-bottom: 2px solid var(--primary-color);
         }
@@ -933,7 +933,7 @@
             margin-right: 6px;
         }
         
-        #stackedBarChartContainer, #severityBarChartContainer { 
+        #lollipopChartContainer, #severityLollipopChartContainer { 
           height: 450px;
           margin-bottom: 16px;
           max-width: 100%;
@@ -943,7 +943,7 @@
           padding: 0 70px;
         }
         
-        .bar-chart-legend { 
+        .lollipop-chart-legend { 
             display: flex; 
             flex-wrap: wrap; 
             gap: 8px 16px;
@@ -953,7 +953,7 @@
             margin-bottom: 16px;
         }
 
-        .bar-chart-legend .legend-item {
+        .lollipop-chart-legend .legend-item {
             font-size: 12px;
             font-weight: 500;
             display: flex;
@@ -961,7 +961,7 @@
             gap: 6px;
         }
 
-        .bar-chart-actions {
+        .lollipop-chart-actions {
             display: flex;
             justify-content: center;
             margin-top: 16px;
@@ -1147,18 +1147,18 @@
                 grid-template-columns: 1fr;
             }
 
-            .bar-chart-container {
+            .lollipop-chart-container {
                 margin-left: 0;
                 margin-right: 0;
                 padding: 16px;
             }
 
-            #stackedBarChartContainer, #severityBarChartContainer {
+            #lollipopChartContainer, #severityLollipopChartContainer {
                 height: 280px;
                 padding: 0 8px;
             }
 
-            .bar-chart-legend {
+            .lollipop-chart-legend {
                 padding: 0 12px;
             }
         }
@@ -1223,11 +1223,11 @@
                 padding: 20px;
             }
 
-            .bar-chart-container {
+            .lollipop-chart-container {
                 padding: 16px;
             }
 
-            .bar-chart-header {
+            .lollipop-chart-header {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 12px;
@@ -1238,12 +1238,12 @@
                 justify-content: flex-end;
             }
 
-            #stackedBarChartContainer {
+            #lollipopChartContainer {
                 height: 250px;
                 padding: 0 8px;
             }
 
-            .bar-chart-legend {
+            .lollipop-chart-legend {
                 padding: 0 8px;
                 justify-content: flex-start;
             }
@@ -1578,37 +1578,37 @@
                 </div>
             </div>
             
-            <div class="bar-chart-container">
+            <div class="lollipop-chart-container">
                 <div class="chart-toggle-buttons">
                     <button class="chart-toggle-btn active" onclick="showAnomalyChart()">Anomaly Analysis</button>
                     <button class="chart-toggle-btn" onclick="showSeverityChart()">Severity Map</button>
                 </div>
 
                 <div id="anomalyChartSection" class="active">
-                    <div class="bar-chart-header">
-                        <div class="bar-chart-title-wrapper">
-                            <span class="bar-chart-title">Block Wise Anomalies</span>
+                    <div class="lollipop-chart-header">
+                        <div class="lollipop-chart-title-wrapper">
+                            <span class="lollipop-chart-title">Block Wise Anomalies</span>
                         </div>
                         <div class="chart-filters">
                             <!-- Filters left blank as requested -->
                         </div>
                     </div>
-                    <div id="stackedBarChartContainer">
-                        <canvas id="stackedBarChart"></canvas>
+                    <div id="lollipopChartContainer">
+                        <canvas id="lollipopChart"></canvas>
                     </div>
-                    <div id="bar-chart-legend" class="bar-chart-legend"></div>
+                    <div id="lollipop-chart-legend" class="lollipop-chart-legend"></div>
                 </div>
 
                 <div id="severityChartSection">
-                    <div class="bar-chart-header">
-                        <div class="bar-chart-title-wrapper">
-                            <span class="bar-chart-title">Severity Analysis</span>
+                    <div class="lollipop-chart-header">
+                        <div class="lollipop-chart-title-wrapper">
+                            <span class="lollipop-chart-title">Severity Analysis</span>
                         </div>
                     </div>
-                    <div id="severityBarChartContainer">
-                        <canvas id="severityBarChart"></canvas>
+                    <div id="severityLollipopChartContainer">
+                        <canvas id="severityLollipopChart"></canvas>
                     </div>
-                    <div id="severity-chart-legend" class="bar-chart-legend"></div>
+                    <div id="severity-lollipop-chart-legend" class="lollipop-chart-legend"></div>
                 </div>
             </div>
         </div>
@@ -1722,20 +1722,20 @@
                     ])|tojson }},
                     counts: {{ anomaly_data.counts|default([125, 87, 63, 42, 38, 29, 56, 34, 18, 25, 33, 15, 12, 8])|tojson }},
                     colors: [
-                        '#FF914D',  // Bypass Diode
-                        '#FFBF00',  // Multi Cell
+                        '#9C27B0',  // Bypass Diode
+                        '#FFA500',  // Multi Cell
                         '#FF0000',  // Cell
-                        '#7173e4',  // Partial String Offline
+                        '#FF66C4',  // Partial String Offline
                         '#2E7D32',  // Vegetation
                         '#C2185B',  // Physical Damage
                         '#65E667',  // Module Power Mismatch
                         '#E77148',  // Shading
                         '#506E9A',  // Short Circuit
                         '#FF1A94',  // String Offline
-                        '#a6a6a6',  // Module Offline
-                        '#7ed957',  // Junction Box
+                        '#545454',  // Module Offline
+                        '#BFC494',  // Junction Box
                         '#5CE1E6',  // Module Missing
-                        '#8C52FF'   // Other
+                        '#8C52FF'
                     ]
                 };
 
@@ -1824,34 +1824,42 @@
                     });
                 }
 
-                // Create Stacked Bar Chart with dynamic data
-                const stackedBarCtx = document.getElementById('stackedBarChart');
-                if (stackedBarCtx) {
-                    const stackedBarData = {
+                // Create Lollipop Chart with dynamic data
+                const lollipopCtx = document.getElementById('lollipopChart');
+                if (lollipopCtx) {
+                    const lollipopData = {
                         labels: {{ bar_chart_data.labels|default(['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6', 'Block 7', 'Block 8'])|tojson }},
                         datasets: {{ bar_chart_data.datasets|default([
-                            { 'label': 'Bypass Diode', 'data': [15, 12, 8, 20, 6, 15, 8, 11], 'backgroundColor': '#5D9CFC' },
-                            { 'label': 'Multi Cell', 'data': [10, 8, 12, 6, 8, 10, 12, 8], 'backgroundColor': '#9867F1' },
-                            { 'label': 'Cell', 'data': [8, 6, 10, 4, 6, 8, 10, 6], 'backgroundColor': '#EC61A6' },
-                            { 'label': 'Vegetation', 'data': [5, 3, 6, 2, 3, 5, 6, 3], 'backgroundColor': '#F58700' },
-                            { 'label': 'Physical Damage', 'data': [3, 2, 4, 1, 2, 3, 4, 2], 'backgroundColor': '#F2C94C' },
-                            { 'label': 'Short Circuit', 'data': [2, 1, 2, 3, 1, 2, 1, 2], 'backgroundColor': '#47C878' },
-                            { 'label': 'String Offline', 'data': [3, 2, 3, 4, 2, 3, 2, 3], 'backgroundColor': '#dc3545' },
-                            { 'label': 'Module Offline', 'data': [4, 3, 4, 5, 3, 4, 3, 4], 'backgroundColor': '#17a2b8' }
+                            { 'label': 'Bypass Diode', 'data': [15, 12, 8, 20, 6, 15, 8, 11], 'backgroundColor': '#FF914D' },
+                            { 'label': 'Multi Cell', 'data': [10, 8, 12, 6, 8, 10, 12, 8], 'backgroundColor': '#FFBF00' },
+                            { 'label': 'Cell', 'data': [8, 6, 10, 4, 6, 8, 10, 6], 'backgroundColor': '#FF0000' },
+                            { 'label': 'Vegetation', 'data': [5, 3, 6, 2, 3, 5, 6, 3], 'backgroundColor': '#2E7D32' },
+                            { 'label': 'Physical Damage', 'data': [3, 2, 4, 1, 2, 3, 4, 2], 'backgroundColor': '#C2185B' },
+                            { 'label': 'Short Circuit', 'data': [2, 1, 2, 3, 1, 2, 1, 2], 'backgroundColor': '#506E9A' },
+                            { 'label': 'String Offline', 'data': [3, 2, 3, 4, 2, 3, 2, 3], 'backgroundColor': '#FF1A94' },
+                            { 'label': 'Module Offline', 'data': [4, 3, 4, 5, 3, 4, 3, 4], 'backgroundColor': '#a6a6a6' }
                         ])|tojson }}
                     };
 
-                    const barLegend = document.getElementById('bar-chart-legend');
-                    if (barLegend) {
-                        barLegend.innerHTML = '';
-                        stackedBarData.datasets.forEach(d => {
-                            barLegend.innerHTML += `<div class="legend-item"><div class="legend-color" style="background-color: ${d.backgroundColor}"></div><span>${d.label}</span></div>`;
+                    const lollipopLegend = document.getElementById('lollipop-chart-legend');
+                    if (lollipopLegend) {
+                        lollipopLegend.innerHTML = '';
+                        lollipopData.datasets.forEach(d => {
+                            lollipopLegend.innerHTML += `<div class="legend-item"><div class="legend-color" style="background-color: ${d.backgroundColor}"></div><span>${d.label}</span></div>`;
                         });
                     }
 
-                    new Chart(stackedBarCtx, {
+                    new Chart(lollipopCtx, {
                         type: 'bar',
-                        data: stackedBarData,
+                        data: {
+                            labels: lollipopData.labels,
+                            datasets: lollipopData.datasets.map(dataset => ({
+                                ...dataset,
+                                barThickness: 15, // Very thin bars for lollipop effect
+                                borderRadius: 3,
+                                borderWidth: 0
+                            }))
+                        },
                         options: {
                             responsive: true, 
                             maintainAspectRatio: false,
@@ -1881,8 +1889,8 @@
                                 x: { 
                                     stacked: true, 
                                     grid: { display: false },
-                                    categoryPercentage: 0.6,
-                                    barPercentage: 0.8,
+                                    categoryPercentage: 0.8,
+                                    barPercentage: 0.6,
                                     title: {
                                         display: true,
                                         text: 'Blocks',
@@ -1958,12 +1966,12 @@
             document.querySelectorAll('.chart-toggle-btn')[1].classList.add('active');
 
             // Create severity chart if not exists
-            createSeverityChart();
+            createSeverityLollipopChart();
         }
 
-        // Create severity bar chart
-        function createSeverityChart() {
-            const severityCtx = document.getElementById('severityBarChart');
+        // Create severity lollipop chart
+        function createSeverityLollipopChart() {
+            const severityCtx = document.getElementById('severityLollipopChart');
             if (severityCtx && !severityCtx.chart) {
                 const severityChartData = {
                     labels: ['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6', 'Block 7', 'Block 8'],
@@ -1971,22 +1979,25 @@
                         { 
                             label: 'High Severity', 
                             data: [8, 6, 4, 12, 3, 8, 4, 6], 
-                            backgroundColor: '#FF0000' 
+                            backgroundColor: '#FF0000',
+                            barThickness: 15
                         },
                         { 
                             label: 'Medium Severity', 
                             data: [12, 9, 8, 15, 7, 12, 8, 10], 
-                            backgroundColor: '#FF914D' 
+                            backgroundColor: '#FF914D',
+                            barThickness: 15
                         },
                         { 
                             label: 'Low Severity', 
                             data: [6, 4, 5, 8, 3, 6, 5, 4], 
-                            backgroundColor: '#008000' 
+                            backgroundColor: '#7ed957',
+                            barThickness: 15
                         }
                     ]
                 };
 
-                const severityLegend = document.getElementById('severity-chart-legend');
+                const severityLegend = document.getElementById('severity-lollipop-chart-legend');
                 if (severityLegend) {
                     severityLegend.innerHTML = '';
                     severityChartData.datasets.forEach(d => {
@@ -2011,6 +2022,8 @@
                             x: { 
                                 stacked: true, 
                                 grid: { display: false },
+                                categoryPercentage: 0.8,
+                                barPercentage: 0.6,
                                 title: {
                                     display: true,
                                     text: 'Blocks',
@@ -2028,6 +2041,12 @@
                                     color: '#374151'
                                 }
                             } 
+                        },
+                        elements: {
+                            bar: {
+                                borderRadius: { topLeft: 3, topRight: 3 },
+                                borderSkipped: false
+                            }
                         }
                     }
                 });
@@ -2090,5 +2109,4 @@
         });
     </script>
 </body>
-
 </html>

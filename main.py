@@ -1956,5 +1956,50 @@ def update_plant_image():
         return jsonify({'success': False, 'message': 'An error occurred while updating the image'})
 
 
+@app.route('/api/plant/<plant_id>/severity-data', methods=['GET', 'POST'])
+@login_required
+def plant_severity_data(plant_id):
+    """API endpoint for managing severity data uploaded by admin"""
+    plant = plants_collection.find_one({'_id': ObjectId(plant_id)})
+    if not plant:
+        return jsonify({'success': False, 'message': 'Plant not found'}), 404
+    
+    # Handle severity data upload (POST)
+    if request.method == 'POST':
+        # Check if user is admin
+        if session.get('user_role') != 'admin':
+            return jsonify({'success': False, 'message': 'Only administrators can upload severity data'}), 403
+        
+        try:
+            # Get severity data from request
+            data = request.get_json()
+            if not data:
+                return jsonify({'success': False, 'message': 'No data provided'}), 400
+            
+            # Validate severity data structure
+            if 'high' not in data or 'medium' not in data or 'low' not in data:
+                return jsonify({'success': False, 'message': 'Invalid severity data format'}), 400
+            
+            # Store severity data in the plants collection
+            plants_collection.update_one(
+                {'_id': ObjectId(plant_id)},
+                {'$set': {'severity_data': data}}
+            )
+            
+            return jsonify({'success': True, 'message': 'Severity data uploaded successfully'})
+        
+        except Exception as e:
+            return jsonify({'success': False, 'message': f'Error uploading severity data: {str(e)}'}), 500
+    
+    # Handle severity data retrieval (GET)
+    else:
+        # Try to get severity data from the plant document
+        severity_data = plant.get('severity_data')
+        if severity_data:
+            return jsonify({'success': True, 'severityData': severity_data})
+        else:
+            return jsonify({'success': False, 'message': 'No severity data found for this plant'}), 404
+
+
 if __name__ == '__main__':
     app.run(debug=True, port=5000, host='0.0.0.0')
