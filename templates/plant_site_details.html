@@ -894,18 +894,14 @@
         <div class="main-content">
             <!-- Header -->
             <div class="header">
-                <div class="breadcrumb">
-                    <a href="/homepage">Plants</a>
-                    <span>›</span>
-                    <a href="/plant/{{ plant._id }}">{{ plant.name }}</a>
-                    <span>›</span>
-                    <span>Site Details</span>
+                <div class="header-left">
+                    <p>Plants / <strong>{{ plant.name }}</strong></p>
                 </div>
-                <div class="header-actions">
+                <div class="header-right-buttons"> 
                     <div class="header-center">
-                        <button class="top-btn" onclick="openOverview()">Overview</button>
+                        <button class="top-btn active">Overview</button>
                         <button class="top-btn" onclick="openAnomaliesMap()">Anomalies</button>
-                        <button class="top-btn active">Site Details</button>
+                        <button class="top-btn" onclick="openSiteDetails()">Site Details</button>
                         <button class="top-btn">Report</button>
                     </div>
                     <div class="user-dropdown">
@@ -925,15 +921,15 @@
                             </a>
                         </div>
                     </div>
-                    <a href="/plant/{{ plant._id }}" class="btn btn-secondary">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    <button class="back-button" onclick="window.history.back()">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
                         </svg>
-                        Back to Plant
-                    </a>
+                        Back to Plants
+                    </button> 
                 </div>
             </div>
+
 
             <!-- Content Area -->
             <div class="content-area">
