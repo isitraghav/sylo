@@ -4,39 +4,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-
     <title>{{ plant.name }} - Plant Details</title>
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo/logo1.png') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
     <style>
+        :root {
+            --primary-color: #2e7d32;
+            --primary-green: #16A34A;
+            --light-gray-bg: #F8FAFC;
+            --border-color: #EAF0F6;
+            --text-primary: #0D1A2B;
+            --text-secondary: #64748B;
+            --white: #FFFFFF;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
-        :root {
-            --primary-color: #2e7d32;
-            --secondary-color: #F97316;
-            --accent-color: #06B6D4;
-            --success-color: #10B981;
-            --warning-color: #F59E0B;
-            --error-color: #EF4444;
-            --background-color: #F8FAFC;
-            --surface-color: #FFFFFF;
-            --text-color: #1E293B;
-            --text-secondary: #64748B;
-            --border-color: #E2E8F0;
-        }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background-color);
-            color: var(--text-color);
+            background-color: var(--light-gray-bg);
+            color: var(--text-primary);
             line-height: 1.6;
+            margin: 0;
         }
 
         .main-app {
-            min-height: 100vh;
             display: flex;
         }
 
@@ -45,13 +41,12 @@
             width: 150px;
             height: 100vh;
             background-color: white;
-            color: white;
             position: fixed;
             top: 0;
             left: 0;
             z-index: 1000;
             overflow-y: auto;
-            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
         }
 
         .sidebar-logo {
@@ -62,16 +57,9 @@
 
         .sidebar-logo img {
             width: 100%;
-            height: auto;
             max-width: 150px;
             display: block;
             margin: 0 auto;
-        }
-
-        .sidebar-logo h2 {
-            color: var(--primary-color);
-            font-size: 20px;
-            font-weight: 700;
         }
 
         .sidebar-menu {
@@ -102,26 +90,27 @@
             margin-right: 10px;
             width: 20px;
             height: 20px;
-            min-width: 20px;
-            min-height: 20px;
             flex-shrink: 0;
         }
 
-        /* Main Content - Updated with margin for fixed sidebar */
+        /* Main Content Styles */
         .main-content {
-            flex: 1;
+            flex-grow: 1;
             margin-left: 150px;
-            display: flex;
-            flex-direction: column;
+            padding: 24px 160px;
+            padding-top: 80px;
+            max-width: calc(100vw - 170px);
+            overflow-x: hidden;
+            box-sizing: border-box;
         }
 
-        /* Header */
+        /* Header Styles */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
-            background-color: var(--background-color);
+            background-color: var(--light-gray-bg);
             padding: 16px 32px;
             position: fixed;
             top: 0;
@@ -131,14 +120,14 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        .header-left p { 
-            font-size: 29px; 
-            color: var(--text-secondary); 
+        .header-left p {
+            font-size: 29px;
+            color: var(--text-secondary);
             margin: 0;
         }
 
-        .header-left strong { 
-            color: var(--text-color); 
+        .header-left strong {
+            color: var(--text-primary);
         }
 
         .header-right-buttons {
@@ -147,45 +136,13 @@
             gap: 16px;
         }
 
-        .header-center {
-            display: flex; 
-            align-items: center; 
-            gap: 6px;
-            background-color: #F1F5F9;
-            padding: 4px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .top-btn {
-            padding: 6px 14px; 
-            background: transparent; 
-            border: none;
-            border-radius: 6px; 
-            font-size: 14px; 
-            font-weight: 600;
-            color: #334155; 
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .top-btn.active { 
-            background: var(--primary-color); 
-            color: white; 
-        }
-
-        .top-btn:hover {
-            background: var(--primary-color);
-            color: white;
-        }
-
         .user-dropdown {
             position: relative;
         }
 
         .user-btn {
-            background: var(--background-color);
-            color: var(--text-color);
+            background: var(--light-gray-bg);
+            color: var(--text-primary);
             border: 1px solid var(--border-color);
             padding: 10px 15px;
             border-radius: 8px;
@@ -208,63 +165,35 @@
             background: white;
             border: 1px solid var(--border-color);
             border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            display: none;
             min-width: 150px;
-            z-index: 1000;
-        }
-
-        .dropdown-menu.show {
-            display: block;
         }
 
         .dropdown-item {
             display: block;
-            width: 100%;
             padding: 10px 15px;
-            text-align: left;
-            color: var(--text-color);
+            color: var(--text-primary);
             text-decoration: none;
-            border: none;
-            background: none;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            transition: background 0.2s;
         }
 
         .dropdown-item:hover {
-            background: var(--background-color);
+            background: var(--light-gray-bg);
         }
 
-        .btn {
-            padding: 10px 15px;
+        .back-button {
+            background: none;
             border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: 500;
-            transition: all 0.3s ease;
+            color: var(--text-primary);
             display: flex;
             align-items: center;
-            gap: 8px;
-            text-decoration: none;
+            gap: 6px;
+            cursor: pointer;
+            font-size: 14px;
         }
 
-        .btn-primary {
-            background: var(--primary-color);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            background: #1e5f32;
-            transform: translateY(-1px);
-        }
-
-        .btn-secondary {
-            background: var(--primary-color);
-            color:white;
-        }
-
-        .btn-secondary:hover {
-            background: #1e5f32;
+        .back-button svg {
+            width: 20px;
+            height: 20px;
         }
 
         /* Content Area */
@@ -1249,12 +1178,6 @@
                     <p>Plants / <strong>{{ plant.name }}</strong></p>
                 </div>
                 <div class="header-right-buttons">
-                    <div class="header-center">
-                        <button class="top-btn" onclick="openOverview()">Overview</button>
-                        <button class="top-btn active">Anomalies</button>
-                        <button class="top-btn" onclick="openSiteDetails()">Site Details</button>
-                        <button class="top-btn">Report</button>
-                    </div>
                     <div class="user-dropdown">
                         <button class="user-btn" onclick="toggleUserDropdown()">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
