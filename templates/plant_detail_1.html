@@ -4,35 +4,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{{ plant.name }} - Plant Details</title>
-    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/logo/logo1.png') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-    <style>
-        :root {
-            --primary-color: #2e7d32;
-            --primary-green: #16A34A;
-            --light-gray-bg: #F8FAFC;
-            --border-color: #EAF0F6;
-            --text-primary: #0D1A2B;
-            --text-secondary: #64748B;
-            --white: #FFFFFF;
-        }
 
+    <title>{{ plant.name }} - Plant Details</title>
+    <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
 
+        :root {
+            --primary-color: #2e7d32;
+            --secondary-color: #F97316;
+            --accent-color: #06B6D4;
+            --success-color: #10B981;
+            --warning-color: #F59E0B;
+            --error-color: #EF4444;
+            --background-color: #F8FAFC;
+            --surface-color: #FFFFFF;
+            --text-color: #1E293B;
+            --text-secondary: #64748B;
+            --border-color: #E2E8F0;
+        }
+
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--light-gray-bg);
-            color: var(--text-primary);
+            background-color: var(--background-color);
+            color: var(--text-color);
             line-height: 1.6;
-            margin: 0;
         }
 
         .main-app {
+            min-height: 100vh;
             display: flex;
         }
 
@@ -41,12 +45,13 @@
             width: 150px;
             height: 100vh;
             background-color: white;
+            color: white;
             position: fixed;
             top: 0;
             left: 0;
             z-index: 1000;
             overflow-y: auto;
-            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+            box-shadow: 2px 0 5px rgba(0,0,0,0.1);
         }
 
         .sidebar-logo {
@@ -57,9 +62,16 @@
 
         .sidebar-logo img {
             width: 100%;
+            height: auto;
             max-width: 150px;
             display: block;
             margin: 0 auto;
+        }
+
+        .sidebar-logo h2 {
+            color: var(--primary-color);
+            font-size: 20px;
+            font-weight: 700;
         }
 
         .sidebar-menu {
@@ -90,27 +102,26 @@
             margin-right: 10px;
             width: 20px;
             height: 20px;
+            min-width: 20px;
+            min-height: 20px;
             flex-shrink: 0;
         }
 
-        /* Main Content Styles */
+        /* Main Content - Updated with margin for fixed sidebar */
         .main-content {
-            flex-grow: 1;
+            flex: 1;
             margin-left: 150px;
-            padding: 24px 160px;
-            padding-top: 80px;
-            max-width: calc(100vw - 170px);
-            overflow-x: hidden;
-            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Header Styles */
+        /* Header */
         .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
-            background-color: var(--light-gray-bg);
+            background-color: var(--background-color);
             padding: 16px 32px;
             position: fixed;
             top: 0;
@@ -120,14 +131,14 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        .header-left p {
-            font-size: 29px;
-            color: var(--text-secondary);
+        .header-left p { 
+            font-size: 29px; 
+            color: var(--text-secondary); 
             margin: 0;
         }
 
-        .header-left strong {
-            color: var(--text-primary);
+        .header-left strong { 
+            color: var(--text-color); 
         }
 
         .header-right-buttons {
@@ -136,13 +147,45 @@
             gap: 16px;
         }
 
+        .header-center {
+            display: flex; 
+            align-items: center; 
+            gap: 6px;
+            background-color: #F1F5F9;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .top-btn {
+            padding: 6px 14px; 
+            background: transparent; 
+            border: none;
+            border-radius: 6px; 
+            font-size: 14px; 
+            font-weight: 600;
+            color: #334155; 
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .top-btn.active { 
+            background: var(--primary-color); 
+            color: white; 
+        }
+
+        .top-btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
         .user-dropdown {
             position: relative;
         }
 
         .user-btn {
-            background: var(--light-gray-bg);
-            color: var(--text-primary);
+            background: var(--background-color);
+            color: var(--text-color);
             border: 1px solid var(--border-color);
             padding: 10px 15px;
             border-radius: 8px;
@@ -165,35 +208,63 @@
             background: white;
             border: 1px solid var(--border-color);
             border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            display: none;
             min-width: 150px;
+            z-index: 1000;
+        }
+
+        .dropdown-menu.show {
+            display: block;
         }
 
         .dropdown-item {
             display: block;
+            width: 100%;
             padding: 10px 15px;
-            color: var(--text-primary);
+            text-align: left;
+            color: var(--text-color);
             text-decoration: none;
-            transition: background 0.2s;
+            border: none;
+            background: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         .dropdown-item:hover {
-            background: var(--light-gray-bg);
+            background: var(--background-color);
         }
 
-        .back-button {
-            background: none;
+        .btn {
+            padding: 10px 15px;
             border: none;
-            color: var(--text-primary);
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 6px;
-            cursor: pointer;
-            font-size: 14px;
+            gap: 8px;
+            text-decoration: none;
         }
 
-        .back-button svg {
-            width: 20px;
-            height: 20px;
+        .btn-primary {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1e5f32;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--primary-color);
+            color:white;
+        }
+
+        .btn-secondary:hover {
+            background: #1e5f32;
         }
 
         /* Content Area */
@@ -1178,6 +1249,12 @@
                     <p>Plants / <strong>{{ plant.name }}</strong></p>
                 </div>
                 <div class="header-right-buttons">
+                    <div class="header-center">
+                        <button class="top-btn" onclick="openOverview()">Overview</button>
+                        <button class="top-btn active">Anomalies</button>
+                        <button class="top-btn" onclick="openSiteDetails()">Site Details</button>
+                        <button class="top-btn">Report</button>
+                    </div>
                     <div class="user-dropdown">
                         <button class="user-btn" onclick="toggleUserDropdown()">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
