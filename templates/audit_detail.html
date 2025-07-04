@@ -1464,48 +1464,7 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Header -->
-        <div class="header">
-            <div class="breadcrumb">
-                <a href="/homepage">Plants</a>
-                <span>›</span>
-                <a href="/plant/{{ plant._id }}">{{ plant.name }}</a>
-                <span>›</span>
-                <span>{{ audit.name }}</span>
-            </div>
-            <div class="header-actions">
-                <div class="header-center">
-                    <button class="top-btn" onclick="openOverview()">Overview</button>
-                    <button class="top-btn active">Anomalies</button>
-                    <button class="top-btn" onclick="openSiteDetails()">Site Details</button>
-                    <button class="top-btn">Report</button>
-                </div>
-                <div class="user-dropdown">
-                    <button class="user-btn" onclick="toggleUserDropdown()">
-                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                        </svg>
-                        <span>{{ session.user_name or 'User' }}</span>
-                    </button>
-                    <div class="dropdown-menu" id="userDropdown">
-                        <a href="/logout" class="dropdown-item">
-                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 8px;">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-                            </svg>
-                            Logout
-                        </a>
-                    </div>
-                </div>
-                <a href="/plant/{{ plant._id }}" class="btn btn-secondary">
-                    <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                              d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
-                    Back to Plant
-                </a>
-            </div>
-        </div>
+        <!-- Header removed -->
 
         <!-- Content Area -->
         <div class="content-area">
