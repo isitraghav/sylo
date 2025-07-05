@@ -2244,7 +2244,7 @@
                 'SCB': anomaly.properties.scb,
                 'String': anomaly.properties.string,
                 'Module': anomaly.properties.panel,
-                'Anomaly Type': anomaly.properties.anomaly_type,
+                'Anomaly Type': anomaly.properties.Anomaly,
                 'Confidence': anomaly.properties.confidence
             };
 
@@ -2267,7 +2267,7 @@
                         const marker = L.marker([anomaly.geometry.coordinates[1], anomaly.geometry.coordinates[0]], {
                             icon: L.divIcon({
                                 className: 'anomaly-marker',
-                                html: `<div class="marker-content">${anomaly.properties.anomaly_type}</div>`
+                                html: `<div class="marker-content">${anomaly.properties.Anomaly}</div>`
                             })
                         });
 

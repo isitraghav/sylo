@@ -1704,199 +1704,203 @@
 
                 // Anomaly Data for Charts with dynamic backend values
                 const anomalyData = {
-                    labels: {{ anomaly_data.labels|default([
-                        'Bypass Diode',
-                        'Multi Cell',
-                        'Cell',
-                        'Partial String Offline',
-                        'Vegetation',
-                        'Physical Damage',
-                        'Module Power Mismatch',
-                        'Shading',
-                        'Short Circuit',
-                        'String Offline',
-                        'Module Offline',
-                        'Junction Box',
-                        'Module Missing',
-                        'Other'
-                    ])|tojson }},
-                    counts: {{ anomaly_data.counts|default([125, 87, 63, 42, 38, 29, 56, 34, 18, 25, 33, 15, 12, 8])|tojson }},
-                    colors: [
-                        '#9C27B0',  // Bypass Diode
-                        '#FFA500',  // Multi Cell
-                        '#FF0000',  // Cell
-                        '#FF66C4',  // Partial String Offline
-                        '#2E7D32',  // Vegetation
-                        '#C2185B',  // Physical Damage
-                        '#65E667',  // Module Power Mismatch
-                        '#E77148',  // Shading
-                        '#506E9A',  // Short Circuit
-                        '#FF1A94',  // String Offline
-                        '#545454',  // Module Offline
-                        '#BFC494',  // Junction Box
-                        '#5CE1E6',  // Module Missing
-                        '#8C52FF'
-                    ]
+                    labels: {{ anomaly_data.labels|default([])|tojson }},
+                    counts: {{ anomaly_data.counts|default([])|tojson }},
+                    colors: {{ anomaly_data.colors|default([])|tojson }}
                 };
+
+                // Default colors if not provided from backend
+                const defaultColors = [
+                    '#9C27B0',  // Bypass Diode
+                    '#FFA500',  // Multi Cell Hotspot
+                    '#FF0000',  // Cell Hotspot
+                    '#FF66C4',  // Partial String Offline
+                    '#2E7D32',  // Vegetation
+                    '#C2185B',  // Physical Damage
+                    '#65E667',  // Module Power Mismatch
+                    '#E77148',  // Shading
+                    '#506E9A',  // Short Circuit
+                    '#FF1A94',  // String Offline
+                    '#545454',  // Module Offline
+                    '#BFC494',  // Junction Box
+                    '#5CE1E6',  // Module Missing
+                    '#8C52FF'   // Other
+                ];
+
+                // Use default colors if colors array is empty
+                if (anomalyData.colors.length === 0 && anomalyData.labels.length > 0) {
+                    anomalyData.colors = anomalyData.labels.map((_, index) => 
+                        defaultColors[index % defaultColors.length]
+                    );
+                }
 
                 const totalAnomalies = anomalyData.counts.reduce((a, b) => a + b, 0);
                 document.getElementById('chartCenterValue').textContent = totalAnomalies;
 
-                // Populate Anomaly Table
-                const tableBody = document.getElementById('anomalyTableBody');
-                if (tableBody) {
-                    tableBody.innerHTML = '';
-                    anomalyData.labels.forEach((label, index) => {
-                        const percentage = ((anomalyData.counts[index] / totalAnomalies) * 100).toFixed(1);
-                        const row = document.createElement('tr');
-                        row.innerHTML = `
-                            <td>
-                                <div class="table-anomaly-type" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 auto;">
-                                    <div class="table-color-dot" style="background-color: ${anomalyData.colors[index]}; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;"></div>
+                // Populate Anomaly Table and charts - only if we have data
+                if (anomalyData.labels.length > 0 && anomalyData.counts.length > 0 && totalAnomalies > 0) {
+                    // Populate Anomaly Table
+                    const tableBody = document.getElementById('anomalyTableBody');
+                    if (tableBody) {
+                        tableBody.innerHTML = '';
+                        anomalyData.labels.forEach((label, index) => {
+                            const percentage = ((anomalyData.counts[index] / totalAnomalies) * 100).toFixed(1);
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>
+                                    <div class="table-anomaly-type" style="display: flex; align-items: center; justify-content: center; gap: 8px; margin: 0 auto;">
+                                        <div class="table-color-dot" style="background-color: ${anomalyData.colors[index]}; width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;"></div>
+                                        <span>${label}</span>
+                                    </div>
+                                </td>
+                                <td>${anomalyData.counts[index]}</td>
+                                <td>${percentage}%</td>
+                            `;
+                            tableBody.appendChild(row);
+                        });
+                    }
+
+                    // Create Doughnut Chart with hover animation
+                    const doughnutCtx = document.getElementById('anomalyDoughnutChart');
+                    if (doughnutCtx) {
+                        const doughnutLegend = document.getElementById('doughnut-legend');
+                        doughnutLegend.innerHTML = '';
+                        anomalyData.labels.forEach((label, i) => {
+                            doughnutLegend.innerHTML += `
+                                <div class="legend-item">
+                                    <div class="legend-color" style="background-color: ${anomalyData.colors[i]}"></div>
                                     <span>${label}</span>
-                                </div>
-                            </td>
-                            <td>${anomalyData.counts[index]}</td>
-                            <td>${percentage}%</td>
-                        `;
-                        tableBody.appendChild(row);
-                    });
-                }
+                                </div>`;
+                        });
 
-                // Create Doughnut Chart with hover animation
-                const doughnutCtx = document.getElementById('anomalyDoughnutChart');
-                if (doughnutCtx) {
-                    const doughnutLegend = document.getElementById('doughnut-legend');
-                    doughnutLegend.innerHTML = '';
-                    anomalyData.labels.forEach((label, i) => {
-                        doughnutLegend.innerHTML += `
-                            <div class="legend-item">
-                                <div class="legend-color" style="background-color: ${anomalyData.colors[i]}"></div>
-                                <span>${label}</span>
-                            </div>`;
-                    });
-
-                    new Chart(doughnutCtx, {
-                        type: 'doughnut',
-                        data: {
-                            labels: anomalyData.labels,
-                            datasets: [{
-                                data: anomalyData.counts,
-                                backgroundColor: anomalyData.colors,
-                                borderColor: '#FFFFFF',
-                                borderWidth: 3,
-                                cutout: '75%',
-                                hoverOffset: 15,
-                                hoverBorderWidth: 4
-                            }]
-                        },
-                        options: { 
-                            responsive: true, 
-                            maintainAspectRatio: false,
-                            interaction: {
-                                intersect: false
+                        new Chart(doughnutCtx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: anomalyData.labels,
+                                datasets: [{
+                                    data: anomalyData.counts,
+                                    backgroundColor: anomalyData.colors,
+                                    borderColor: '#FFFFFF',
+                                    borderWidth: 3,
+                                    cutout: '75%',
+                                    hoverOffset: 15,
+                                    hoverBorderWidth: 4
+                                }]
                             },
-                            plugins: { 
-                                legend: { display: false }, 
-                                tooltip: { 
-                                    enabled: true,
-                                    callbacks: {
-                                        label: function(context) {
-                                            const label = context.label || '';
-                                            const value = context.parsed;
-                                            const percentage = ((value / totalAnomalies) * 100).toFixed(1);
-                                            return `${label}: ${value} (${percentage}%)`;
+                            options: { 
+                                responsive: true, 
+                                maintainAspectRatio: false,
+                                interaction: {
+                                    intersect: false
+                                },
+                                plugins: { 
+                                    legend: { display: false }, 
+                                    tooltip: { 
+                                        enabled: true,
+                                        callbacks: {
+                                            label: function(context) {
+                                                const label = context.label || '';
+                                                const value = context.parsed;
+                                                const percentage = ((value / totalAnomalies) * 100).toFixed(1);
+                                                return `${label}: ${value} (${percentage}%)`;
+                                            }
                                         }
                                     }
-                                }
-                            },
-                            animation: {
-                                animateRotate: true,
-                                animateScale: true,
-                                duration: 1000
-                            },
-                            elements: {
-                                arc: {
-                                    borderWidth: 2
+                                },
+                                animation: {
+                                    animateRotate: true,
+                                    animateScale: true,
+                                    duration: 1000
+                                },
+                                elements: {
+                                    arc: {
+                                        borderWidth: 2
+                                    }
                                 }
                             }
-                        }
-                    });
+                        });
+                    }
+                } else {
+                    // Handle empty data case
+                    const tableBody = document.getElementById('anomalyTableBody');
+                    if (tableBody) {
+                        tableBody.innerHTML = '<tr><td colspan="3" style="text-align: center; padding: 20px; color: #666;">No anomaly data available</td></tr>';
+                    }
+                    
+                    const doughnutLegend = document.getElementById('doughnut-legend');
+                    if (doughnutLegend) {
+                        doughnutLegend.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No data to display</div>';
+                    }
+                    
+                    document.getElementById('chartCenterValue').textContent = '0';
                 }
 
                 // Create Lollipop Chart with dynamic data
                 const lollipopCtx = document.getElementById('lollipopChart');
                 if (lollipopCtx) {
                     const lollipopData = {
-                        labels: {{ bar_chart_data.labels|default(['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6', 'Block 7', 'Block 8'])|tojson }},
-                        datasets: {{ bar_chart_data.datasets|default([
-                            { 'label': 'Bypass Diode', 'data': [15, 12, 8, 20, 6, 15, 8, 11], 'backgroundColor': '#FF914D' },
-                            { 'label': 'Multi Cell', 'data': [10, 8, 12, 6, 8, 10, 12, 8], 'backgroundColor': '#FFBF00' },
-                            { 'label': 'Cell', 'data': [8, 6, 10, 4, 6, 8, 10, 6], 'backgroundColor': '#FF0000' },
-                            { 'label': 'Vegetation', 'data': [5, 3, 6, 2, 3, 5, 6, 3], 'backgroundColor': '#2E7D32' },
-                            { 'label': 'Physical Damage', 'data': [3, 2, 4, 1, 2, 3, 4, 2], 'backgroundColor': '#C2185B' },
-                            { 'label': 'Short Circuit', 'data': [2, 1, 2, 3, 1, 2, 1, 2], 'backgroundColor': '#506E9A' },
-                            { 'label': 'String Offline', 'data': [3, 2, 3, 4, 2, 3, 2, 3], 'backgroundColor': '#FF1A94' },
-                            { 'label': 'Module Offline', 'data': [4, 3, 4, 5, 3, 4, 3, 4], 'backgroundColor': '#a6a6a6' }
-                        ])|tojson }}
+                        labels: {{ bar_chart_data.labels|default([])|tojson }},
+                        datasets: {{ bar_chart_data.datasets|default([])|tojson }}
                     };
 
-                    const lollipopLegend = document.getElementById('lollipop-chart-legend');
-                    if (lollipopLegend) {
-                        lollipopLegend.innerHTML = '';
-                        lollipopData.datasets.forEach(d => {
-                            lollipopLegend.innerHTML += `<div class="legend-item"><div class="legend-color" style="background-color: ${d.backgroundColor}"></div><span>${d.label}</span></div>`;
-                        });
-                    }
+                    // Only create chart if we have data
+                    if (lollipopData.labels.length > 0 && lollipopData.datasets.length > 0) {
+                        const lollipopLegend = document.getElementById('lollipop-chart-legend');
+                        if (lollipopLegend) {
+                            lollipopLegend.innerHTML = '';
+                            lollipopData.datasets.forEach(d => {
+                                lollipopLegend.innerHTML += `<div class="legend-item"><div class="legend-color" style="background-color: ${d.backgroundColor}"></div><span>${d.label}</span></div>`;
+                            });
+                        }
 
-                    new Chart(lollipopCtx, {
-                        type: 'bar',
-                        data: {
-                            labels: lollipopData.labels,
-                            datasets: lollipopData.datasets.map(dataset => ({
-                                ...dataset,
-                                barThickness: 30, // Very thin bars for lollipop effect
-                                borderRadius: 3,
-                                borderWidth: 0
-                            }))
-                        },
-                        options: {
-                            responsive: true, 
-                            maintainAspectRatio: false,
-                            animation: {
-                                duration: 1000,
-                                easing: 'easeInOutCubic'
+                        new Chart(lollipopCtx, {
+                            type: 'bar',
+                            data: {
+                                labels: lollipopData.labels,
+                                datasets: lollipopData.datasets.map(dataset => ({
+                                    ...dataset,
+                                    barThickness: 30, // Very thin bars for lollipop effect
+                                    borderRadius: 3,
+                                    borderWidth: 0
+                                }))
                             },
-                            plugins: { 
-                                legend: { display: false }, 
-                                tooltip: { 
-                                    mode: 'index', 
-                                    intersect: false,
-                                    backgroundColor: 'rgba(0,0,0,0.8)',
-                                    titleColor: '#fff',
-                                    bodyColor: '#fff',
-                                    borderColor: 'rgba(255,255,255,0.1)',
-                                    borderWidth: 1,
-                                    cornerRadius: 6,
-                                    callbacks: {
-                                        title: function(context) {
-                                            return context[0].label + ' - Total Anomalies';
+                            options: {
+                                responsive: true, 
+                                maintainAspectRatio: false,
+                                animation: {
+                                    duration: 1000,
+                                    easing: 'easeInOutCubic'
+                                },
+                                plugins: { 
+                                    legend: { display: false }, 
+                                    tooltip: { 
+                                        mode: 'index', 
+                                        intersect: false,
+                                        backgroundColor: 'rgba(0,0,0,0.8)',
+                                        titleColor: '#fff',
+                                        bodyColor: '#fff',
+                                        borderColor: 'rgba(255,255,255,0.1)',
+                                        borderWidth: 1,
+                                        cornerRadius: 6,
+                                        callbacks: {
+                                            title: function(context) {
+                                                return context[0].label + ' - Total Anomalies';
+                                            }
                                         }
                                     }
-                                }
-                            },
-                            scales: { 
-                                x: { 
-                                    stacked: true, 
-                                    grid: { display: false },
-                                    categoryPercentage: 0.8,
-                                    barPercentage: 0.6,
-                                    title: {
-                                        display: true,
-                                        text: 'Blocks',
-                                        font: { weight: 'bold', size: 12 },
-                                        color: '#374151'
-                                    },
+                                },
+                                scales: { 
+                                    x: { 
+                                        stacked: true, 
+                                        grid: { display: false },
+                                        categoryPercentage: 0.8,
+                                        barPercentage: 0.6,
+                                        title: {
+                                            display: true,
+                                            text: 'Blocks',
+                                            font: { weight: 'bold', size: 12 },
+                                            color: '#374151'
+                                        },
                                     ticks: {
                                         color: '#6B7280',
                                         font: { size: 11 }
@@ -1938,6 +1942,13 @@
                             }
                         }
                     });
+                    } else {
+                        // Handle empty bar chart data
+                        const lollipopLegend = document.getElementById('lollipop-chart-legend');
+                        if (lollipopLegend) {
+                            lollipopLegend.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;">No block data available</div>';
+                        }
+                    }
                 }
 
             } catch (error) {
