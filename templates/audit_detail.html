@@ -1398,42 +1398,82 @@
             width: 100%;
             height: 100% !important;
             object-fit: cover;
-            border-radius: 8px;
         }
-
-        .download-btn {
+        
+        .fullscreen-btn {
             position: absolute;
-            top: 1px;
-            right: 1px;
-            background: rgba(255, 255, 255, 0.9);
+            bottom: 10px;
+            right: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: white;
             border: none;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border-radius: 4px;
+            padding: 6px;
             cursor: pointer;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            z-index: 10;
             transition: all 0.2s ease;
         }
-
-        .download-btn:hover {
-            background: white;
-            transform: scale(1.1);
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
-        }
-
-        .download-btn svg {
+        
+        .fullscreen-btn svg {
             width: 20px;
             height: 20px;
-            color: #0750ff;
+        }
+        
+        .fullscreen-btn:hover {
+            background-color: rgba(0, 0, 0, 0.7);
+            transform: scale(1.05);
+        }
+        
+        .fullscreen-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .fullscreen-overlay.active {
+            display: flex;
+        }
+        
+        .fullscreen-image {
+            max-width: 90%;
+            max-height: 90%;
+            object-fit: contain;
+        }
+        
+        .close-fullscreen {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: white;
+            font-size: 30px;
+            cursor: pointer;
+            background: none;
+            border: none;
+        }
+            border-radius: 8px;
         }
 
     </style>
 </head>
 
 <body>
+<!-- Fullscreen Image Overlay -->
+<div id="fullscreenOverlay" class="fullscreen-overlay">
+    <img id="fullscreenImage" class="fullscreen-image" src="" alt="Fullscreen Image">
+    <button class="close-fullscreen" onclick="closeFullscreen()">
+        <svg fill="none" stroke="white" viewBox="0 0 24 24" width="32" height="32">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+    </button>
+</div>
+
 <div class="main-app">
     <!-- Sidebar -->
     <div class="sidebar">
@@ -2556,6 +2596,11 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
                         </svg>
                     </button>
+                    <button class="fullscreen-btn" onclick="openFullscreen('${imagePath}')" title="View Fullscreen">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5v-4m0 4h-4m4 0l-5-5"></path>
+                        </svg>
+                    </button>
                 </div>
                 <hr>
                 <div class="detail-boxes-container">
@@ -2917,6 +2962,45 @@
             
             if (userBtn && dropdown && !userBtn.contains(event.target) && !dropdown.contains(event.target)) {
                 dropdown.classList.remove('show');
+            }
+        });
+
+        // Fullscreen image functionality
+        function openFullscreen(imageSrc) {
+            const overlay = document.getElementById('fullscreenOverlay');
+            const fullscreenImg = document.getElementById('fullscreenImage');
+            
+            fullscreenImg.src = imageSrc;
+            overlay.classList.add('active');
+            
+            // Prevent scrolling on the body
+            document.body.style.overflow = 'hidden';
+            
+            // Add ESC key listener to close
+            document.addEventListener('keydown', handleEscKey);
+        }
+        
+        function closeFullscreen() {
+            const overlay = document.getElementById('fullscreenOverlay');
+            overlay.classList.remove('active');
+            
+            // Re-enable scrolling
+            document.body.style.overflow = '';
+            
+            // Remove ESC key listener
+            document.removeEventListener('keydown', handleEscKey);
+        }
+        
+        function handleEscKey(event) {
+            if (event.key === 'Escape') {
+                closeFullscreen();
+            }
+        }
+        
+        // Close fullscreen when clicking outside the image
+        document.getElementById('fullscreenOverlay').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeFullscreen();
             }
         });
 
