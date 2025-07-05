@@ -2276,6 +2276,17 @@
             // Show drone section by default
             showSection('drone');
 
+            // Select the first inspection item by default
+            const inspectionItems = document.querySelectorAll('.inspection-item');
+            if (inspectionItems && inspectionItems.length > 0) {
+                const firstItem = inspectionItems[0];
+                const titleElement = firstItem.querySelector('.inspection-title');
+                if (titleElement) {
+                    // Trigger click on the first inspection item
+                    handleAnomalyClick(titleElement);
+                }
+            }
+            
             // // Add click event listeners to inspection items
             // const inspectionItems = document.querySelectorAll('.inspection-item');
             // console.log("---inspectionItems",inspectionItems)
