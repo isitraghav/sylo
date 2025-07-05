@@ -2373,11 +2373,12 @@
                 const divB = document.getElementById('divABottom');
                 divA.classList.remove('hidden');
                 divB.classList.add('hidden');
+                
+                // Reset map view to show all features
                 const extent = vectorLayer.getSource().getExtent();
-
-                map.getView().setCenter([0, 0]); // Reset map position to initial position
-                map.getView().setZoom(0); // Reset map zoom to initial zoom level
-                const vectorLayer = map.getLayers().getArray()[3]; // Assuming vectorLayer is the 4th layer in the map
+                // Reset styles on all map features
+                vectorLayer.getSource().getFeatures().forEach(f => f.setStyle(null));
+                
                 if (extent && extent.every(Number.isFinite)) {
                     map.getView().fit(extent, {
                         padding: [20, 20, 20, 20],
@@ -2410,43 +2411,36 @@
             let Longitud = anomalyData.properties.Longitude
             let image_name = anomalyData.properties['name']
 
-
             // Add small delay to show loader, then process data
             setTimeout(() => {
                 displayAnomalyData(anomalyData);
             }, 500);
 
-            zoomToTile(Latitude, Longitud, image_name)
+            // Zoom to and highlight on map
+            zoomToTile(Latitude, Longitud, image_name);
         }
 
 
         function handleAnomalyClickMap(data_anomaly) {
-
-            // Remove 'selected' class from all items
-            // document.querySelectorAll('.inspection-item').forEach(item => {
-            //     item.classList.remove('selected');
-            // });
-
-            // Add 'selected' class to the clicked item's parent
-            // element.closest('.inspection-item').classList.add('selected');
-
             // Get the anomaly data from the data attribute
             const anomalyDataString = data_anomaly //element.getAttribute('data-anomaly');
 
             // Now you have access to the full anomaly object
-
             const divA = document.getElementById('divATop');
             const divB = document.getElementById('divABottom');
             divA.classList.add('hidden');
             divB.classList.remove('hidden');
-            // const validJsonString = anomalyDataString.replace(/'/g, '"');
-            // console.log("---validJsonString", validJsonString.type, typeof validJsonString)
+            
             const anomalyData = { "properties": data_anomaly };
             showLoader();
 
-            let Latitude = anomalyData.properties.Latitude
-            let Longitud = anomalyData.properties.Longitude
-            let image_name = anomalyData.properties['name']
+            let Latitude = anomalyData.properties.Latitude;
+            let Longitud = anomalyData.properties.Longitude;
+            let image_name = anomalyData.properties['name'];
+            
+            // Find and highlight the corresponding item in the list
+            highlightListItem(image_name);
+            
             console.log("---image_name", image_name)
 
             // Add small delay to show loader, then process data
@@ -2496,47 +2490,47 @@
             const geometry = matchedFeatures[0].getGeometry();
             const extent = geometry.getExtent();
             // view.fit(extent, { maxZoom: zoomLevel, duration: 500 });
+        }
 
-
-
-
-            // // Reset previous selection style
-            // if (selectedFeature) {
-            //     console.log("---log coming",lon,  lat,selectedFeature)
-            //     selectedFeature.setStyle(null); // revert to default style
-            // }
-            // const highlightStyle = new ol.style.Style({
-            //     image: new ol.style.Circle({
-            //         radius: 7,
-            //         fill: new ol.style.Fill({ color: 'black' }),
-            //         stroke: new ol.style.Stroke({ color: '#fff', width: 2 })
-            //     }),
-            //     stroke: new ol.style.Stroke({ color: 'black', width: 3 }),
-            //     fill: new ol.style.Fill({ color: 'rgba(0, 0, 0, 0.4)' })
-            // });
-            // // Find the nearest feature manually from vector source
-            // const source = vectorLayer.getSource();
-            // const features = source.getFeatures();
-
-            // let closestFeature = null;
-            // let minDistance = Infinity;
-
-            // features.forEach(feature => {
-            //     const geometry = feature.getGeometry();
-            //     const distance = ol.sphere.getDistance(geometry.getClosestPoint(coordinate), coordinate);
-            //     if (distance < minDistance) {
-            //         minDistance = distance;
-            //         closestFeature = feature;
-            //     }
-            // });
-
-            // // Set style if within a reasonable distance
-            // if (closestFeature && minDistance < 20) {  // 20 meters threshold
-            //     selectedFeature = closestFeature;
-            //     selectedFeature.setStyle(highlightStyle);
-            // }
-            // // Find the closest feature
-
+        // Function to find and highlight the corresponding item in the anomaly list
+        function highlightListItem(imageName) {
+            if (!imageName) return;
+            
+            // Remove selected class from all items
+            document.querySelectorAll('.inspection-item').forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            // Find the list item with matching image name
+            const inspectionItems = document.querySelectorAll('.inspection-item');
+            let foundItem = null;
+            
+            inspectionItems.forEach(item => {
+                try {
+                    const titleElement = item.querySelector('.inspection-title');
+                    if (!titleElement) return;
+                    
+                    const anomalyDataString = titleElement.getAttribute('data-anomaly');
+                    if (!anomalyDataString) return;
+                    
+                    const validJsonString = anomalyDataString.replace(/'/g, '"');
+                    const anomalyData = JSON.parse(validJsonString);
+                    
+                    if (anomalyData.properties['name'] === imageName) {
+                        // Found the matching item
+                        foundItem = item;
+                        // Add selected class
+                        item.classList.add('selected');
+                        
+                        // Scroll the item into view if it's not visible
+                        item.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                } catch (error) {
+                    console.error('Error parsing anomaly data:', error);
+                }
+            });
+            
+            return foundItem;
         }
 
 
