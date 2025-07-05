@@ -159,7 +159,7 @@
         /* Main Content */
         .main-content {
             flex: 1;
-            margin-left: 250px;
+            margin-left: 150px;
             display: flex;
             flex-direction: column;
             transition: all 0.3s ease;
@@ -174,15 +174,41 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 24px;
-            background-color: var(--light-gray-bg);
-            padding: 16px 32px;
+            background-color: #F8FAFC;
+            padding: 16px 30px;
             position: fixed;
             top: 0;
             left: 150px;
             right: 0;
             z-index: 50;
             border-bottom: 1px solid var(--border-color);
+            height: 64px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        
+        .header-right-buttons {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .back-button {
+            background-color: #2e7d32;
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 8px 15px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        
+        .back-button:hover {
+            background-color: var(--border-color);
         }
 
         .breadcrumb {
@@ -190,6 +216,8 @@
             align-items: center;
             gap: 10px;
             color: var(--text-secondary);
+            font-size: 14px;
+            padding: 4px 0;
         }
 
         .breadcrumb a {
@@ -330,7 +358,7 @@
         /* Content Area */
         .content-area {
             flex: 1;
-            /* padding: 30px; */
+            padding: 85px 30px 30px;
             overflow-y: auto;
         }
 
@@ -675,10 +703,38 @@
                 width: 100%;
                 position: relative;
                 height: auto;
+                z-index: 100;
             }
 
             .main-content {
                 margin-left: 0;
+            }
+            
+            .header {
+                left: 0;
+                padding: 10px 15px;
+                flex-wrap: wrap;
+                height: auto;
+            }
+            
+            .header-center {
+                margin: 10px 0;
+                width: 100%;
+                justify-content: center;
+                order: 1;
+            }
+            
+            .breadcrumb {
+                width: 100%;
+                margin-bottom: 10px;
+                white-space: nowrap;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            
+            .back-button {
+                font-size: 12px;
+                padding: 6px 10px;
             }
 
             .audit-meta {
@@ -1464,7 +1520,45 @@
 
     <!-- Main Content -->
     <div class="main-content">
-        <!-- Header removed -->
+        <!-- Header -->
+        <div class="header">
+            <div class="breadcrumb">
+                <a href="/homepage">Plants</a> /
+                <a href="/plant_detail/{{ plant.id }}">{{ plant.name }}</a> /
+                <span>{{ audit.name }}</span> (Audit Detail)
+            </div>
+            <div class="header-actions">
+                <div class="header-center">
+                    <button class="top-btn" onclick="openOverview()">Overview</button>
+                    <button class="top-btn active">Anomalies</button>
+                    <button class="top-btn" onclick="openSiteDetails()">Site Details</button>
+                    <button class="top-btn">Report</button>
+                </div>
+                <div class="user-dropdown">
+                    <button class="user-btn" onclick="toggleUserDropdown()">
+                        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+                        </svg>
+                        <span>{{ session.user_name or 'User' }}</span>
+                    </button>
+                    <div class="dropdown-menu" id="userDropdown">
+                        <a href="/logout" class="dropdown-item">
+                            <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="margin-right: 8px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+                            </svg>
+                            Logout
+                        </a>
+                    </div>
+                </div>
+                    <button class="back-button" onclick="window.location.href='/homepage'">
+                        <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
+                        </svg>
+                        Back to Plants
+                    </button>
+                </div>
+            </div>
 
         <!-- Content Area -->
         <div class="content-area">
@@ -1808,11 +1902,23 @@
         function toggleSidebar() {
             const sidebar = document.querySelector('.sidebar');
             const mainContent = document.querySelector('.main-content');
+            const header = document.querySelector('.header');
             const toggleBtn = document.querySelector('.toggle-sidebar svg');
 
             if (sidebar && mainContent && toggleBtn) {
                 sidebar.classList.toggle('collapsed');
                 mainContent.classList.toggle('expanded');
+                
+                // Update header position when sidebar is collapsed/expanded
+                if (sidebar.classList.contains('collapsed')) {
+                    if (header) {
+                        header.style.left = '60px';
+                    }
+                } else {
+                    if (header) {
+                        header.style.left = '150px';
+                    }
+                }
 
                 // Rotate the arrow icon
                 if (sidebar.classList.contains('collapsed')) {
@@ -2760,12 +2866,37 @@
         }
 
         // Navigation functions
+        // Navigation functions
         function openOverview() {
-            window.location.href = `/plant/{{ plant._id }}/overview`;
+            const plantId = '{{ plant._id }}';
+            window.location.href = '/plant/' + plantId + '/overview';
         }
 
         function openSiteDetails() {
-            window.location.href = `/plant/{{ plant._id }}/site-details`;
+            const plantId = '{{ plant._id }}';
+            window.location.href = '/plant/' + plantId + '/site-details';
+        }
+
+        // Function for opening the anomalies page (this page)
+        function openAnomaliesMap() {
+            const plantId = '{{ plant._id }}';
+            // Try to get the first audit for this plant and redirect to its anomalies
+            fetch(`/api/plants/${plantId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.plant.audits && data.plant.audits.length > 0) {
+                        // Redirect to the first audit's detail page
+                        window.location.href = '/audit/' + data.plant.audits[0];
+                    } else {
+                        // Fallback to plant detail page
+                        window.location.href = '/plant/' + plantId;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching plant data:', error);
+                    // Fallback to plant detail page
+                    window.location.href = '/plant/' + plantId;
+                });
         }
 
         // User dropdown functionality

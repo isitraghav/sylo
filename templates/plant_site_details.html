@@ -106,9 +106,6 @@
             min-width: 20px;
             min-height: 20px;
             flex-shrink: 0;
-            min-width: 20px;
-            min-height: 20px;
-            flex-shrink: 0;
         }
 
         /* Main Content */
@@ -117,11 +114,11 @@
             margin-left: 150px;
             display: flex;
             flex-direction: column;
+            padding-top: 64px; /* Add padding to account for fixed header */
         }
 
         /* Header */
-        /* Header Styles */
-        .header {
+ .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -143,7 +140,7 @@
         }
 
         .header-left strong { 
-            color: var(--text-primary); 
+            color: black; 
         }
 
         .header-right-buttons {
@@ -246,7 +243,7 @@
             gap: 8px;
             padding: 9px 16px; 
             background: var(--primary-color);
-            color: var(--white); 
+            color: black; 
             border: none; 
             border-radius: 8px;
             font-size: 14px; 
@@ -271,7 +268,7 @@
         .overview-metrics-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
+            gap: 9px;
             flex-grow: 1;
         }
 
@@ -837,7 +834,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/audit" class="active">
+                    <a href="/homepage" class="active">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
                             <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                             <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -851,7 +848,7 @@
                         <path d="M3 20 V4 H21" /> <!-- Axes -->
                         <path d="M3 18 C6 14, 12 8, 21 4" /> <!-- IV Curve -->
                       </svg>
-                      <span>IV Curve Testing</span>
+                        <span>IV Curve Testing</span>
                     </a>
                   </li>
 
@@ -863,7 +860,7 @@
                         <path d="M4 10h16M4 14h16" />
                         <path d="M10 4v16" />
                       </svg>
-                      <span>EL Testing</span>
+                        <span>EL Testing</span>
                     </a>
                   </li>
                   <li>
@@ -874,7 +871,7 @@
                         <path d="M6 6h12M4 10h16M6 14h12" /> <!-- Cross arms -->
                         <path d="M6 6l-2 4M18 6l2 4M6 14l-2-4M18 14l2-4" /> <!-- Wires -->
                       </svg>
-                      <span>Transmission Line</span>
+                        <span>Transmission Line</span>
                     </a>
                   </li>
                 <li>
@@ -897,11 +894,11 @@
                 <div class="header-left">
                     <p>Plants / <strong>{{ plant.name }}</strong></p>
                 </div>
-                <div class="header-right-buttons"> 
+                <div class="header-right-buttons">
                     <div class="header-center">
-                        <button class="top-btn active">Overview</button>
+                        <button class="top-btn" onclick="openOverview()">Overview</button>
                         <button class="top-btn" onclick="openAnomaliesMap()">Anomalies</button>
-                        <button class="top-btn" onclick="openSiteDetails()">Site Details</button>
+                        <button class="top-btn active">Site Details</button>
                         <button class="top-btn">Report</button>
                     </div>
                     <div class="user-dropdown">
@@ -1251,6 +1248,41 @@
     <script>
         // User role check
         const isAdmin = {% if check_mate == 1 %}true{% else %}false{% endif %};
+        
+        // Navigation functions
+        function openOverview() {
+            const plantId = '{{ plant._id }}';
+            window.location.href = '/plant/' + plantId + '/overview';
+        }
+        
+          function openAnomaliesMap() {
+            const plantId = '{{ plant._id }}';
+            // Try to get the first audit for this plant and redirect to its anomalies
+            fetch(`/api/plants/${plantId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.plant.audits && data.plant.audits.length > 0) {
+                        // Redirect to the first audit's detail page
+                        window.location.href = '/audit/' + data.plant.audits[0];
+                    } else {
+                        // Fallback to plant detail page
+                        window.location.href = '/plant/' + plantId;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching plant data:', error);
+                    // Fallback to plant detail page
+                    window.location.href = '/plant/' + plantId;
+                });
+        }
+        
+        function openSiteDetails() {
+            // Already on this page, so do nothing
+        }
+        
+        function toggleUserDropdown() {
+            document.getElementById('userDropdown').classList.toggle('show');
+        }
 
         // Modal functions
         function openImageModal() {
@@ -1460,32 +1492,6 @@
             });
         });
 
-        // Navigation functions
-        function openOverview() {
-            const plantId = '{{ plant._id }}';
-            window.location.href = '/plant/' + plantId + '/overview';
-        }
-
-        function openAnomaliesMap() {
-            const plantId = '{{ plant._id }}';
-            // Try to get the first audit for this plant and redirect to its anomalies
-            fetch(`/api/plants/${plantId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.plant.audits && data.plant.audits.length > 0) {
-                        // Redirect to the first audit's detail page
-                        window.location.href = '/audit/' + data.plant.audits[0];
-                    } else {
-                        // Fallback to plant detail page
-                        window.location.href = '/plant/' + plantId;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching plant data:', error);
-                    // Fallback to plant detail page
-                    window.location.href = '/plant/' + plantId;
-                });
-        }
 
         // Toggle user dropdown
         function toggleUserDropdown() {
@@ -1502,6 +1508,36 @@
                 dropdown.classList.remove('show');
             }
         });
+        
+        // Function to open overview
+        function openOverview() {
+            const plantId = '{{ plant._id }}';
+            window.location.href = '/plant/' + plantId + '/overview';
+        }
+
+        // Add this at the beginning of your script section
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const toggleBtn = document.querySelector('.toggle-sidebar svg');
+
+            if (sidebar && mainContent && toggleBtn) {
+                // Collapse sidebar by default
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+
+                // Update toggle button icon
+                toggleBtn.style.transform = 'rotate(180deg)';
+            }
+            
+            // Initialize active state for Site Details button
+            const siteDetailsBtn = document.querySelector('[data-page="site-details"]');
+            if (siteDetailsBtn) {
+                siteDetailsBtn.classList.add('active');
+            }
+        });
+
+        // Sidebar toggle function removed to match homepage
     </script>
 </body>
 
