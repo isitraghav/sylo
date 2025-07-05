@@ -289,7 +289,7 @@
         /* Content Area */
         .content-area {
             flex: 1;
-            padding: 0px;
+            padding: 30px;
             overflow-y: auto;
         }
 
@@ -863,7 +863,7 @@
 
         .header p {
             color: #64748b;
-            font-size: 29px;
+            font-size: 1.9rem;
         }
 
         .stats-row {

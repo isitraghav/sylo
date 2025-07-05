@@ -106,26 +106,24 @@
             min-width: 20px;
             min-height: 20px;
             flex-shrink: 0;
-            min-width: 20px;
-            min-height: 20px;
-            flex-shrink: 0;
         }
 
         /* Main Content */
         .main-content {
             flex: 1;
-            margin-left: -1515px;
+            margin-left: 150px;
             display: flex;
             flex-direction: column;
+            padding-top: 64px; /* Add padding to account for fixed header */
         }
 
         /* Header */
-        .header {
+ .header {
             display: flex;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 24px;
-            background-color: var(--background-color);
+            background-color: var(--light-gray-bg);
             padding: 16px 32px;
             position: fixed;
             top: 0;
@@ -135,24 +133,14 @@
             border-bottom: 1px solid var(--border-color);
         }
 
-        .header-center {
-            display: flex; 
-            align-items: center; 
-            gap: 6px;
-            background-color: #F1F5F9;
-            padding: 4px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
         .header-left p { 
             font-size: 29px; 
-            color: var(--text-secondary); 
+            color: black; 
             margin: 0;
         }
 
         .header-left strong { 
-            color: var(--text-color); 
+            color: black; 
         }
 
         .header-right-buttons {
@@ -166,8 +154,8 @@
         }
 
         .user-btn {
-            background: var(--background-color);
-            color: var(--text-color);
+            background: var(--light-gray-bg);
+            color: var(--text-primary);
             border: 1px solid var(--border-color);
             padding: 10px 15px;
             border-radius: 8px;
@@ -205,7 +193,7 @@
             width: 100%;
             padding: 10px 15px;
             text-align: left;
-            color: var(--text-color);
+            color: var(--text-primary);
             text-decoration: none;
             border: none;
             background: none;
@@ -214,12 +202,17 @@
         }
 
         .dropdown-item:hover {
-            background: var(--background-color);
+            background: var(--light-gray-bg);
         }
 
-        .top-buttons {
-            display: flex;
-            gap: 10px;
+        .header-center {
+            display: flex; 
+            align-items: center; 
+            gap: 6px;
+            background-color: #F1F5F9;
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
         }
 
         .top-btn {
@@ -234,44 +227,55 @@
             transition: all 0.2s;
         }
 
-        .top-btn:hover {
-            background: var(--primary-color);
-            color: white;
-        }
-
         .top-btn.active { 
             background: var(--primary-color); 
-            color: white; 
+            color: var(--white); 
         }
 
-        .top-btn svg {
-            width: 16px;
-            height: 16px;
+        .top-btn:hover {
+            background: var(--primary-color);
+            color: var(--white);
         }
 
         .back-button {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        padding: 9px 16px;
-        background: var(--primary-green);
-        color: var(--white);
-        border: none;
-        border-radius: 8px;
-        font-size: 14px;
-        font-weight: 500;
-        cursor: pointer;
-        transition: background 0.2s;
+            display: flex; 
+            align-items: center; 
+            gap: 8px;
+            padding: 9px 16px; 
+            background: var(--primary-color);
+            color: black; 
+            border: none; 
+            border-radius: 8px;
+            font-size: 14px; 
+            font-weight: 500; 
+            cursor: pointer;
+            transition: background 0.2s;
         }
 
         .back-button:hover {
-            background: var(--border-color);
+            background: #1f5f23; /* Matches the other hover states */
+        }
+
+        /* Top Section Layout - 40% left metrics, 60% right status bars */
+        .top-section-layout {
+            display: grid;
+            grid-template-columns: 40% 60%;
+            gap: 16px;
+            margin-bottom: 20px;
+            align-items: start;
+        }
+
+        .overview-metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 9px;
+            flex-grow: 1;
         }
 
         /* Content Area */
         .content-area {
             flex: 1;
-            padding: 45px;
+            padding: 85px 30px 30px;
             overflow-y: auto;
         }
 
@@ -316,7 +320,7 @@
 
         .section-header p {
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 29pxpx;
         }
 
         .plant-image-container {
@@ -691,12 +695,12 @@
         }
 
         .btn-secondary {
-            background: var(--border-color);
-            color: var(--text-color);
+            background: var(--primary-color);
+            color: white;
         }
 
         .btn-secondary:hover {
-            background: #D1D5DB;
+            background: #1e7b31;
         }
 
         /* Info Grid */
@@ -787,6 +791,8 @@
             }
 
             .header {
+                position: relative;
+                left: 0;
                 flex-direction: column;
                 gap: 15px;
                 align-items: stretch;
@@ -799,6 +805,7 @@
 
             .content-area {
                 padding: 20px;
+                margin-top: 0;
             }
 
             .page-title {
@@ -827,7 +834,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/audit" class="active">
+                    <a href="/homepage" class="active">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
                             <path d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
                             <path d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
@@ -841,7 +848,7 @@
                         <path d="M3 20 V4 H21" /> <!-- Axes -->
                         <path d="M3 18 C6 14, 12 8, 21 4" /> <!-- IV Curve -->
                       </svg>
-                      <span>IV Curve Testing</span>
+                        <span>IV Curve Testing</span>
                     </a>
                   </li>
 
@@ -853,7 +860,7 @@
                         <path d="M4 10h16M4 14h16" />
                         <path d="M10 4v16" />
                       </svg>
-                      <span>EL Testing</span>
+                        <span>EL Testing</span>
                     </a>
                   </li>
                   <li>
@@ -864,7 +871,7 @@
                         <path d="M6 6h12M4 10h16M6 14h12" /> <!-- Cross arms -->
                         <path d="M6 6l-2 4M18 6l2 4M6 14l-2-4M18 14l2-4" /> <!-- Wires -->
                       </svg>
-                      <span>Transmission Line</span>
+                        <span>Transmission Line</span>
                     </a>
                   </li>
                 <li>
@@ -894,7 +901,6 @@
                         <button class="top-btn active">Site Details</button>
                         <button class="top-btn">Report</button>
                     </div>
-                    </div>
                     <div class="user-dropdown">
                         <button class="user-btn" onclick="toggleUserDropdown()">
                             <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -912,14 +918,15 @@
                             </a>
                         </div>
                     </div>
-                    <button class="back-button" onclick="window.location.href='/plant/{{ plant._id }}/overview'">
+                    <button class="back-button" onclick="window.location.href='/homepage'">
                         <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
                             <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd"></path>
                         </svg>
-                        Back to Overview
+                        Back to Plants
                     </button>
                 </div>
             </div>
+
 
             <!-- Content Area -->
             <div class="content-area">
@@ -1241,6 +1248,41 @@
     <script>
         // User role check
         const isAdmin = {% if check_mate == 1 %}true{% else %}false{% endif %};
+        
+        // Navigation functions
+        function openOverview() {
+            const plantId = '{{ plant._id }}';
+            window.location.href = '/plant/' + plantId + '/overview';
+        }
+        
+          function openAnomaliesMap() {
+            const plantId = '{{ plant._id }}';
+            // Try to get the first audit for this plant and redirect to its anomalies
+            fetch(`/api/plants/${plantId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.plant.audits && data.plant.audits.length > 0) {
+                        // Redirect to the first audit's detail page
+                        window.location.href = '/audit/' + data.plant.audits[0];
+                    } else {
+                        // Fallback to plant detail page
+                        window.location.href = '/plant/' + plantId;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching plant data:', error);
+                    // Fallback to plant detail page
+                    window.location.href = '/plant/' + plantId;
+                });
+        }
+        
+        function openSiteDetails() {
+            // Already on this page, so do nothing
+        }
+        
+        function toggleUserDropdown() {
+            document.getElementById('userDropdown').classList.toggle('show');
+        }
 
         // Modal functions
         function openImageModal() {
@@ -1450,32 +1492,6 @@
             });
         });
 
-        // Navigation functions
-        function openOverview() {
-            const plantId = '{{ plant._id }}';
-            window.location.href = '/plant/' + plantId + '/overview';
-        }
-
-        function openAnomaliesMap() {
-            const plantId = '{{ plant._id }}';
-            // Try to get the first audit for this plant and redirect to its anomalies
-            fetch(`/api/plants/${plantId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.plant.audits && data.plant.audits.length > 0) {
-                        // Redirect to the first audit's detail page
-                        window.location.href = '/audit/' + data.plant.audits[0];
-                    } else {
-                        // Fallback to plant detail page
-                        window.location.href = '/plant/' + plantId;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching plant data:', error);
-                    // Fallback to plant detail page
-                    window.location.href = '/plant/' + plantId;
-                });
-        }
 
         // Toggle user dropdown
         function toggleUserDropdown() {
@@ -1492,6 +1508,36 @@
                 dropdown.classList.remove('show');
             }
         });
+        
+        // Function to open overview
+        function openOverview() {
+            const plantId = '{{ plant._id }}';
+            window.location.href = '/plant/' + plantId + '/overview';
+        }
+
+        // Add this at the beginning of your script section
+        document.addEventListener('DOMContentLoaded', function () {
+            const sidebar = document.querySelector('.sidebar');
+            const mainContent = document.querySelector('.main-content');
+            const toggleBtn = document.querySelector('.toggle-sidebar svg');
+
+            if (sidebar && mainContent && toggleBtn) {
+                // Collapse sidebar by default
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+
+                // Update toggle button icon
+                toggleBtn.style.transform = 'rotate(180deg)';
+            }
+            
+            // Initialize active state for Site Details button
+            const siteDetailsBtn = document.querySelector('[data-page="site-details"]');
+            if (siteDetailsBtn) {
+                siteDetailsBtn.classList.add('active');
+            }
+        });
+
+        // Sidebar toggle function removed to match homepage
     </script>
 </body>
 

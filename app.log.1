@@ -1,0 +1,1116 @@
+2025-06-30 13:11:33,017 - ERROR - Exception on /homepage [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\main.py", line 230, in homepage
+    plants = [make_serializable(i) for i in list(plants_collection.find())]
+                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1284, in __next__
+    return self.next()
+           ^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1260, in next
+    if len(self._data) or self._refresh():
+                          ^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1208, in _refresh
+    self._send_message(q)
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1102, in _send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1917, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2026, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1993, in _retry_internal
+    ).run()
+      ^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2730, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2875, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2823, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1799, in _select_server
+    topology = self._get_topology()
+               ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1737, in _get_topology
+    self._resolve_srv()
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 903, in _resolve_srv
+    res = uri_parser._parse_srv(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\uri_parser.py", line 163, in _parse_srv
+    nodes = dns_resolver.get_hosts()
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\srv_resolver.py", line 157, in get_hosts
+    _, nodes = self._get_srv_response_and_hosts(True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\srv_resolver.py", line 131, in _get_srv_response_and_hosts
+    results = self._resolve_uri(encapsulate_errors)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\my\thermalClient-main\thermalClient-main\.venv\Lib\site-packages\pymongo\synchronous\srv_resolver.py", line 125, in _resolve_uri
+    raise ConfigurationError(str(exc)) from None
+pymongo.errors.ConfigurationError: The resolution lifetime expired after 21.602 seconds: Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.; Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.; Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.; Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.; Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.
+2025-07-01 16:24:47,023 - ERROR - Exception on /plant/6852b7237893b6a6b3bf84ba/overview [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 1760, in plant_overview
+    return render_template('plant_overview.html',
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\templates\plant_overview.html", line 1250, in top-level template code
+    ])|tojson }},
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'anomaly_data' is undefined
+2025-07-01 16:24:50,616 - ERROR - Exception on /plant/6852b7237893b6a6b3bf84ba/overview [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 1760, in plant_overview
+    return render_template('plant_overview.html',
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\templates\plant_overview.html", line 1250, in top-level template code
+    ])|tojson }},
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'anomaly_data' is undefined
+2025-07-01 16:42:25,760 - ERROR - Exception on /plant/6852b7237893b6a6b3bf84ba/overview [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 1760, in plant_overview
+    # Anomaly data for pie chart
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\templating.py", line 150, in render_template
+    return _render(app, template, context)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\templating.py", line 131, in _render
+    rv = template.render(context)
+         ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 1295, in render
+    self.environment.handle_exception()
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\templates\plant_overview.html", line 1250, in top-level template code
+    ])|tojson }},
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 490, in getattr
+    return getattr(obj, attribute)
+           ^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.UndefinedError: 'anomaly_data' is undefined
+2025-07-01 20:20:11,495 - ERROR - Exception on /plant/685bbd2077340138895dc02e/overview [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 1736, in plant_overview
+    plant = plants_collection.find_one({'_id': ObjectId(plant_id)})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\collection.py", line 1755, in find_one
+    for result in cursor.limit(-1):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1284, in __next__
+    return self.next()
+           ^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1260, in next
+    if len(self._data) or self._refresh():
+                          ^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1208, in _refresh
+    self._send_message(q)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1102, in _send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1917, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2026, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1993, in _retry_internal
+    ).run()
+      ^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2730, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2875, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2823, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1799, in _select_server
+    topology = self._get_topology()
+               ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1737, in _get_topology
+    self._resolve_srv()
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 903, in _resolve_srv
+    res = uri_parser._parse_srv(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\uri_parser.py", line 163, in _parse_srv
+    nodes = dns_resolver.get_hosts()
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\srv_resolver.py", line 157, in get_hosts
+    _, nodes = self._get_srv_response_and_hosts(True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\srv_resolver.py", line 131, in _get_srv_response_and_hosts
+    results = self._resolve_uri(encapsulate_errors)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\srv_resolver.py", line 125, in _resolve_uri
+    raise ConfigurationError(str(exc)) from None
+pymongo.errors.ConfigurationError: The resolution lifetime expired after 21.614 seconds: Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.; Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.; Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.; Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.; Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.
+2025-07-02 21:04:40,173 - ERROR - Exception on /plant/684e94d73f9581767e479dc4/overview [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2730, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2875, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2823, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1812, in _select_server
+    server = topology.select_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 409, in select_server
+    server = self._select_server(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 387, in _select_server
+    servers = self.select_servers(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 294, in select_servers
+    server_descriptions = self._select_servers_loop(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 344, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: ac-83pxzuc-shard-00-02.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),ac-83pxzuc-shard-00-01.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),ac-83pxzuc-shard-00-00.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68654efb01ed854a60d67887, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-83pxzuc-shard-00-00.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-00.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-83pxzuc-shard-00-01.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-01.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-83pxzuc-shard-00-02.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-02.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 1736, in plant_overview
+    plant = plants_collection.find_one({'_id': ObjectId(plant_id)})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\collection.py", line 1755, in find_one
+    for result in cursor.limit(-1):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1284, in __next__
+    return self.next()
+           ^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1260, in next
+    if len(self._data) or self._refresh():
+                          ^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1208, in _refresh
+    self._send_message(q)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1102, in _send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1917, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2026, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1993, in _retry_internal
+    ).run()
+      ^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2735, in run
+    self._check_last_error()
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2816, in _check_last_error
+    raise self._last_error
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2730, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2891, in _read
+    return self._func(self._session, self._server, conn, read_pref)  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1908, in _cmd
+    return server.run_operation(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\helpers.py", line 47, in inner
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\server.py", line 208, in run_operation
+    reply = conn.receive_message(request_id)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\pool.py", line 470, in receive_message
+    self._raise_connection_failure(error)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\pool.py", line 467, in receive_message
+    return receive_message(self, request_id, self.max_message_size)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\network_layer.py", line 759, in receive_message
+    length, _, response_to, op_code = _UNPACK_HEADER(receive_data(conn, 16, deadline))
+                                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\network_layer.py", line 343, in receive_data
+    wait_for_read(conn, deadline)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\network_layer.py", line 318, in wait_for_read
+    raise _OperationCancelled("operation cancelled")
+pymongo.errors._OperationCancelled: operation cancelled
+2025-07-02 21:04:40,681 - ERROR - Exception on /plant/6852b7237893b6a6b3bf84ba/overview [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 1736, in plant_overview
+    plant = plants_collection.find_one({'_id': ObjectId(plant_id)})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\collection.py", line 1755, in find_one
+    for result in cursor.limit(-1):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1284, in __next__
+    return self.next()
+           ^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1260, in next
+    if len(self._data) or self._refresh():
+                          ^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1208, in _refresh
+    self._send_message(q)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1102, in _send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1917, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2026, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1993, in _retry_internal
+    ).run()
+      ^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2730, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2875, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2823, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1812, in _select_server
+    server = topology.select_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 409, in select_server
+    server = self._select_server(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 387, in _select_server
+    servers = self.select_servers(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 294, in select_servers
+    server_descriptions = self._select_servers_loop(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 344, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: ac-83pxzuc-shard-00-02.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),ac-83pxzuc-shard-00-01.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),ac-83pxzuc-shard-00-00.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68654efb01ed854a60d67887, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-83pxzuc-shard-00-00.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-00.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-83pxzuc-shard-00-01.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-01.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-83pxzuc-shard-00-02.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-02.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-07-02 21:04:46,757 - ERROR - Exception on /plant/6852b7237893b6a6b3bf84ba/overview [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\pool.py", line 1033, in connect
+    networking_interface = _configured_socket_interface(self.address, self.opts)
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\pool_shared.py", line 500, in _configured_socket_interface
+    sock = _create_connection(address, options)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\pool_shared.py", line 404, in _create_connection
+    for res in socket.getaddrinfo(host, port, family=family, type=socket.SOCK_STREAM):  # type: ignore[attr-defined, unused-ignore]
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Python311\Lib\socket.py", line 962, in getaddrinfo
+    for res in _socket.getaddrinfo(host, port, family, type, proto, flags):
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+socket.gaierror: [Errno 11001] getaddrinfo failed
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 1736, in plant_overview
+    plant = plants_collection.find_one({'_id': ObjectId(plant_id)})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\collection.py", line 1755, in find_one
+    for result in cursor.limit(-1):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1284, in __next__
+    return self.next()
+           ^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1260, in next
+    if len(self._data) or self._refresh():
+                          ^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1208, in _refresh
+    self._send_message(q)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1102, in _send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1917, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2026, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1993, in _retry_internal
+    ).run()
+      ^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2735, in run
+    self._check_last_error()
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2816, in _check_last_error
+    raise self._last_error
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2730, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2877, in _read
+    with self._client._conn_from_server(self._read_pref, self._server, self._session) as (
+  File "C:\Python311\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1846, in _conn_from_server
+    with self._checkout(server, session) as conn:
+  File "C:\Python311\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1756, in _checkout
+    with server.checkout(handler=err_handler) as conn:
+  File "C:\Python311\Lib\contextlib.py", line 137, in __enter__
+    return next(self.gen)
+           ^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\pool.py", line 1119, in checkout
+    conn = self._get_conn(checkout_started_time, handler=handler)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\pool.py", line 1281, in _get_conn
+    conn = self.connect(handler=handler)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\pool.py", line 1056, in connect
+    _raise_connection_failure(self.address, error, timeout_details=details)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\pool_shared.py", line 149, in _raise_connection_failure
+    raise AutoReconnect(msg) from error
+pymongo.errors.AutoReconnect: ac-83pxzuc-shard-00-01.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: connectTimeoutMS: 20000.0ms)
+2025-07-02 21:04:52,326 - ERROR - Exception on /plant/6852b7237893b6a6b3bf84ba/overview [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 1736, in plant_overview
+    plant = plants_collection.find_one({'_id': ObjectId(plant_id)})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\collection.py", line 1755, in find_one
+    for result in cursor.limit(-1):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1284, in __next__
+    return self.next()
+           ^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1260, in next
+    if len(self._data) or self._refresh():
+                          ^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1208, in _refresh
+    self._send_message(q)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1102, in _send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1917, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2026, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1993, in _retry_internal
+    ).run()
+      ^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2730, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2875, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2823, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1812, in _select_server
+    server = topology.select_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 409, in select_server
+    server = self._select_server(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 387, in _select_server
+    servers = self.select_servers(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 294, in select_servers
+    server_descriptions = self._select_servers_loop(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 344, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: ac-83pxzuc-shard-00-02.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),ac-83pxzuc-shard-00-01.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),ac-83pxzuc-shard-00-00.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68654efb01ed854a60d67887, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-83pxzuc-shard-00-00.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-00.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-83pxzuc-shard-00-01.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-01.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-83pxzuc-shard-00-02.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-02.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-07-02 21:05:01,446 - ERROR - Exception on /plant/6852b7237893b6a6b3bf84ba/overview [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 1736, in plant_overview
+    plant = plants_collection.find_one({'_id': ObjectId(plant_id)})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\collection.py", line 1755, in find_one
+    for result in cursor.limit(-1):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1284, in __next__
+    return self.next()
+           ^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1260, in next
+    if len(self._data) or self._refresh():
+                          ^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1208, in _refresh
+    self._send_message(q)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1102, in _send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1917, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2026, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1993, in _retry_internal
+    ).run()
+      ^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2730, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2875, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2823, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1812, in _select_server
+    server = topology.select_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 409, in select_server
+    server = self._select_server(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 387, in _select_server
+    servers = self.select_servers(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 294, in select_servers
+    server_descriptions = self._select_servers_loop(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 344, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: ac-83pxzuc-shard-00-02.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),ac-83pxzuc-shard-00-01.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),ac-83pxzuc-shard-00-00.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68654efb01ed854a60d67887, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-83pxzuc-shard-00-00.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-00.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-83pxzuc-shard-00-01.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-01.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-83pxzuc-shard-00-02.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-02.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-07-02 21:06:56,281 - ERROR - Exception on /plant/6852b7237893b6a6b3bf84ba/overview [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 1736, in plant_overview
+    plant = plants_collection.find_one({'_id': ObjectId(plant_id)})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\collection.py", line 1755, in find_one
+    for result in cursor.limit(-1):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1284, in __next__
+    return self.next()
+           ^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1260, in next
+    if len(self._data) or self._refresh():
+                          ^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1208, in _refresh
+    self._send_message(q)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1102, in _send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1917, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2026, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1993, in _retry_internal
+    ).run()
+      ^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2730, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2875, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2823, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1812, in _select_server
+    server = topology.select_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 409, in select_server
+    server = self._select_server(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 387, in _select_server
+    servers = self.select_servers(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 294, in select_servers
+    server_descriptions = self._select_servers_loop(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 344, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: ac-83pxzuc-shard-00-02.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),ac-83pxzuc-shard-00-01.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms),ac-83pxzuc-shard-00-00.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms), Timeout: 30s, Topology Description: <TopologyDescription id: 68654efb01ed854a60d67887, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-83pxzuc-shard-00-00.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-00.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-83pxzuc-shard-00-01.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-01.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>, <ServerDescription ('ac-83pxzuc-shard-00-02.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None, error=AutoReconnect('ac-83pxzuc-shard-00-02.pw330ac.mongodb.net:27017: [Errno 11001] getaddrinfo failed (configured timeouts: socketTimeoutMS: 20000.0ms, connectTimeoutMS: 20000.0ms)')>]>
+2025-07-03 10:22:32,591 - ERROR - Exception on /plant/6852b7237893b6a6b3bf84ba [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 403, in plant_detail
+    return render_template('plant_detail_1.html', plant=plant, audits=audits,analysis_data=analysis_data,check_mate=role)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\loaders.py", line 126, in load
+    source, filename, uptodate = self.get_source(environment, name)
+                                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\templating.py", line 65, in get_source
+    return self._get_source_fast(environment, template)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\templating.py", line 99, in _get_source_fast
+    raise TemplateNotFound(template)
+jinja2.exceptions.TemplateNotFound: plant_detail_1.html
+2025-07-03 15:34:53,004 - ERROR - Exception on /plant/684e94d73f9581767e479dc4/overview [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 1736, in plant_overview
+    plant = plants_collection.find_one({'_id': ObjectId(plant_id)})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\collection.py", line 1755, in find_one
+    for result in cursor.limit(-1):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1284, in __next__
+    return self.next()
+           ^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1260, in next
+    if len(self._data) or self._refresh():
+                          ^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1208, in _refresh
+    self._send_message(q)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1102, in _send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1917, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2026, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1993, in _retry_internal
+    ).run()
+      ^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2730, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2875, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2823, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1799, in _select_server
+    topology = self._get_topology()
+               ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1737, in _get_topology
+    self._resolve_srv()
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 903, in _resolve_srv
+    res = uri_parser._parse_srv(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\uri_parser.py", line 163, in _parse_srv
+    nodes = dns_resolver.get_hosts()
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\srv_resolver.py", line 157, in get_hosts
+    _, nodes = self._get_srv_response_and_hosts(True)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\srv_resolver.py", line 131, in _get_srv_response_and_hosts
+    results = self._resolve_uri(encapsulate_errors)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\srv_resolver.py", line 125, in _resolve_uri
+    raise ConfigurationError(str(exc)) from None
+pymongo.errors.ConfigurationError: The resolution lifetime expired after 21.609 seconds: Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.; Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.; Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.; Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.; Server Do53:192.168.42.129@53 answered The DNS operation timed out.; Server Do53:192.168.4.193@53 answered The DNS operation timed out.
+2025-07-04 18:00:14,309 - ERROR - Exception on /plant/684e94d73f9581767e479dc4/overview [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 1736, in plant_overview
+    plant = plants_collection.find_one({'_id': ObjectId(plant_id)})
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\collection.py", line 1755, in find_one
+    for result in cursor.limit(-1):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1284, in __next__
+    return self.next()
+           ^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1260, in next
+    if len(self._data) or self._refresh():
+                          ^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1208, in _refresh
+    self._send_message(q)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\cursor.py", line 1102, in _send_message
+    response = client._run_operation(
+               ^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1917, in _run_operation
+    return self._retryable_read(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2026, in _retryable_read
+    return self._retry_internal(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\_csot.py", line 125, in csot_wrapper
+    return func(self, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1993, in _retry_internal
+    ).run()
+      ^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2730, in run
+    return self._read() if self._is_read else self._write()
+           ^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2875, in _read
+    self._server = self._get_server()
+                   ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 2823, in _get_server
+    return self._client._select_server(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\mongo_client.py", line 1812, in _select_server
+    server = topology.select_server(
+             ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 409, in select_server
+    server = self._select_server(
+             ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 387, in _select_server
+    servers = self.select_servers(
+              ^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 294, in select_servers
+    server_descriptions = self._select_servers_loop(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\pymongo\synchronous\topology.py", line 344, in _select_servers_loop
+    raise ServerSelectionTimeoutError(
+pymongo.errors.ServerSelectionTimeoutError: No replica set members match selector "Primary()", Timeout: 30s, Topology Description: <TopologyDescription id: 6867c92635004ea95ab06b86, topology_type: ReplicaSetNoPrimary, servers: [<ServerDescription ('ac-83pxzuc-shard-00-00.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None>, <ServerDescription ('ac-83pxzuc-shard-00-01.pw330ac.mongodb.net', 27017) server_type: Unknown, rtt: None>, <ServerDescription ('ac-83pxzuc-shard-00-02.pw330ac.mongodb.net', 27017) server_type: RSSecondary, rtt: 1.639999999999418>]>
+2025-07-04 19:06:09,986 - ERROR - Exception on /plant/684e94d73f9581767e479dc4 [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 403, in plant_detail
+    return render_template('plant_detail_1.html', plant=plant, audits=audits,analysis_data=analysis_data,check_mate=role)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\templates\plant_detail_1.html", line 1924, in template
+    const plantId = '{{ plant._id }}';
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: Unexpected end of template. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+2025-07-04 19:06:13,193 - ERROR - Exception on /plant/684e94d73f9581767e479dc4 [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 403, in plant_detail
+    return render_template('plant_detail_1.html', plant=plant, audits=audits,analysis_data=analysis_data,check_mate=role)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\templates\plant_detail_1.html", line 1924, in template
+    const plantId = '{{ plant._id }}';
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: Unexpected end of template. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+2025-07-04 19:25:32,480 - ERROR - Exception on /plant/684e94d73f9581767e479dc4/site-details [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 1820, in plant_site_details
+    return render_template('plant_site_details.html', plant=plant, check_mate=role)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\templates\plant_site_details.html", line 1460, in template
+    const plantId = '{{ plant._id }}';
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: Unexpected end of template. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
+2025-07-04 19:25:35,293 - ERROR - Exception on /plant/684e94d73f9581767e479dc4/site-details [GET]
+Traceback (most recent call last):
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 1511, in wsgi_app
+    response = self.full_dispatch_request()
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 919, in full_dispatch_request
+    rv = self.handle_user_exception(e)
+         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 917, in full_dispatch_request
+    rv = self.dispatch_request()
+         ^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\app.py", line 902, in dispatch_request
+    return self.ensure_sync(self.view_functions[rule.endpoint])(**view_args)  # type: ignore[no-any-return]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 142, in decorated_function
+    return f(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\main.py", line 1820, in plant_site_details
+    return render_template('plant_site_details.html', plant=plant, check_mate=role)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\flask\templating.py", line 149, in render_template
+    template = app.jinja_env.get_or_select_template(template_name_or_list)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 1087, in get_or_select_template
+    return self.get_template(template_name_or_list, parent, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 1016, in get_template
+    return self._load_template(name, globals)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 975, in _load_template
+    template = self.loader.load(self, name, self.make_globals(globals))
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\loaders.py", line 138, in load
+    code = environment.compile(source, name, filename)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 771, in compile
+    self.handle_exception(source=source_hint)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\venv\Lib\site-packages\jinja2\environment.py", line 942, in handle_exception
+    raise rewrite_traceback_stack(source=source)
+  File "D:\syloProject\thermalClient-master (4)\thermalClient-master\templates\plant_site_details.html", line 1460, in template
+    const plantId = '{{ plant._id }}';
+    ^^^^^^^^^^^^^^^^^^^^^^^^^
+jinja2.exceptions.TemplateSyntaxError: Unexpected end of template. Jinja was looking for the following tags: 'endblock'. The innermost block that needs to be closed is 'block'.
