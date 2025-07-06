@@ -13,7 +13,7 @@
     <script src="https://cdn.jsdelivr.net/npm/ol-geotiff@3.1.0/dist/ol-geotiff.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@7.4.0/ol.css">
     <script src="https://cdn.jsdelivr.net/npm/ol/ol.js"></script>
-    <link rel="stylesheet" href="{{ url_for('static', filename='audit_detail.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='audit_detail.css') }}?v={{ now }}">
 
 </head>
 
@@ -1521,7 +1521,7 @@
 </script>
 
 <!-- Load external JS at the end of the body for better performance -->
-<script src="{{ url_for('static', filename='audit_detail.js') }}"></script>
+<script src="{{ url_for('static', filename='audit_detail.js') }}?v={{ now }}"></script>
 
 </body>
 

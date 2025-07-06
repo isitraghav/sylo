@@ -13,7 +13,10 @@ except ImportError:
     WAITRESS_AVAILABLE = False
     print("⚠️  Waitress not available, using Flask's built-in server")
 
+# Import main module and disable caching for static files
 import main
+# Configure Flask app to not cache static files
+main.app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 1211))

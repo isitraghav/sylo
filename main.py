@@ -40,8 +40,27 @@ def get_config(key, default=None):
     except:
         return default
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='/static')
 app.config['SECRET_KEY'] = 'vdvhvgh8764767363868'
+app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0  # Disable caching for static files
+
+# Add cache control headers to prevent browser caching
+@app.after_request
+def add_header(response):
+    """
+    Add headers to both force latest IE rendering engine or Chrome Frame,
+    and also to prevent caching of dynamic and static content
+    """
+    response.headers['Cache-Control'] = 'no-store, no-cache, must-revalidate, post-check=0, pre-check=0, max-age=0'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '-1'
+    return response
+
+# Add a timestamp as a context variable to all templates for cache-busting
+@app.context_processor
+def inject_now():
+    from datetime import datetime
+    return {'now': datetime.now().timestamp()}
 
 # Configure MongoDB URI with fallback handling
 mongo_uri = get_config('MONGO_CONNECTION')
@@ -658,7 +677,25 @@ def audit_detail(audit_id):
     }
     audit = make_serializable(audit)
 
-    return render_template('audit_detail.html', audit=audit, plant=plant, anomalies=anomalies,geojson= anomalies,s3_url=s3_url,thermal_ortho=thermal_ortho, visual_ortho=visual_ortho, block_filters=block_filters,anomaly_filter=anomaly_filter,s3_base_path=s3_base_path,s3_tif_base_url=s3_tif_base_url,anomaly_count=anomaly_count,fault_colors=fault_colors)
+    # Add timestamp for cache busting
+    from datetime import datetime
+    now = datetime.now().timestamp()
+    
+    return render_template('audit_detail.html', 
+                          audit=audit, 
+                          plant=plant, 
+                          anomalies=anomalies,
+                          geojson=anomalies,
+                          s3_url=s3_url,
+                          thermal_ortho=thermal_ortho, 
+                          visual_ortho=visual_ortho, 
+                          block_filters=block_filters,
+                          anomaly_filter=anomaly_filter,
+                          s3_base_path=s3_base_path,
+                          s3_tif_base_url=s3_tif_base_url,
+                          anomaly_count=anomaly_count,
+                          fault_colors=fault_colors,
+                          now=now)
 
 
 @app.route('/data')
