@@ -18,6 +18,10 @@
 </head>
 
 <body>
+<!-- Store s3BasePath for JS access -->
+<div id="s3BasePathContainer" data-path="{{ s3_base_path }}" style="display:none;"></div>
+<div id="plantDataContainer" data-plant-id="{{ plant._id }}" style="display:none;"></div>
+
 <!-- Fullscreen Image Overlay -->
 <div id="fullscreenOverlay" class="fullscreen-overlay">
     <img id="fullscreenImage" class="fullscreen-image" src="" alt="Fullscreen Image">
@@ -31,7 +35,7 @@
 <div class="main-app">
     <!-- Sidebar -->
     <div class="sidebar">
-        <div class="toggle-sidebar" onclick="toggleSidebar()">
+        <div class="toggle-sidebar" onclick="window.toggleSidebar()">
             <svg width="12" height="12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
             </svg>
@@ -123,9 +127,9 @@
             </div>
             <div class="header-actions">
                 <div class="header-center">
-                    <button class="top-btn" onclick="openOverview()">Overview</button>
+                    <button class="top-btn" onclick="window.openOverview()">Overview</button>
                     <button class="top-btn active">Anomalies</button>
-                    <button class="top-btn" onclick="openSiteDetails()">Site Details</button>
+                    <button class="top-btn" onclick="window.openSiteDetails()">Site Details</button>
                     <button class="top-btn">Report</button>
                 </div>
                 <div class="user-dropdown">
@@ -493,35 +497,7 @@
             }
         });
 
-        function toggleSidebar() {
-            const sidebar = document.querySelector('.sidebar');
-            const mainContent = document.querySelector('.main-content');
-            const header = document.querySelector('.header');
-            const toggleBtn = document.querySelector('.toggle-sidebar svg');
-
-            if (sidebar && mainContent && toggleBtn) {
-                sidebar.classList.toggle('collapsed');
-                mainContent.classList.toggle('expanded');
-                
-                // Update header position when sidebar is collapsed/expanded
-                if (sidebar.classList.contains('collapsed')) {
-                    if (header) {
-                        header.style.left = '60px';
-                    }
-                } else {
-                    if (header) {
-                        header.style.left = '150px';
-                    }
-                }
-
-                // Rotate the arrow icon
-                if (sidebar.classList.contains('collapsed')) {
-                    toggleBtn.style.transform = 'rotate(180deg)';
-                } else {
-                    toggleBtn.style.transform = 'rotate(0deg)';
-                }
-            }
-        }
+        // toggleSidebar function is now defined in audit_detail.js
 
         // Section switching functionality
         function showSection(sectionId) {
@@ -1358,19 +1334,34 @@
             }
         });
 
-        const map = new ol.Map({
+        console.log("Initializing map with layers:", {
+            baseLayer: baseLayer,
+            visualLayersCount: visualLayers.length,
+            thermalLayersCount: thermalLayers.length,
+            vectorFeatures: features.length,
+            mapTarget: document.getElementById('map')
+        });
+        
+        // Make map globally accessible
+        window.map = new ol.Map({
             target: 'map',
             view: view,
             layers: [baseLayer, ...visualLayers, ...thermalLayers, vectorLayer],
-            controls: [
+            controls:
+            [
                 new ol.control.Zoom(),
                 new ol.control.Attribution(),
                 new ol.control.FullScreen()
             ]
         });
+        
+        console.log("Map initialized:", window.map);
+        
+        // Set a local reference for the current context
+        const map = window.map;
 
-        map.on('click', function (event) {
-
+        window.map.on('click', function (event) {
+            const map = window.map; // Ensure local access to the map
             map.forEachFeatureAtPixel(event.pixel, function (feature) {
                 console.log(feature.values_);
                 handleAnomalyClickMap(feature.values_)
@@ -1389,7 +1380,7 @@
 
             // visualLayer.setVisible(true);
             // thermalLayer.setVisible(false);
-            visualLayers.forEach((layer, i) => layer.setVisible(i === i));  // Show only first by default
+            visualLayers.forEach((layer, i) => layer.setVisible(i === 0));  // Show only first by default
 
             // thermalLayers.forEach((layer, i) => layer.setVisible(i !== i));  // Show only first by default
             thermalLayers.forEach((layer) => layer.setVisible(false));
@@ -1422,7 +1413,7 @@
             vectorLayerWasVisible = vectorLayer.getVisible();
 
             // thermalLayer.setVisible(true);
-            thermalLayers.forEach((layer, i) => layer.setVisible(i === i));  // Show only first by default
+            thermalLayers.forEach((layer, i) => layer.setVisible(i === 0));  // Show only first by default
 
             // visualLayer.setVisible(false);
             // visualLayers.forEach((layer, i) => layer.setVisible(i !== i));  // Show only first by default
@@ -1469,39 +1460,8 @@
                 });
         }
 
-        // Navigation functions
-        // Navigation functions
-        function openOverview() {
-            const plantId = '{{ plant._id }}';
-            window.location.href = '/plant/' + plantId + '/overview';
-        }
-
-        function openSiteDetails() {
-            const plantId = '{{ plant._id }}';
-            window.location.href = '/plant/' + plantId + '/site-details';
-        }
-
-        // Function for opening the anomalies page (this page)
-        function openAnomaliesMap() {
-            const plantId = '{{ plant._id }}';
-            // Try to get the first audit for this plant and redirect to its anomalies
-            fetch(`/api/plants/${plantId}`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.plant.audits && data.plant.audits.length > 0) {
-                        // Redirect to the first audit's detail page
-                        window.location.href = '/audit/' + data.plant.audits[0];
-                    } else {
-                        // Fallback to plant detail page
-                        window.location.href = '/plant/' + plantId;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching plant data:', error);
-                    // Fallback to plant detail page
-                    window.location.href = '/plant/' + plantId;
-                });
-        }
+        // Navigation functions are now defined in audit_detail.js
+                        // This function is now defined in audit_detail.js
 
         // User dropdown functionality
         function toggleUserDropdown() {
@@ -1560,6 +1520,8 @@
 
 </script>
 
+<!-- Load external JS at the end of the body for better performance -->
+<script src="{{ url_for('static', filename='audit_detail.js') }}"></script>
 
 </body>
 
