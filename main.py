@@ -625,22 +625,6 @@ def audit_detail(audit_id):
     s3_base_path = f"{s3_prefix}/audits/{str(audit['plant_id'])}/{str(audit_id)}"
     s3_tif_base_url = s3_prefix
     fault_colors = {
-            "Cell": "#FF0000",
-            "Multi Cell": "#FFA500",
-            "Bypass Diode": "#9C27B0",
-            "Short Circuit": "#000000",
-            "String Offline": "#FF1A94",
-            "Module Power Mismatch": "#65E667",
-            "Shading": "#E77148",
-            "Plant Vegetation": "#2E7D32",
-            "Other": "#00BFFF",
-            "Junction Box": "#BFC494",
-            "Physical Damage": "#C2185B",
-            "Module Missing": "#FFFFFF",
-            "Module Offline": "#FF1493",
-        "Partial String Offline":"#ED0C7D"
-        }
-    fault_colors = {
         "Cell": "#FF0000",
         "Multi Cell": "#FFA500",
         "Bypass Diode": "#9C27B0",
@@ -1801,7 +1785,12 @@ def plant_overview(plant_id):
                 'Shading': '#E77148',
                 'Short Circuit': '#506E9A',
                 'String Offline': '#FF1A94',
-                'Module Offline': '#545454'
+                'Module Offline': '#545454',
+                'Junction Box': '#BFC494',
+                'Module Missing': '#5CE1E6',
+                'Other': '#8C52FF',
+                'Cell': '#FF0000',
+                'Multi Cell': '#FFA500'
             }
             
             for anomaly in anomalies:
