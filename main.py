@@ -1,7 +1,7 @@
 import shutil
 import zipfile
 
-from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for, flash, send_file
 from flask_pymongo import PyMongo
 from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
@@ -20,6 +20,21 @@ import  gdown
 
 import logging
 from logging.handlers import RotatingFileHandler
+
+# PDF generation imports
+try:
+    from reportlab.lib.pagesizes import letter, A4
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Image, Table, TableStyle
+    from reportlab.lib import colors
+    from reportlab.lib.enums import TA_LEFT, TA_CENTER
+    from PIL import Image as PILImage
+    import requests
+    PDF_ENABLED = True
+except ImportError:
+    PDF_ENABLED = False
+    print("PDF generation libraries not found. PDF functionality will be disabled.")
 
 
 
@@ -134,6 +149,7 @@ plants_collection = mongo.db.plants
 audits_collection = mongo.db.audits
 data_uploads_collection = mongo.db.data_uploads
 anomalies_collection = mongo.db.anomalies
+anomaly_updates_collection = mongo.db.anomaly_updates
 def get_s3_resource():
     s3 = boto3.client(
         's3',
@@ -2221,6 +2237,298 @@ def plant_anomalies_by_block(plant_id):
     except Exception as e:
         print(f"❌ Error in plant_anomalies_by_block for plant {plant_id}: {str(e)}")
         return jsonify({'success': False, 'message': f'Error fetching plant anomalies by block: {str(e)}'}), 500
+
+
+@app.route('/api/update_anomaly_details', methods=['POST'])
+@login_required
+def update_anomaly_details():
+    """Update anomaly details with verification information"""
+    try:
+        # Get form data
+        audit_id = request.form.get('audit_id')
+        anomaly_id = request.form.get('anomaly_id')
+        issue_type = request.form.get('issueType')
+        status = request.form.get('status')
+        voc_module = request.form.get('vocModule')
+        module_serial = request.form.get('moduleSerial')
+        verified_at = request.form.get('verifiedAt')
+        verified_by = request.form.get('verifiedBy')
+        action = request.form.get('action')
+        remarks = request.form.get('remarks')
+        
+        # Handle file upload
+        attachment = request.files.get('attachment')
+        attachment_path = None
+        
+        if attachment and attachment.filename:
+            filename = secure_filename(attachment.filename)
+            # Create uploads directory if it doesn't exist
+            upload_dir = os.path.join('uploads_data', 'anomaly_updates')
+            os.makedirs(upload_dir, exist_ok=True)
+            
+            # Generate unique filename
+            timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+            attachment_path = os.path.join(upload_dir, f"{timestamp}_{filename}")
+            attachment.save(attachment_path)
+        
+        # Create update record
+        update_data = {
+            'audit_id': audit_id,
+            'anomaly_id': anomaly_id,
+            'issue_type': issue_type,
+            'status': status,
+            'voc_module': voc_module,
+            'module_serial': module_serial,
+            'verified_at': verified_at,
+            'verified_by': verified_by,
+            'action': action,
+            'remarks': remarks,
+            'attachment_path': attachment_path,
+            'created_at': datetime.now(),
+            'updated_at': datetime.now(),
+            'created_by': session['user_id']
+        }
+        
+        # Check if update already exists and update it, otherwise create new
+        existing_update = anomaly_updates_collection.find_one({
+            'audit_id': audit_id,
+            'anomaly_id': anomaly_id
+        })
+        
+        if existing_update:
+            # Update existing record
+            update_data['updated_at'] = datetime.now()
+            result = anomaly_updates_collection.update_one(
+                {'audit_id': audit_id, 'anomaly_id': anomaly_id},
+                {'$set': update_data}
+            )
+            app.logger.info(f"Updated anomaly details for audit {audit_id}, anomaly {anomaly_id}")
+        else:
+            # Create new record
+            result = anomaly_updates_collection.insert_one(update_data)
+            app.logger.info(f"Created new anomaly update for audit {audit_id}, anomaly {anomaly_id}")
+        
+        return jsonify({
+            'success': True,
+            'message': 'Anomaly details updated successfully',
+            'data': update_data
+        })
+        
+    except Exception as e:
+        app.logger.error(f"Error updating anomaly details: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Error updating anomaly details: {str(e)}'
+        }), 500
+
+
+@app.route('/api/generate_anomaly_pdf', methods=['POST'])
+@login_required
+def generate_anomaly_pdf():
+    """Generate comprehensive PDF report for anomaly"""
+    if not PDF_ENABLED:
+        return jsonify({
+            'success': False,
+            'message': 'PDF generation is not available. Required libraries not installed.'
+        }), 500
+    
+    try:
+        data = request.get_json()
+        image_path = data.get('image_path')
+        image_name = data.get('image_name')
+        properties = data.get('properties')
+        audit_id = data.get('audit_id')
+        
+        # Create PDF buffer
+        buffer = io.BytesIO()
+        doc = SimpleDocTemplate(buffer, pagesize=A4, topMargin=1*inch)
+        
+        # Styles
+        styles = getSampleStyleSheet()
+        title_style = ParagraphStyle(
+            'CustomTitle',
+            parent=styles['Heading1'],
+            fontSize=18,
+            spaceAfter=30,
+            alignment=TA_CENTER
+        )
+        
+        heading_style = ParagraphStyle(
+            'CustomHeading',
+            parent=styles['Heading2'],
+            fontSize=14,
+            spaceAfter=12,
+            textColor=colors.HexColor('#2e7d32')
+        )
+        
+        normal_style = styles['Normal']
+        
+        # Build PDF content
+        story = []
+        
+        # Title
+        story.append(Paragraph("Thermal Anomaly Report", title_style))
+        story.append(Spacer(1, 20))
+        
+        # Anomaly Information
+        story.append(Paragraph("Anomaly Information", heading_style))
+        
+        # Basic details table
+        basic_data = [
+            ['Anomaly ID:', properties.get('ID', 'N/A')],
+            ['Anomaly Type:', properties.get('Anomaly', 'N/A')],
+            ['Severity:', properties.get('Severity', 'N/A')],
+            ['Date:', properties.get('Date', 'N/A')],
+            ['Time:', properties.get('Time', 'N/A')],
+        ]
+        
+        basic_table = Table(basic_data, colWidths=[2*inch, 3*inch])
+        basic_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        
+        story.append(basic_table)
+        story.append(Spacer(1, 20))
+        
+        # Technical Details
+        story.append(Paragraph("Technical Details", heading_style))
+        
+        tech_data = [
+            ['ΔT (T2 - T1):', properties.get('Hotspot', 'N/A')],
+            ['Irradiance:', properties.get('Irradian', 'N/A')],
+            ['Module Make:', properties.get('make', 'N/A')],
+            ['Module Watt:', properties.get('Wat', 'N/A')],
+            ['Barcode Serial:', properties.get('barcode', 'N/A')],
+        ]
+        
+        tech_table = Table(tech_data, colWidths=[2*inch, 3*inch])
+        tech_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        
+        story.append(tech_table)
+        story.append(Spacer(1, 20))
+        
+        # Location Details
+        story.append(Paragraph("Location Details", heading_style))
+        
+        location_data = [
+            ['Latitude:', properties.get('Latitude', 'N/A')],
+            ['Longitude:', properties.get('Longitude', 'N/A')],
+            ['Block:', properties.get('Block', 'N/A')],
+            ['String:', properties.get('String', 'N/A')],
+            ['Module:', properties.get('panel', 'N/A')],
+        ]
+        
+        location_table = Table(location_data, colWidths=[2*inch, 3*inch])
+        location_table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+            ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+            ('FONTSIZE', (0, 0), (-1, -1), 10),
+            ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black)
+        ]))
+        
+        story.append(location_table)
+        story.append(Spacer(1, 30))
+        
+        # Thermal Image
+        story.append(Paragraph("Thermal Image", heading_style))
+        
+        # Try to add the image
+        try:
+            if image_path.startswith('http'):
+                # Download image from URL
+                response = requests.get(image_path)
+                if response.status_code == 200:
+                    img_buffer = io.BytesIO(response.content)
+                    img = Image(img_buffer, width=4*inch, height=3*inch)
+                    story.append(img)
+                else:
+                    story.append(Paragraph(f"Error loading image from URL: {image_path}", normal_style))
+            else:
+                # Local file path
+                if os.path.exists(image_path):
+                    img = Image(image_path, width=4*inch, height=3*inch)
+                    story.append(img)
+                else:
+                    story.append(Paragraph(f"Image not found: {image_path}", normal_style))
+        except Exception as img_error:
+            story.append(Paragraph(f"Error loading image: {str(img_error)}", normal_style))
+        
+        story.append(Spacer(1, 20))
+        
+        # Get update details if available
+        update_details = anomaly_updates_collection.find_one({
+            'audit_id': audit_id,
+            'anomaly_id': image_name
+        })
+        
+        if update_details:
+            story.append(Paragraph("Update Details", heading_style))
+            
+            update_data = [
+                ['Issue Type:', update_details.get('issue_type', 'N/A')],
+                ['Status:', update_details.get('status', 'N/A')],
+                ['Voc of Module:', update_details.get('voc_module', 'N/A')],
+                ['Module Serial:', update_details.get('module_serial', 'N/A')],
+                ['Verified At:', update_details.get('verified_at', 'N/A')],
+                ['Verified By:', update_details.get('verified_by', 'N/A')],
+                ['Action Taken:', update_details.get('action', 'N/A')],
+            ]
+            
+            if update_details.get('remarks'):
+                update_data.append(['Remarks:', update_details.get('remarks', 'N/A')])
+            
+            update_table = Table(update_data, colWidths=[2*inch, 3*inch])
+            update_table.setStyle(TableStyle([
+                ('BACKGROUND', (0, 0), (0, -1), colors.lightgrey),
+                ('TEXTCOLOR', (0, 0), (-1, -1), colors.black),
+                ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+                ('FONTNAME', (0, 0), (-1, -1), 'Helvetica'),
+                ('FONTSIZE', (0, 0), (-1, -1), 10),
+                ('BOTTOMPADDING', (0, 0), (-1, -1), 8),
+                ('GRID', (0, 0), (-1, -1), 1, colors.black)
+            ]))
+            
+            story.append(update_table)
+        
+        # Footer
+        story.append(Spacer(1, 30))
+        footer_text = f"Report generated on {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}"
+        story.append(Paragraph(footer_text, normal_style))
+        
+        # Build PDF
+        doc.build(story)
+        buffer.seek(0)
+        
+        return send_file(
+            buffer,
+            as_attachment=True,
+            download_name=f'anomaly_report_{image_name}.pdf',
+            mimetype='application/pdf'
+        )
+        
+    except Exception as e:
+        app.logger.error(f"Error generating PDF: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': f'Error generating PDF: {str(e)}'
+        }), 500
 
 
 if __name__ == '__main__':
