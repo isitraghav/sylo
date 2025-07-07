@@ -644,22 +644,6 @@ def audit_detail(audit_id):
     s3_base_path = f"{s3_prefix}/audits/{str(audit['plant_id'])}/{str(audit_id)}"
     s3_tif_base_url = s3_prefix
     fault_colors = {
-            "Cell": "#FF0000",
-            "Multi Cell": "#FFA500",
-            "Bypass Diode": "#9C27B0",
-            "Short Circuit": "#000000",
-            "String Offline": "#FF1A94",
-            "Module Power Mismatch": "#65E667",
-            "Shading": "#E77148",
-            "Plant Vegetation": "#2E7D32",
-            "Other": "#00BFFF",
-            "Junction Box": "#BFC494",
-            "Physical Damage": "#C2185B",
-            "Module Missing": "#FFFFFF",
-            "Module Offline": "#FF1493",
-        "Partial String Offline":"#ED0C7D"
-        }
-    fault_colors = {
         "Cell": "#FF0000",
         "Multi Cell": "#FFA500",
         "Bypass Diode": "#9C27B0",
@@ -1770,66 +1754,165 @@ def upload_progress(upload_id):
 @login_required
 def plant_overview(plant_id):
     """Plant overview page with analytics and charts"""
+    print(f"🏭 Plant overview requested for plant: {plant_id}")
+    
     plant = plants_collection.find_one({'_id': ObjectId(plant_id)})
     if not plant:
+        print(f"❌ Plant not found: {plant_id}")
         flash('Plant not found', 'error')
         return redirect(url_for('homepage'))
+    
+    print(f"✅ Plant found: {plant.get('name', 'Unknown')} (ID: {plant_id})")
     
     # Make plant serializable
     plant = make_serializable(plant)
     
-    # Get analytics data (placeholder data for now)
-    analytics = {
-        'power_loss': '125',
-        'revenue_loss': '2,45,000'
-    }
+    # Get the latest audit for this plant to fetch real data
+    audits = list(audits_collection.find({'plant_id': str(plant_id)}).sort('_id', -1).limit(1))
+    print(f"📄 Found {len(audits)} audits for plant {plant_id}")
     
-    # Progress data (placeholder)
-    progress_data = {
-        'pending': 25,
-        'resolved': 60,
-        'not_found': 15,
-        'high': 30,
-        'medium': 45,
-        'low': 25
-    }
-    
-    # Anomaly data for pie chart
+    # Initialize default data
     anomaly_data = {
-        'labels': [
-            'Bypass Diode',
-            'Multi-Cell', 
-            'Cell',
-            'Partial String Offline',
-            'Vegetation',
-            'Physical Damage',
-            'Module Power Mismatch',
-            'Shading',
-            'Short Circuit',
-            'String Offline',
-            'Module Offline'
-        ],
-        'counts': [125, 87, 63, 42, 38, 29, 56, 34, 18, 25, 33],
-        'colors': ['#9C27B0', '#FFA500', '#FF0000', '#FF66C4', '#2E7D32', '#C2185B', '#65E667', '#E77148', '#506E9A', '#FF1A94', '#545454']
+        'labels': [],
+        'counts': [],
+        'colors': []
     }
     
-    # Bar chart data 
     bar_chart_data = {
-        'labels': ['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6', 'Block 7', 'Block 8'],
-        'datasets': [
-            {'label': 'Bypass Diode', 'data': [15, 12, 8, 20, 6, 15, 8, 11], 'backgroundColor': '#9C27B0'},
-            {'label': 'Multi-Cell', 'data': [10, 8, 12, 6, 8, 10, 12, 8], 'backgroundColor': '#FFA500'},
-            {'label': 'Cell', 'data': [8, 6, 10, 4, 6, 8, 10, 6], 'backgroundColor': '#FF0000'},
-            {'label': 'Partial String Offline', 'data': [6, 4, 7, 3, 5, 6, 7, 4], 'backgroundColor': '#FF66C4'},
-            {'label': 'Vegetation', 'data': [5, 3, 6, 2, 3, 5, 6, 3], 'backgroundColor': '#2E7D32'},
-            {'label': 'Physical Damage', 'data': [3, 2, 4, 1, 2, 3, 4, 2], 'backgroundColor': '#C2185B'},
-            {'label': 'Module Power Mismatch', 'data': [7, 5, 8, 6, 7, 9, 6, 8], 'backgroundColor': '#65E667'},
-            {'label': 'Shading', 'data': [4, 3, 5, 2, 4, 5, 6, 5], 'backgroundColor': '#E77148'},
-            {'label': 'Short Circuit', 'data': [2, 1, 2, 3, 1, 2, 1, 2], 'backgroundColor': '#506E9A'},
-            {'label': 'String Offline', 'data': [3, 2, 3, 4, 2, 3, 2, 3], 'backgroundColor': '#FF1A94'},
-            {'label': 'Module Offline', 'data': [4, 3, 4, 5, 3, 4, 3, 4], 'backgroundColor': '#545454'}
-        ]
+        'labels': [],
+        'datasets': []
     }
+    
+    analytics = {
+        'power_loss': '0',
+        'revenue_loss': '0'
+    }
+    
+    progress_data = {
+        'pending': 0,
+        'resolved': 0,
+        'not_found': 0,
+        'high': 0,
+        'medium': 0,
+        'low': 0
+    }
+    
+    # If audit data exists, process it
+    if audits and audits[0].get('anomalies'):
+        try:
+            audit_id = str(audits[0]['_id'])
+            print(f"🏭 Processing plant {plant_id} overview with audit {audit_id}")
+            
+            anomalies = json.loads(audits[0]['anomalies'])['features']
+            print(f"📊 Found {len(anomalies)} anomalies to process for overview charts")
+            
+            # Process anomalies for charts
+            anomaly_counts = {}
+            blocks_data = {}
+            
+            # Define color mapping for anomaly types
+            color_map = {
+                'Bypass Diode': '#9C27B0',
+                'Multi Cell Hotspot': '#FFA500', 
+                'Cell Hotspot': '#FF0000',
+                'Partial String Offline': '#FF66C4',
+                'Vegetation': '#2E7D32',
+                'Physical Damage': '#C2185B',
+                'Module Power Mismatch': '#65E667',
+                'Shading': '#E77148',
+                'Short Circuit': '#506E9A',
+                'String Offline': '#FF1A94',
+                'Module Offline': '#545454',
+                'Junction Box': '#BFC494',
+                'Module Missing': '#5CE1E6',
+                'Other': '#8C52FF',
+                'Cell': '#FF0000',
+                'Multi Cell': '#FFA500'
+            }
+            
+            for anomaly in anomalies:
+                properties = anomaly['properties']
+                
+                # Debug: Print available properties to understand data structure
+                print(f"🔍 Available properties: {list(properties.keys())}")
+                
+                # Use the correct property name based on your existing code
+                anomaly_type = properties.get('Anomaly', 'Unknown')  # Changed from 'Anomaly_type' to 'Anomaly'
+                block_value = properties.get('Block', 'Unknown')
+                
+                print(f"   Anomaly type: {anomaly_type}, Block: {block_value}")
+                
+                # Count anomaly types
+                if anomaly_type in anomaly_counts:
+                    anomaly_counts[anomaly_type] += 1
+                else:
+                    anomaly_counts[anomaly_type] = 1
+                
+                # Group by blocks for bar chart
+                if block_value != 'Unknown':
+                    if block_value not in blocks_data:
+                        blocks_data[block_value] = {}
+                    
+                    if anomaly_type in blocks_data[block_value]:
+                        blocks_data[block_value][anomaly_type] += 1
+                    else:
+                        blocks_data[block_value][anomaly_type] = 1
+            
+            print(f"📈 Anomaly type distribution for overview:")
+            for anomaly_type, count in anomaly_counts.items():
+                print(f"   {anomaly_type}: {count}")
+            
+            print(f"🏗️ Block distribution for overview:")
+            for block, type_data in blocks_data.items():
+                total_in_block = sum(type_data.values())
+                print(f"   Block {block}: {total_in_block} anomalies")
+            
+            # Prepare pie chart data
+            anomaly_data['labels'] = list(anomaly_counts.keys())
+            anomaly_data['counts'] = list(anomaly_counts.values())
+            anomaly_data['colors'] = [color_map.get(label, '#888888') for label in anomaly_data['labels']]
+            
+            # Prepare bar chart data
+            if blocks_data:
+                sorted_blocks = sorted(blocks_data.keys())
+                bar_chart_data['labels'] = sorted_blocks
+                
+                # Create datasets for each anomaly type
+                datasets = []
+                for anomaly_type in anomaly_counts.keys():
+                    dataset_data = []
+                    for block in sorted_blocks:
+                        count = blocks_data[block].get(anomaly_type, 0)
+                        dataset_data.append(count)
+                    
+                    datasets.append({
+                        'label': anomaly_type,
+                        'data': dataset_data,
+                        'backgroundColor': color_map.get(anomaly_type, '#888888')
+                    })
+                
+                bar_chart_data['datasets'] = datasets
+                print(f"📊 Created {len(datasets)} datasets for {len(sorted_blocks)} blocks")
+            
+            # Calculate some basic analytics
+            total_anomalies = sum(anomaly_counts.values())
+            # Estimate power loss (placeholder calculation)
+            analytics['power_loss'] = str(total_anomalies * 2)  # 2kW per anomaly estimate
+            analytics['revenue_loss'] = str(total_anomalies * 1500)  # Rs 1500 per anomaly estimate
+            
+            print(f"💰 Calculated analytics:")
+            print(f"   Power loss estimate: {analytics['power_loss']} kW")
+            print(f"   Revenue loss estimate: Rs {analytics['revenue_loss']}")
+            
+        except Exception as e:
+            print(f"❌ Error processing anomaly data for plant {plant_id}: {e}")
+    else:
+        print(f"⚠️ No audit data found for plant {plant_id} - using empty data")
+    
+    print(f"🎯 Rendering plant overview template with:")
+    print(f"   Analytics: {analytics}")
+    print(f"   Anomaly data labels: {len(anomaly_data['labels'])} types")
+    print(f"   Bar chart labels: {len(bar_chart_data['labels'])} blocks")
     
     return render_template('plant_overview.html', 
                          plant=plant, 
@@ -2036,6 +2119,108 @@ def plant_severity_data(plant_id):
             return jsonify({'success': True, 'severityData': severity_data})
         else:
             return jsonify({'success': False, 'message': 'No severity data found for this plant'}), 404
+
+
+@app.route('/api/audit/<audit_id>/anomalies/by-block', methods=['GET'])
+@login_required
+def audit_anomalies_by_block(audit_id):
+    """Get anomalies grouped by block for a specific audit"""
+    try:
+        print(f"🔍 Fetching anomalies by block for audit: {audit_id}")
+        audit = audits_collection.find_one({'_id': ObjectId(audit_id)})
+        if not audit or not audit.get('anomalies'):
+            print(f"❌ No anomalies data found for audit: {audit_id}")
+            return jsonify({'success': False, 'message': 'No anomalies data found'}), 404
+
+        anomalies = json.loads(audit['anomalies'])['features']
+        print(f"📊 Found {len(anomalies)} total anomalies in audit {audit_id}")
+        
+        # Group anomalies by block
+        blocks_data = {}
+        for anomaly in anomalies:
+            block_value = anomaly['properties'].get('Block')
+            if block_value:
+                if block_value not in blocks_data:
+                    blocks_data[block_value] = []
+                blocks_data[block_value].append(anomaly)
+        
+        print(f"🏗️ Grouped anomalies into {len(blocks_data)} blocks:")
+        for block, anomaly_list in blocks_data.items():
+            print(f"   Block {block}: {len(anomaly_list)} anomalies")
+        
+        return jsonify({
+            'success': True,
+            'blocks': blocks_data
+        })
+    except Exception as e:
+        print(f"❌ Error in audit_anomalies_by_block for audit {audit_id}: {str(e)}")
+        return jsonify({'success': False, 'message': f'Error fetching anomalies by block: {str(e)}'}), 500
+
+
+@app.route('/api/plant/<plant_id>/anomalies/by-block', methods=['GET'])
+@login_required
+def plant_anomalies_by_block(plant_id):
+    """Get anomalies grouped by block for the latest audit of a plant"""
+    try:
+        print(f"🌱 Fetching anomalies by block for plant: {plant_id}")
+        # Get the latest audit for this plant
+        audits = list(audits_collection.find({'plant_id': str(plant_id)}).sort('_id', -1).limit(1))
+        
+        if not audits or not audits[0].get('anomalies'):
+            print(f"❌ No anomalies data found for plant: {plant_id}")
+            return jsonify({'success': False, 'message': 'No anomalies data found for this plant'}), 404
+        
+        latest_audit = audits[0]
+        audit_id = str(latest_audit['_id'])
+        print(f"📄 Using latest audit: {audit_id}")
+        
+        anomalies = json.loads(latest_audit['anomalies'])['features']
+        print(f"📊 Found {len(anomalies)} total anomalies in latest audit")
+        
+        # Group anomalies by block and count by type
+        blocks_data = {}
+        anomaly_type_counts = {}
+        
+        for anomaly in anomalies:
+            properties = anomaly['properties']
+            block_value = properties.get('Block')
+            anomaly_type = properties.get('Anomaly', 'Unknown')  # Changed from 'Anomaly_type' to 'Anomaly'
+            
+            print(f"   Processing anomaly - Type: {anomaly_type}, Block: {block_value}")
+            
+            if block_value:
+                if block_value not in blocks_data:
+                    blocks_data[block_value] = {}
+                
+                if anomaly_type not in blocks_data[block_value]:
+                    blocks_data[block_value][anomaly_type] = 0
+                blocks_data[block_value][anomaly_type] += 1
+                
+                # Overall count
+                if anomaly_type not in anomaly_type_counts:
+                    anomaly_type_counts[anomaly_type] = 0
+                anomaly_type_counts[anomaly_type] += 1
+        
+        print(f"🏗️ Grouped anomalies into {len(blocks_data)} blocks:")
+        for block, type_counts in blocks_data.items():
+            total_in_block = sum(type_counts.values())
+            print(f"   Block {block}: {total_in_block} anomalies")
+            for anomaly_type, count in type_counts.items():
+                print(f"     - {anomaly_type}: {count}")
+        
+        print(f"📈 Overall anomaly type distribution:")
+        for anomaly_type, count in anomaly_type_counts.items():
+            print(f"   {anomaly_type}: {count}")
+        
+        return jsonify({
+            'success': True,
+            'blocks': blocks_data,
+            'anomaly_type_counts': anomaly_type_counts,
+            'audit_id': str(latest_audit['_id'])
+        })
+    except Exception as e:
+        print(f"❌ Error in plant_anomalies_by_block for plant {plant_id}: {str(e)}")
+        return jsonify({'success': False, 'message': f'Error fetching plant anomalies by block: {str(e)}'}), 500
 
 
 if __name__ == '__main__':
