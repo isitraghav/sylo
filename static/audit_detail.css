@@ -235,13 +235,14 @@
             display: flex;
             align-items: center;
             gap: 10px;
-            color: var(--text-secondary);
-            font-size: 14px;
+            color: black;
+            font-size: 29px;
+            font-weight: 500;
             padding: 4px 0;
         }
 
         .breadcrumb a {
-            color: var(--primary-color);
+            color: black;
             text-decoration: none;
         }
 
