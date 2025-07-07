@@ -544,16 +544,18 @@
                 "Cell": "#FF0000",
                 "Multi Cell": "#FFA500",
                 "Bypass Diode": "#9C27B0",
-                "Short Circuit": "#000000",
+                "Short Circuit": "#506E9A",
                 "String Offline": "#FF1A94",
                 "Module Power Mismatch": "#65E667",
                 "Shading": "#E77148",
                 "Plant Found": "#2E7D32",
-                "Other": "#00BFFF",
+                "Vegetation": "#2E7D32",
+                "Other": "#8C52FF",
                 "Junction Box": "#BFC494",
                 "Physical Damage": "#C2185B",
-                "Module Missing": "#FFFFFF",
-                "Module Offline": "#FF1493"
+                "Module Missing": "#5CE1E6",
+                "Module Offline": "#545454",
+                "Partial String Offline": "#FF66C4"
             };
 
 
@@ -890,7 +892,7 @@
                 'SCB': anomaly.properties.scb,
                 'String': anomaly.properties.string,
                 'Module': anomaly.properties.panel,
-                'Anomaly Type': anomaly.properties.anomaly_type,
+                'Anomaly Type': anomaly.properties.Anomaly,
                 'Confidence': anomaly.properties.confidence
             };
 
@@ -913,7 +915,7 @@
                         const marker = L.marker([anomaly.geometry.coordinates[1], anomaly.geometry.coordinates[0]], {
                             icon: L.divIcon({
                                 className: 'anomaly-marker',
-                                html: `<div class="marker-content">${anomaly.properties.anomaly_type}</div>`
+                                html: `<div class="marker-content">${anomaly.properties.Anomaly}</div>`
                             })
                         });
 
