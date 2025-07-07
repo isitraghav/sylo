@@ -26,6 +26,19 @@ function createAnomalyPopupContent(properties) {
     // Anomaly Type
     let anomalyType = properties.Anomaly || '';
     
+    // Severity with legend
+    let severity = properties.Severity || 'N/A';
+    let severityWithLegend = `${severity} <span class="severity-legend" onclick="window.showSeverityLegend()" title="Click to see severity classification" style="cursor: pointer; color: #0066cc;">ℹ️</span>`;
+    
+    // Format datetime
+    let formattedDateTime = window.formatDateTime ? window.formatDateTime(properties['Date'], properties['Time']) : formatDateTime(properties['Date'], properties['Time']);
+    
+    // Additional fields
+    let moduleMake = properties.make || 'N/A';
+    let moduleWatt = properties.Wat || 'N/A';
+    let barcodeSerial = properties.barcode || 'N/A';
+    let deltaT = properties.Hotspot || 'N/A';
+    
     // Image
     let s3BasePath = window.s3BasePath || '';
     let imageName = properties['Image name'] || properties['Image na'] || '';
@@ -37,6 +50,13 @@ function createAnomalyPopupContent(properties) {
             <div class="anomaly-popup-title">${hash} (${anomalyType})</div>
             <div class="anomaly-popup-localisation">${localisationStr}</div>
             <div class="anomaly-popup-status">Status - ${status}</div>
+            <div class="anomaly-popup-severity">Severity - ${severityWithLegend}</div>
+            <div class="anomaly-popup-datetime">Date Time - ${formattedDateTime}</div>
+            <hr style="margin: 8px 0; border: none; border-top: 1px solid #e0e0e0;">
+            <div class="anomaly-popup-field">ΔT(T2 - T1) - ${deltaT}</div>
+            <div class="anomaly-popup-field">Module Make - ${moduleMake}</div>
+            <div class="anomaly-popup-field">Module Watt - ${moduleWatt}</div>
+            <div class="anomaly-popup-field">Barcode Serial No. - ${barcodeSerial}</div>
         </div>
     `;
 }
@@ -50,7 +70,19 @@ function showAnomalyPopupOnHover(evt) {
         anomalyPopup = document.createElement('div');
         anomalyPopup.className = 'anomaly-popup';
         anomalyPopup.style.display = 'none';
-        document.body.appendChild(anomalyPopup);
+        
+        // Append to the map container or body based on fullscreen state
+        const mapElement = document.getElementById('map');
+        const isFullscreen = document.fullscreenElement === mapElement || 
+                            document.webkitFullscreenElement === mapElement ||
+                            document.mozFullScreenElement === mapElement ||
+                            document.msFullscreenElement === mapElement;
+        
+        if (isFullscreen) {
+            mapElement.appendChild(anomalyPopup);
+        } else {
+            document.body.appendChild(anomalyPopup);
+        }
     }
 
     const pixel = evt.pixel;
@@ -69,9 +101,31 @@ function showAnomalyPopupOnHover(evt) {
             }
             
             // Position the popup near the mouse pointer
-            const position = evt.originalEvent;
-            anomalyPopup.style.left = (position.pageX + 15) + 'px';
-            anomalyPopup.style.top = (position.pageY - 10) + 'px';
+            // Check if map is in fullscreen mode
+            const mapElement = document.getElementById('map');
+            const isFullscreen = document.fullscreenElement === mapElement || 
+                                document.webkitFullscreenElement === mapElement ||
+                                document.mozFullScreenElement === mapElement ||
+                                document.msFullscreenElement === mapElement;
+            
+            let position = evt.originalEvent;
+            
+            // Adjust positioning for fullscreen mode
+            if (isFullscreen) {
+                // In fullscreen, position relative to the map container
+                const mapRect = mapElement.getBoundingClientRect();
+                anomalyPopup.style.position = 'absolute';
+                anomalyPopup.style.left = (position.clientX - mapRect.left + 15) + 'px';
+                anomalyPopup.style.top = (position.clientY - mapRect.top - 10) + 'px';
+                anomalyPopup.style.zIndex = '10002';
+            } else {
+                // Normal mode positioning relative to document
+                anomalyPopup.style.position = 'absolute';
+                anomalyPopup.style.left = (position.pageX + 15) + 'px';
+                anomalyPopup.style.top = (position.pageY - 10) + 'px';
+                anomalyPopup.style.zIndex = '10001';
+            }
+            
             anomalyPopup.style.display = 'block';
             
             return true; // Stop further searching
@@ -92,7 +146,125 @@ function hideAnomalyPopup() {
     if (anomalyPopup) {
         anomalyPopup.style.display = 'none';
         lastHoveredFeature = null;
+        
+        // Remove popup from its current parent and reset for next use
+        if (anomalyPopup.parentNode) {
+            anomalyPopup.parentNode.removeChild(anomalyPopup);
+        }
+        anomalyPopup = null; // Reset so it gets recreated with proper parent
     }
+}
+
+/**
+ * Handle fullscreen change events to ensure popup works correctly
+ */
+function handleFullscreenChange() {
+    // If popup exists, hide it when fullscreen state changes
+    if (anomalyPopup) {
+        hideAnomalyPopup();
+    }
+}
+
+/**
+ * Format datetime to DD-MM-YYYY, HH:MM:SS format
+ * @param {string} dateStr - Date string
+ * @param {string} timeStr - Time string
+ * @returns {string} Formatted datetime
+ */
+function formatDateTime(dateStr, timeStr) {
+    try {
+        // Clean up the date and time strings
+        let cleanDate = dateStr ? dateStr.trim() : '';
+        let cleanTime = timeStr ? timeStr.trim() : '';
+        
+        // Remove any trailing .000Z or similar
+        cleanTime = cleanTime.replace(/\.\d{3}Z?$/, '');
+        
+        // Parse the date (assuming it's in YYYY-MM-DD format)
+        let dateParts = cleanDate.split('-');
+        if (dateParts.length === 3) {
+            // Convert to DD-MM-YYYY format
+            let formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+            return `${formattedDate}, ${cleanTime}`;
+        }
+        
+        // If parsing fails, return original
+        return `${cleanDate}, ${cleanTime}`;
+    } catch (error) {
+        console.error('Error formatting datetime:', error);
+        return `${dateStr}, ${timeStr}`;
+    }
+}
+
+/**
+ * Show severity legend popup
+ */
+function showSeverityLegend() {
+    const legendContent = `
+        <div style="font-size: 14px; line-height: 1.6;">
+            <h4 style="margin: 0 0 10px 0; color: #333;">Severity Classification (ΔT)</h4>
+            <div style="margin-bottom: 8px;">
+                <span style="color: #dc3545; font-weight: bold;">🔴 High:</span> ΔT > 20°C
+            </div>
+            <div style="margin-bottom: 8px;">
+                <span style="color: #fd7e14; font-weight: bold;">🟠 Medium:</span> 10°C < ΔT ≤ 20°C
+            </div>
+            <div style="margin-bottom: 8px;">
+                <span style="color: #28a745; font-weight: bold;">🟢 Low:</span> ΔT ≤ 10°C
+            </div>
+            <div style="font-size: 12px; color: #666; margin-top: 10px;">
+                ΔT = Temperature difference between hotspot and ambient
+            </div>
+        </div>
+    `;
+    
+    // Create a modal-like popup
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 10000;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    `;
+    
+    const popup = document.createElement('div');
+    popup.style.cssText = `
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        max-width: 350px;
+        position: relative;
+    `;
+    
+    const closeBtn = document.createElement('button');
+    closeBtn.innerHTML = '×';
+    closeBtn.style.cssText = `
+        position: absolute;
+        top: 10px;
+        right: 15px;
+        background: none;
+        border: none;
+        font-size: 20px;
+        cursor: pointer;
+        color: #666;
+    `;
+    
+    closeBtn.onclick = () => overlay.remove();
+    overlay.onclick = (e) => {
+        if (e.target === overlay) overlay.remove();
+    };
+    
+    popup.innerHTML = legendContent;
+    popup.appendChild(closeBtn);
+    overlay.appendChild(popup);
+    document.body.appendChild(overlay);
 }
 
 // Initialize map hover functionality
@@ -136,6 +308,12 @@ function initializeMapHoverPopup() {
             console.error('Could not get map viewport');
         }
         
+        // Add fullscreen change event listeners to handle popup repositioning
+        document.addEventListener('fullscreenchange', handleFullscreenChange);
+        document.addEventListener('webkitfullscreenchange', handleFullscreenChange);
+        document.addEventListener('mozfullscreenchange', handleFullscreenChange);
+        document.addEventListener('MSFullscreenChange', handleFullscreenChange);
+        
         console.log('Map hover popup initialization complete!');
     } catch (error) {
         console.error('Error initializing map hover popup:', error);
@@ -174,6 +352,10 @@ window.toggleSidebar = function() {
         }
     }
 };
+
+// Make formatDateTime and showSeverityLegend globally accessible
+window.formatDateTime = formatDateTime;
+window.showSeverityLegend = showSeverityLegend;
 
 window.openOverview = function() {
     console.log("openOverview called");
