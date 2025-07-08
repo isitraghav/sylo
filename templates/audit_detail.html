@@ -32,6 +32,90 @@
     </button>
 </div>
 
+<!-- Update Anomaly Modal -->
+<div id="updateAnomalyModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3>Update Anomaly Details</h3>
+            <button class="modal-close" onclick="closeUpdateAnomalyModal()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" width="24" height="24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                </svg>
+            </button>
+        </div>
+        <form id="updateAnomalyForm" class="modal-body">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="issueType">Issue Type *</label>
+                    <select id="issueType" name="issueType" required>
+                        <option value="">Select Issue Type</option>
+                        <option value="Cell">Cell</option>
+                        <option value="Multi Cell">Multi Cell</option>
+                        <option value="Bypass Diode">Bypass Diode</option>
+                        <option value="Short Circuit">Short Circuit</option>
+                        <option value="String Offline">String Offline</option>
+                        <option value="Module Power Mismatch">Module Power Mismatch</option>
+                        <option value="Shading">Shading</option>
+                        <option value="Vegetation">Vegetation</option>
+                        <option value="Junction Box">Junction Box</option>
+                        <option value="Physical Damage">Physical Damage</option>
+                        <option value="Module Missing">Module Missing</option>
+                        <option value="Module Offline">Module Offline</option>
+                        <option value="Partial String Offline">Partial String Offline</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="status">Status *</label>
+                    <select id="status" name="status" required>
+                        <option value="">Select Status</option>
+                        <option value="Corrected">Corrected</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Not Found">Not Found</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="vocModule">Voc of Module *</label>
+                    <input type="text" id="vocModule" name="vocModule" placeholder="Enter Voc value" required>
+                </div>
+                <div class="form-group">
+                    <label for="moduleSerial">Module Serial No. *</label>
+                    <input type="text" id="moduleSerial" name="moduleSerial" placeholder="Enter serial number" required>
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="verifiedAt">Verified at *</label>
+                    <input type="date" id="verifiedAt" name="verifiedAt" required>
+                </div>
+                <div class="form-group">
+                    <label for="verifiedBy">Verified By *</label>
+                    <input type="text" id="verifiedBy" name="verifiedBy" placeholder="Enter verifier name" required>
+                </div>
+            </div>
+            <div class="form-group full-width">
+                <label for="action">Action Taken *</label>
+                <input type="text" id="action" name="action" placeholder="Describe action taken" required>
+            </div>
+            <div class="form-group full-width">
+                <label for="remarks">Remarks</label>
+                <textarea id="remarks" name="remarks" placeholder="Enter detailed remarks..." rows="4"></textarea>
+            </div>
+            <div class="form-group full-width">
+                <label for="attachment">Upload Attachment</label>
+                <input type="file" id="attachment" name="attachment" accept=".pdf,.jpg,.jpeg,.png,.doc,.docx">
+                <small>Supported formats: PDF, JPG, PNG, DOC, DOCX</small>
+            </div>
+        </form>
+        <div class="modal-footer">
+            <button type="button" class="btn-secondary" onclick="closeUpdateAnomalyModal()">Cancel</button>
+            <button type="button" class="btn-primary" onclick="submitUpdateAnomaly()">Update</button>
+        </div>
+    </div>
+</div>
+
 <div class="main-app">
     <!-- Sidebar -->
     <div class="sidebar">
@@ -1117,6 +1201,9 @@
             const resolve_status = anomalyData.resolve_status
             console.log("log data coming", resolve_status)
 
+            // Store properties in a global variable to access from modal
+            window.currentAnomalyProperties = properties;
+
             const detailsHTML = `
                 <div class="image-container">
                     <img class="upper-section"
@@ -1126,6 +1213,16 @@
                     <button class="download-btn" onclick="downloadImage('${imagePath}', '${imageName}')" title="Download Image">
                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                    </button>
+                    <button class="update-btn" onclick="openUpdateAnomalyModal('${audit_id_value}', '${imageName}', window.currentAnomalyProperties)" title="Update Anomaly Details">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                        </svg>
+                    </button>
+                    <button class="download-pdf-btn" onclick="downloadFullPDF('${imagePath}', '${imageName}', window.currentAnomalyProperties)" title="Download Full PDF Report">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path>
                         </svg>
                     </button>
                     <button class="fullscreen-btn" onclick="openFullscreen('${imagePath}')" title="View Fullscreen">
@@ -1143,7 +1240,7 @@
 
                     <div class="detail-box">
                         <span class="detail-label">Severity</span>
-                        <span class="detail-value">${properties.Severity}</span>
+                        <span class="detail-value">${properties.Severity} <span class="severity-legend" onclick="showSeverityLegend()" title="Click to see severity classification">ℹ️</span></span>
                     </div>
 
                   <div class="detail-box">
@@ -1156,6 +1253,21 @@
                         <span class="detail-value">${properties['Hotspot']}</span>
                     </div>
 
+                    <div class="detail-box">
+                        <span class="detail-label">Module Make</span>
+                        <span class="detail-value">${properties['make'] || 'N/A'}</span>
+                    </div>
+
+                    <div class="detail-box">
+                        <span class="detail-label">Module Watt</span>
+                        <span class="detail-value">${properties['Wat'] || 'N/A'}</span>
+                    </div>
+
+                    <div class="detail-box">
+                        <span class="detail-label">Barcode Serial No.</span>
+                        <span class="detail-value">${properties['barcode'] || 'N/A'}</span>
+                    </div>
+
 
                     <div class="detail-box">
                         <span class="detail-label">Lat,Long</span>
@@ -1166,7 +1278,7 @@
 
                     <div class="detail-box">
                         <span class="detail-label">Date Time</span>
-                        <span class="detail-value">${properties['Date']}, ${properties['Time']}</span>
+                        <span class="detail-value" id="formatted-datetime">${formatDateTime(properties['Date'], properties['Time'])}</span>
                     </div>
 
                    
@@ -1292,7 +1404,7 @@
                 }]
             }),
             // visible: index === 0,  // Only first visible by default
-            opacity: 0.8,
+            opacity: 1,
             title: `Visual Layer ${index + 1}`
         }));
         // Thermal ortho as separate layers
@@ -1443,23 +1555,238 @@
             return `rgba(${r},${g},${b},${alpha})`;
         }
 
+        function formatDateTime(dateStr, timeStr) {
+            try {
+                // Clean up the date and time strings
+                let cleanDate = dateStr ? dateStr.trim() : '';
+                let cleanTime = timeStr ? timeStr.trim() : '';
+                
+                // Remove any trailing .000Z or similar
+                cleanTime = cleanTime.replace(/\.\d{3}Z?$/, '');
+                
+                // Parse the date (assuming it's in YYYY-MM-DD format)
+                let dateParts = cleanDate.split('-');
+                if (dateParts.length === 3) {
+                    // Convert to DD-MM-YYYY format
+                    let formattedDate = `${dateParts[2]}-${dateParts[1]}-${dateParts[0]}`;
+                    return `${formattedDate}, ${cleanTime}`;
+                }
+                
+                // If parsing fails, return original
+                return `${cleanDate}, ${cleanTime}`;
+            } catch (error) {
+                console.error('Error formatting datetime:', error);
+                return `${dateStr}, ${timeStr}`;
+            }
+        }
+
+        function showSeverityLegend() {
+            const legendContent = `
+                <div style="font-size: 14px; line-height: 1.6;">
+                    <h4 style="margin: 0 0 10px 0; color: #333;">Severity Classification (ΔT)</h4>
+                    <div style="margin-bottom: 8px;">
+                        <span style="color: #dc3545; font-weight: bold;">🔴 High:</span> ΔT > 20°C
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <span style="color: #fd7e14; font-weight: bold;">🟠 Medium:</span> 10°C < ΔT ≤ 20°C
+                    </div>
+                    <div style="margin-bottom: 8px;">
+                        <span style="color: #28a745; font-weight: bold;">🟢 Low:</span> ΔT ≤ 10°C
+                    </div>
+                    <div style="font-size: 12px; color: #666; margin-top: 10px;">
+                        ΔT = Temperature difference between hotspot and ambient
+                    </div>
+                </div>
+            `;
+            
+            // Create a modal-like popup
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 10000;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            `;
+            
+            const popup = document.createElement('div');
+            popup.style.cssText = `
+                background: white;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+                max-width: 350px;
+                position: relative;
+            `;
+            
+            const closeBtn = document.createElement('button');
+            closeBtn.innerHTML = '×';
+            closeBtn.style.cssText = `
+                position: absolute;
+                top: 10px;
+                right: 15px;
+                background: none;
+                border: none;
+                font-size: 20px;
+                cursor: pointer;
+                color: #666;
+            `;
+            
+            closeBtn.onclick = () => overlay.remove();
+            overlay.onclick = (e) => {
+                if (e.target === overlay) overlay.remove();
+            };
+            
+            popup.innerHTML = legendContent;
+            popup.appendChild(closeBtn);
+            overlay.appendChild(popup);
+            document.body.appendChild(overlay);
+        }
+
         function downloadImage(url, filename) {
-            fetch(url)
-                .then(response => response.blob())
+            // Try direct download first (for same-origin resources)
+            try {
+                fetch(url, {
+                    method: 'GET',
+                    mode: 'cors',
+                    credentials: 'omit'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    return response.blob();
+                })
                 .then(blob => {
                     const blobUrl = window.URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = blobUrl;
-                    a.download = filename;
+                    a.download = filename || 'anomaly_image.jpg';
                     document.body.appendChild(a);
                     a.click();
                     window.URL.revokeObjectURL(blobUrl);
                     document.body.removeChild(a);
                 })
                 .catch(error => {
-                    console.error('Error downloading image:', error);
-                    alert('Failed to download image. Please try again.');
+                    console.error('Fetch download failed:', error);
+                    // Fallback to direct link download
+                    fallbackDownload(url, filename);
                 });
+            } catch (error) {
+                console.error('Error in downloadImage:', error);
+                fallbackDownload(url, filename);
+            }
+        }
+
+        function fallbackDownload(url, filename) {
+            // Create a temporary link and trigger download
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename || 'anomaly_image.jpg';
+            a.target = '_blank';
+            a.rel = 'noopener noreferrer';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+        }
+
+        // Update Anomaly Modal Functions
+        function openUpdateAnomalyModal(auditId, anomalyId, properties) {
+            const modal = document.getElementById('updateAnomalyModal');
+            modal.style.display = 'flex';
+            
+            // Store data for form submission
+            modal.dataset.auditId = auditId;
+            modal.dataset.anomalyId = anomalyId;
+            modal.dataset.properties = JSON.stringify(properties);
+            
+            // Pre-populate form with existing data if available
+            document.getElementById('issueType').value = properties.Anomaly || '';
+            
+            // Prevent body scrolling
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeUpdateAnomalyModal() {
+            const modal = document.getElementById('updateAnomalyModal');
+            modal.style.display = 'none';
+            
+            // Reset form
+            document.getElementById('updateAnomalyForm').reset();
+            
+            // Re-enable body scrolling
+            document.body.style.overflow = '';
+        }
+
+        async function submitUpdateAnomaly() {
+            const modal = document.getElementById('updateAnomalyModal');
+            const form = document.getElementById('updateAnomalyForm');
+            const formData = new FormData(form);
+            
+            // Add audit and anomaly IDs
+            formData.append('audit_id', modal.dataset.auditId);
+            formData.append('anomaly_id', modal.dataset.anomalyId);
+            
+            try {
+                const response = await fetch('/api/update_anomaly_details', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    alert('Anomaly details updated successfully!');
+                    closeUpdateAnomalyModal();
+                    // Optionally refresh the anomaly data
+                    location.reload();
+                } else {
+                    alert('Failed to update anomaly details: ' + result.message);
+                }
+            } catch (error) {
+                console.error('Error updating anomaly details:', error);
+                alert('Error updating anomaly details. Please try again.');
+            }
+        }
+
+        // PDF Download Function
+        async function downloadFullPDF(imagePath, imageName, properties) {
+            try {
+                const response = await fetch('/api/generate_anomaly_pdf', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image_path: imagePath,
+                        image_name: imageName,
+                        properties: properties,
+                        audit_id: "{{ audit._id }}"
+                    })
+                });
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `anomaly_report_${imageName}.pdf`;
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                } else {
+                    alert('Failed to generate PDF report. Please try again.');
+                }
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('Error generating PDF report. Please try again.');
+            }
         }
 
         // Navigation functions are now defined in audit_detail.js
@@ -1519,6 +1846,183 @@
                 closeFullscreen();
             }
         });
+
+        // Modal functionality for updating anomaly details
+        let currentAnomalyData = null;
+
+        function openUpdateAnomalyModal(auditId, imageName, properties) {
+            currentAnomalyData = {
+                auditId: auditId,
+                imageName: imageName,
+                properties: properties
+            };
+            
+            const modal = document.getElementById('updateAnomalyModal');
+            modal.classList.add('show');
+            document.body.style.overflow = 'hidden';
+            
+            // Reset form
+            document.getElementById('updateAnomalyForm').reset();
+            
+            // Add ESC key listener
+            document.addEventListener('keydown', handleModalEscKey);
+        }
+
+        function closeUpdateAnomalyModal() {
+            const modal = document.getElementById('updateAnomalyModal');
+            modal.classList.remove('show');
+            document.body.style.overflow = '';
+            currentAnomalyData = null;
+            
+            // Remove ESC key listener
+            document.removeEventListener('keydown', handleModalEscKey);
+        }
+
+        function handleModalEscKey(event) {
+            if (event.key === 'Escape') {
+                closeUpdateAnomalyModal();
+            }
+        }
+
+        // Close modal when clicking outside the modal content
+        document.getElementById('updateAnomalyModal').addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeUpdateAnomalyModal();
+            }
+        });
+
+        function submitUpdateAnomaly() {
+            if (!currentAnomalyData) {
+                alert('No anomaly data available');
+                return;
+            }
+
+            const form = document.getElementById('updateAnomalyForm');
+            const formData = new FormData(form);
+            
+            // Add audit and anomaly identifiers
+            formData.append('audit_id', currentAnomalyData.auditId);
+            formData.append('anomaly_id', currentAnomalyData.imageName);
+            
+            // Validate required fields
+            const requiredFields = ['issueType', 'status', 'vocModule', 'moduleSerial', 'verifiedAt', 'verifiedBy', 'action'];
+            let hasError = false;
+            
+            requiredFields.forEach(field => {
+                const value = formData.get(field);
+                if (!value || value.trim() === '') {
+                    hasError = true;
+                    const element = document.getElementById(field);
+                    element.style.borderColor = 'var(--error-color)';
+                    setTimeout(() => {
+                        element.style.borderColor = '';
+                    }, 3000);
+                }
+            });
+            
+            if (hasError) {
+                alert('Please fill in all required fields');
+                return;
+            }
+            
+            // Show loading state
+            const submitBtn = document.querySelector('.modal-footer .btn-primary');
+            const originalText = submitBtn.textContent;
+            submitBtn.textContent = 'Updating...';
+            submitBtn.disabled = true;
+            
+            fetch('/api/update_anomaly_details', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('Anomaly details updated successfully!');
+                    closeUpdateAnomalyModal();
+                    // Refresh the anomaly data display
+                    loadAnomalies();
+                } else {
+                    alert('Error updating anomaly details: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error updating anomaly details');
+            })
+            .finally(() => {
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            });
+        }
+
+        // Enhanced PDF download function
+        function downloadFullPDF(imagePath, imageName, properties) {
+            // Show loading state
+            const loadingOverlay = document.createElement('div');
+            loadingOverlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10001;
+            `;
+            loadingOverlay.innerHTML = `
+                <div style="background: white; padding: 20px; border-radius: 8px; text-align: center;">
+                    <div style="margin-bottom: 10px;">Generating PDF Report...</div>
+                    <div style="width: 50px; height: 50px; border: 3px solid #f3f3f3; border-top: 3px solid #2e7d32; border-radius: 50%; animation: spin 1s linear infinite; margin: 0 auto;"></div>
+                </div>
+            `;
+            document.body.appendChild(loadingOverlay);
+
+            const data = {
+                image_path: imagePath,
+                image_name: imageName,
+                properties: properties,
+                audit_id: "{{ audit._id }}"
+            };
+            
+            fetch('/api/generate_anomaly_pdf', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                }
+                return response.json().then(err => {
+                    throw new Error(err.message || 'Failed to generate PDF');
+                });
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `anomaly_report_${imageName}.pdf`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error generating PDF report: ' + error.message);
+            })
+            .finally(() => {
+                // Remove loading overlay
+                if (document.body.contains(loadingOverlay)) {
+                    document.body.removeChild(loadingOverlay);
+                }
+            });
+        }
 
 </script>
 
