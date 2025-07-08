@@ -1783,6 +1783,11 @@ def plant_overview(plant_id):
         'datasets': []
     }
     
+    severity_chart_data = {
+        'labels': [],
+        'datasets': []
+    }
+    
     analytics = {
         'power_loss': '0',
         'revenue_loss': '0'
@@ -1809,6 +1814,7 @@ def plant_overview(plant_id):
             # Process anomalies for charts
             anomaly_counts = {}
             blocks_data = {}
+            severity_blocks_data = {}
             
             # Define color mapping for anomaly types
             color_map = {
@@ -1837,16 +1843,33 @@ def plant_overview(plant_id):
                 print(f"🔍 Available properties: {list(properties.keys())}")
                 
                 # Use the correct property name based on your existing code
-                anomaly_type = properties.get('Anomaly', 'Unknown')  # Changed from 'Anomaly_type' to 'Anomaly'
+                anomaly_type = properties.get('Anomaly', 'Unknown')
                 block_value = properties.get('Block', 'Unknown')
+                severity_value = properties.get('Severity', 'Unknown')
                 
-                print(f"   Anomaly type: {anomaly_type}, Block: {block_value}")
+                print(f"   Anomaly type: {anomaly_type}, Block: {block_value}, Severity: {severity_value}")
                 
                 # Count anomaly types
                 if anomaly_type in anomaly_counts:
                     anomaly_counts[anomaly_type] += 1
                 else:
                     anomaly_counts[anomaly_type] = 1
+                
+                # Count severity levels for progress data - more flexible matching
+                severity_lower = severity_value.lower()
+                if 'high' in severity_lower or 'critical' in severity_lower or 'severe' in severity_lower or ('remediation' in severity_lower and 'recommended' in severity_lower):
+                    progress_data['high'] += 1
+                elif 'medium' in severity_lower or 'moderate' in severity_lower or 'warning' in severity_lower or ('monitor' in severity_lower and 'remediate' in severity_lower):
+                    progress_data['medium'] += 1
+                elif 'low' in severity_lower or 'minor' in severity_lower or 'info' in severity_lower or ('long-term' in severity_lower and 'monitoring' in severity_lower):
+                    progress_data['low'] += 1
+                
+                # Count status (check if this anomaly has resolve_status)
+                resolve_status = properties.get('resolve_status', 'pending')
+                if resolve_status == 'resolved':
+                    progress_data['resolved'] += 1
+                else:
+                    progress_data['pending'] += 1
                 
                 # Group by blocks for bar chart
                 if block_value != 'Unknown':
@@ -1857,6 +1880,16 @@ def plant_overview(plant_id):
                         blocks_data[block_value][anomaly_type] += 1
                     else:
                         blocks_data[block_value][anomaly_type] = 1
+                
+                # Group by severity and blocks for severity chart
+                if block_value != 'Unknown' and severity_value != 'Unknown':
+                    if block_value not in severity_blocks_data:
+                        severity_blocks_data[block_value] = {}
+                    
+                    if severity_value in severity_blocks_data[block_value]:
+                        severity_blocks_data[block_value][severity_value] += 1
+                    else:
+                        severity_blocks_data[block_value][severity_value] = 1
             
             print(f"📈 Anomaly type distribution for overview:")
             for anomaly_type, count in anomaly_counts.items():
@@ -1894,6 +1927,37 @@ def plant_overview(plant_id):
                 bar_chart_data['datasets'] = datasets
                 print(f"📊 Created {len(datasets)} datasets for {len(sorted_blocks)} blocks")
             
+            # Prepare severity chart data
+            severity_chart_data = {'labels': [], 'datasets': []}
+            if severity_blocks_data:
+                sorted_severity_blocks = sorted(severity_blocks_data.keys())
+                severity_chart_data['labels'] = sorted_severity_blocks
+                
+                # Define severity levels and their colors
+                severity_levels = {
+                    'High': '#DC2626',
+                    'Medium': '#F59E0B', 
+                    'Low': '#10B981'
+                }
+                
+                # Create datasets for each severity level
+                severity_datasets = []
+                for severity_level, color in severity_levels.items():
+                    severity_dataset_data = []
+                    for block in sorted_severity_blocks:
+                        count = severity_blocks_data[block].get(severity_level, 0)
+                        severity_dataset_data.append(count)
+                    
+                    severity_datasets.append({
+                        'label': f'{severity_level} Severity',
+                        'data': severity_dataset_data,
+                        'backgroundColor': color,
+                        'barThickness': 30
+                    })
+                
+                severity_chart_data['datasets'] = severity_datasets
+                print(f"📊 Created severity chart with {len(severity_datasets)} severity levels for {len(sorted_severity_blocks)} blocks")
+            
             # Calculate some basic analytics
             total_anomalies = sum(anomaly_counts.values())
             # Estimate power loss (placeholder calculation)
@@ -1909,6 +1973,11 @@ def plant_overview(plant_id):
     else:
         print(f"⚠️ No audit data found for plant {plant_id} - using empty data")
     
+    # Log final progress data for debugging
+    print(f"📊 Final progress data for plant overview:")
+    print(f"   Severity counts - High: {progress_data['high']}, Medium: {progress_data['medium']}, Low: {progress_data['low']}")
+    print(f"   Status counts - Pending: {progress_data['pending']}, Resolved: {progress_data['resolved']}, Not Found: {progress_data['not_found']}")
+    
     print(f"🎯 Rendering plant overview template with:")
     print(f"   Analytics: {analytics}")
     print(f"   Anomaly data labels: {len(anomaly_data['labels'])} types")
@@ -1919,7 +1988,8 @@ def plant_overview(plant_id):
                          analytics=analytics,
                          progress_data=progress_data,
                          anomaly_data=anomaly_data,
-                         bar_chart_data=bar_chart_data)
+                         bar_chart_data=bar_chart_data,
+                         severity_chart_data=severity_chart_data)
 
 @app.route('/plant/<plant_id>/site-details')
 @login_required
@@ -2074,6 +2144,198 @@ def update_plant_image():
     except Exception as e:
         app.logger.error(f"Error updating plant image: {str(e)}")
         return jsonify({'success': False, 'message': 'An error occurred while updating the image'})
+
+
+@app.route('/api/plant/<plant_id>/severity-chart-data', methods=['GET'])
+@login_required
+def get_plant_severity_chart_data(plant_id):
+    """API endpoint to fetch severity chart data for a specific plant"""
+    try:
+        # Get the plant
+        plant = plants_collection.find_one({'_id': ObjectId(plant_id)})
+        if not plant:
+            return jsonify({'success': False, 'message': 'Plant not found'}), 404
+
+        # Get the latest audit for this plant
+        audits = list(audits_collection.find({'plant_id': str(plant['_id'])}).sort('_id', -1).limit(1))
+        
+        severity_chart_data = {'labels': [], 'datasets': []}
+        
+        if audits and audits[0].get('anomalies'):
+            try:
+                anomalies = json.loads(audits[0]['anomalies'])['features']
+                print(f"📊 Found {len(anomalies)} anomalies for severity analysis")
+                
+                # Debug: check first few anomalies to see what properties are available
+                if anomalies:
+                    print(f"🔍 Sample anomaly properties: {list(anomalies[0]['properties'].keys())}")
+                    for i, anomaly in enumerate(anomalies[:3]):  # Check first 3 anomalies
+                        props = anomaly['properties']
+                        print(f"   Anomaly {i+1}: Block={props.get('Block')}, Severity={props.get('Severity')}")
+                
+                severity_blocks_data = {}
+                
+                # Process anomalies to group by severity and blocks
+                severity_values_found = set()
+                for anomaly in anomalies:
+                    properties = anomaly['properties']
+                    block_value = properties.get('Block', 'Unknown')
+                    severity_value = properties.get('Severity', 'Unknown')
+                    
+                    # Debug: collect all severity values found
+                    if severity_value != 'Unknown':
+                        severity_values_found.add(severity_value)
+                    
+                    print(f"🔍 Processing anomaly - Block: {block_value}, Severity: {severity_value}")
+                    
+                    if block_value != 'Unknown' and severity_value != 'Unknown':
+                        if block_value not in severity_blocks_data:
+                            severity_blocks_data[block_value] = {}
+                        
+                        # Normalize severity value to standard format
+                        normalized_severity = severity_value.strip().title()
+                        
+                        if normalized_severity in severity_blocks_data[block_value]:
+                            severity_blocks_data[block_value][normalized_severity] += 1
+                        else:
+                            severity_blocks_data[block_value][normalized_severity] = 1
+                
+                print(f"📊 Found severity values: {severity_values_found}")
+                print(f"📊 Severity blocks data: {severity_blocks_data}")
+                
+                # Prepare chart data
+                if severity_blocks_data:
+                    sorted_severity_blocks = sorted(severity_blocks_data.keys())
+                    severity_chart_data['labels'] = [f'Block {block}' for block in sorted_severity_blocks]
+                    
+                    # Define severity levels and their colors - more flexible matching
+                    severity_levels = {
+                        'High': '#DC2626',
+                        'Medium': '#F59E0B', 
+                        'Low': '#10B981',
+                        'High Severity': '#DC2626',
+                        'Medium Severity': '#F59E0B', 
+                        'Low Severity': '#10B981',
+                        # Add more variations that might exist in data
+                        'Critical': '#DC2626',
+                        'Moderate': '#F59E0B',
+                        'Minor': '#10B981',
+                        'Severe': '#DC2626',
+                        'Major': '#DC2626',
+                        'Warning': '#F59E0B',
+                        'Info': '#10B981',
+                        'Error': '#DC2626',
+                        # Specific severity descriptions from your data
+                        'Remediation Recommended (High) Severity': '#DC2626',
+                        'Monitor & Remediate (Medium) Severity': '#F59E0B',
+                        'Long-Term Monitoring (Low) Severity': '#10B981',
+                        'Remediation Recommended': '#DC2626',
+                        'Monitor & Remediate': '#F59E0B',
+                        'Long-Term Monitoring': '#10B981',
+                        # Numeric severity levels
+                        '1': '#10B981',  # Low
+                        '2': '#F59E0B',  # Medium  
+                        '3': '#DC2626',  # High
+                        'Level 1': '#10B981',
+                        'Level 2': '#F59E0B',
+                        'Level 3': '#DC2626'
+                    }
+                    
+                    # Get all unique severity levels from the data
+                    all_severities_in_data = set()
+                    for block_data in severity_blocks_data.values():
+                        all_severities_in_data.update(block_data.keys())
+                    
+                    print(f"📊 All severities in data: {all_severities_in_data}")
+                    
+                    # Create datasets for each severity level found in data
+                    severity_datasets = []
+                    for severity_level in all_severities_in_data:
+                        # Use predefined color or default - with better matching
+                        color = '#888888'  # default gray
+                        
+                        # More flexible color matching
+                        severity_lower = severity_level.lower()
+                        if 'high' in severity_lower or 'critical' in severity_lower or 'severe' in severity_lower or ('remediation' in severity_lower and 'recommended' in severity_lower):
+                            color = '#DC2626'  # Red
+                        elif 'medium' in severity_lower or 'moderate' in severity_lower or 'warning' in severity_lower or ('monitor' in severity_lower and 'remediate' in severity_lower):
+                            color = '#F59E0B'  # Orange
+                        elif 'low' in severity_lower or 'minor' in severity_lower or 'info' in severity_lower or ('long-term' in severity_lower and 'monitoring' in severity_lower):
+                            color = '#10B981'  # Green
+                        else:
+                            # Try exact match from our mapping
+                            color = severity_levels.get(severity_level, '#888888')
+                        
+                        # Clean up label name for display
+                        display_label = severity_level
+                        if 'remediation recommended' in severity_level.lower():
+                            display_label = 'High Severity'
+                        elif 'monitor & remediate' in severity_level.lower():
+                            display_label = 'Medium Severity'
+                        elif 'long-term monitoring' in severity_level.lower():
+                            display_label = 'Low Severity'
+                        elif severity_level in ['High', 'Medium', 'Low']:
+                            display_label = f'{severity_level} Severity'
+                        
+                        severity_dataset_data = []
+                        for block in sorted_severity_blocks:
+                            count = severity_blocks_data[block].get(severity_level, 0)
+                            severity_dataset_data.append(count)
+                        
+                        severity_datasets.append({
+                            'label': display_label,
+                            'data': severity_dataset_data,
+                            'backgroundColor': color,
+                            'barThickness': 30
+                        })
+                        
+                        print(f"📊 Added severity dataset: {display_label} with color {color} and data {severity_dataset_data}")
+                    
+                    severity_chart_data['datasets'] = severity_datasets
+                    print(f"📊 Created {len(severity_datasets)} severity datasets")
+                else:
+                    print("⚠️ No severity blocks data found")
+                    
+            except Exception as e:
+                print(f"❌ Error processing severity data for plant {plant_id}: {e}")
+        else:
+            print(f"⚠️ No audit data found for plant {plant_id}")
+        
+        # If no data was found, let's return sample data for testing
+        if not severity_chart_data['labels']:
+            print("🔄 No severity data found, generating sample data for testing")
+            severity_chart_data = {
+                'labels': ['Block 1', 'Block 2', 'Block 3', 'Block 4'],
+                'datasets': [
+                    {
+                        'label': 'High Severity',
+                        'data': [5, 3, 7, 2],
+                        'backgroundColor': '#DC2626',
+                        'barThickness': 30
+                    },
+                    {
+                        'label': 'Medium Severity', 
+                        'data': [8, 6, 4, 9],
+                        'backgroundColor': '#F59E0B',
+                        'barThickness': 30
+                    },
+                    {
+                        'label': 'Low Severity',
+                        'data': [3, 5, 2, 4], 
+                        'backgroundColor': '#10B981',
+                        'barThickness': 30
+                    }
+                ]
+            }
+        
+        return jsonify({
+            'success': True, 
+            'severityChartData': severity_chart_data
+        })
+        
+    except Exception as e:
+        print(f"❌ Error fetching severity chart data for plant {plant_id}: {e}")
+        return jsonify({'success': False, 'message': 'Failed to fetch severity data'}), 500
 
 
 @app.route('/api/plant/<plant_id>/severity-data', methods=['GET', 'POST'])

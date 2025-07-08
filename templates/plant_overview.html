@@ -400,12 +400,12 @@
         }
 
         .status-segment.pending { background-color: #7173e4; }
-        .status-segment.resolved { background-color: #7ed957; }
+        .status-segment.resolved { background-color: #10B981; }
         .status-segment.not-found { background-color: #a6a6a6; }
         
-        .status-segment.high { background-color: #FF0000; }
-        .status-segment.medium { background-color: #FF914D; }
-        .status-segment.low { background-color: #7ed957; }
+        .status-segment.high { background-color: #DC2626; }
+        .status-segment.medium { background-color: #F59E0B; }
+        .status-segment.low { background-color: #10B981; }
 
         .status-labels {
             display: flex;
@@ -1500,7 +1500,7 @@
                                 <span>Pending <span id="pendingCount">25</span> (<span id="pendingPercent">25</span>%)</span>
                             </div>
                             <div class="status-item">
-                                <div class="status-dot" style="background-color: #7ed957;"></div>
+                                <div class="status-dot" style="background-color: #10B981;"></div>
                                 <span>Corrected <span id="resolvedCount">60</span> (<span id="resolvedPercent">60</span>%)</span>
                             </div>
                             <div class="status-item">
@@ -1526,15 +1526,15 @@
                         </div>
                         <div class="status-labels">
                             <div class="status-item">
-                                <div class="status-dot" style="background-color: #FF0000;"></div>
+                                <div class="status-dot" style="background-color: #DC2626;"></div>
                                 <span>High <span id="highCount">30</span> (<span id="highPercent">30</span>%)</span>
                             </div>
                             <div class="status-item">
-                                <div class="status-dot" style="background-color: #FF914D;"></div>
+                                <div class="status-dot" style="background-color: #F59E0B;"></div>
                                 <span>Medium <span id="mediumCount">45</span> (<span id="mediumPercent">45</span>%)</span>
                             </div>
                             <div class="status-item">
-                                <div class="status-dot" style="background-color: #7ed957;"></div>
+                                <div class="status-dot" style="background-color: #10B981;"></div>
                                 <span>Low <span id="lowCount">25</span> (<span id="lowPercent">25</span>%)</span>
                             </div>
                         </div>
@@ -1885,6 +1885,17 @@
                                         callbacks: {
                                             title: function(context) {
                                                 return context[0].label + ' - Total Anomalies';
+                                            },
+                                            label: function(context) {
+                                                // Filter out items with value 0
+                                                if (context.parsed.y === 0) {
+                                                    return null;
+                                                }
+                                                return context.dataset.label + ': ' + context.parsed.y;
+                                            },
+                                            filter: function(tooltipItem) {
+                                                // Additional filter to exclude zero values
+                                                return tooltipItem.parsed.y > 0;
                                             }
                                         }
                                     }
@@ -1984,83 +1995,225 @@
         function createSeverityLollipopChart() {
             const severityCtx = document.getElementById('severityLollipopChart');
             if (severityCtx && !severityCtx.chart) {
-                const severityChartData = {
-                    labels: ['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6', 'Block 7', 'Block 8'],
-                    datasets: [
-                        { 
-                            label: 'High Severity', 
-                            data: [8, 6, 4, 12, 3, 8, 4, 6], 
-                            backgroundColor: '#FF0000',
-                            barThickness: 30
-                        },
-                        { 
-                            label: 'Medium Severity', 
-                            data: [12, 9, 8, 15, 7, 12, 8, 10], 
-                            backgroundColor: '#FF914D',
-                            barThickness: 30
-                        },
-                        { 
-                            label: 'Low Severity', 
-                            data: [6, 4, 5, 8, 3, 6, 5, 4], 
-                            backgroundColor: '#7ed957',
-                            barThickness: 30
+                // Fetch dynamic severity data from server
+                const plantId = '{{ plant._id }}';
+                
+                fetch(`/api/plant/${plantId}/severity-chart-data`)
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log('📊 Severity data response:', data);
+                        let severityChartData;
+                        
+                        if (data.success && data.severityChartData.labels.length > 0) {
+                            // Use dynamic data from server
+                            severityChartData = data.severityChartData;
+                            console.log('✅ Using dynamic severity data:', severityChartData);
+                            console.log('📊 Datasets with colors:', severityChartData.datasets.map(d => ({
+                                label: d.label,
+                                backgroundColor: d.backgroundColor,
+                                dataLength: d.data.length
+                            })));
+                        } else {
+                            // Fallback to default data if no data is available
+                            console.log('⚠️ No severity data found, using fallback data');
+                            severityChartData = {
+                                labels: ['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6', 'Block 7', 'Block 8'],
+                                datasets: [
+                                    { 
+                                        label: 'High Severity', 
+                                        data: [8, 6, 4, 12, 3, 8, 4, 6], 
+                                        backgroundColor: '#DC2626',
+                                        barThickness: 30
+                                    },
+                                    { 
+                                        label: 'Medium Severity', 
+                                        data: [12, 9, 8, 15, 7, 12, 8, 10], 
+                                        backgroundColor: '#F59E0B',
+                                        barThickness: 30
+                                    },
+                                    { 
+                                        label: 'Low Severity', 
+                                        data: [6, 4, 5, 8, 3, 6, 5, 4], 
+                                        backgroundColor: '#10B981',
+                                        barThickness: 30
+                                    }
+                                ]
+                            };
                         }
-                    ]
-                };
 
-                const severityLegend = document.getElementById('severity-lollipop-chart-legend');
-                if (severityLegend) {
-                    severityLegend.innerHTML = '';
-                    severityChartData.datasets.forEach(d => {
-                        severityLegend.innerHTML += `<div class="legend-item"><div class="legend-color" style="background-color: ${d.backgroundColor}"></div><span>${d.label}</span></div>`;
+                        const severityLegend = document.getElementById('severity-lollipop-chart-legend');
+                        if (severityLegend) {
+                            severityLegend.innerHTML = '';
+                            severityChartData.datasets.forEach(d => {
+                                severityLegend.innerHTML += `<div class="legend-item"><div class="legend-color" style="background-color: ${d.backgroundColor}"></div><span>${d.label}</span></div>`;
+                            });
+                        }
+
+                        severityCtx.chart = new Chart(severityCtx, {
+                            type: 'bar',
+                            data: severityChartData,
+                            options: {
+                                responsive: true, 
+                                maintainAspectRatio: false,
+                                plugins: { 
+                                    legend: { display: false }, 
+                                    tooltip: { 
+                                        mode: 'index', 
+                                        intersect: false,
+                                        backgroundColor: 'rgba(0,0,0,0.8)',
+                                        titleColor: '#fff',
+                                        bodyColor: '#fff',
+                                        borderColor: 'rgba(255,255,255,0.1)',
+                                        borderWidth: 1,
+                                        cornerRadius: 6,
+                                        callbacks: {
+                                            label: function(context) {
+                                                // Filter out items with value 0
+                                                if (context.parsed.y === 0) {
+                                                    return null;
+                                                }
+                                                return context.dataset.label + ': ' + context.parsed.y;
+                                            },
+                                            filter: function(tooltipItem) {
+                                                // Additional filter to exclude zero values
+                                                return tooltipItem.parsed.y > 0;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: { 
+                                    x: { 
+                                        stacked: true, 
+                                        grid: { display: false },
+                                        categoryPercentage: 0.8,
+                                        barPercentage: 0.6,
+                                        title: {
+                                            display: true,
+                                            text: 'Blocks',
+                                            font: { weight: 'bold', size: 12 },
+                                            color: '#374151'
+                                        }
+                                    }, 
+                                    y: { 
+                                        stacked: true, 
+                                        beginAtZero: true, 
+                                        title: {
+                                            display: true,
+                                            text: 'Severity Count',
+                                            font: { weight: 'bold', size: 12 },
+                                            color: '#374151'
+                                        }
+                                    } 
+                                },
+                                elements: {
+                                    bar: {
+                                        borderRadius: { topLeft: 3, topRight: 3 },
+                                        borderSkipped: false
+                                    }
+                                }
+                            }
+                        });
+                    })
+                    .catch(error => {
+                        console.error('❌ Error fetching severity data:', error);
+                        // Use fallback data if API call fails
+                        const fallbackData = {
+                            labels: ['Block 1', 'Block 2', 'Block 3', 'Block 4', 'Block 5', 'Block 6', 'Block 7', 'Block 8'],
+                            datasets: [
+                                { 
+                                    label: 'High Severity', 
+                                    data: [8, 6, 4, 12, 3, 8, 4, 6], 
+                                    backgroundColor: '#DC2626',
+                                    barThickness: 30
+                                },
+                                { 
+                                    label: 'Medium Severity', 
+                                    data: [12, 9, 8, 15, 7, 12, 8, 10], 
+                                    backgroundColor: '#F59E0B',
+                                    barThickness: 30
+                                },
+                                { 
+                                    label: 'Low Severity', 
+                                    data: [6, 4, 5, 8, 3, 6, 5, 4], 
+                                    backgroundColor: '#10B981',
+                                    barThickness: 30
+                                }
+                            ]
+                        };
+                        
+                        const severityLegend = document.getElementById('severity-lollipop-chart-legend');
+                        if (severityLegend) {
+                            severityLegend.innerHTML = '';
+                            fallbackData.datasets.forEach(d => {
+                                severityLegend.innerHTML += `<div class="legend-item"><div class="legend-color" style="background-color: ${d.backgroundColor}"></div><span>${d.label}</span></div>`;
+                            });
+                        }
+
+                        severityCtx.chart = new Chart(severityCtx, {
+                            type: 'bar',
+                            data: fallbackData,
+                            options: {
+                                responsive: true, 
+                                maintainAspectRatio: false,
+                                plugins: { 
+                                    legend: { display: false }, 
+                                    tooltip: { 
+                                        mode: 'index', 
+                                        intersect: false,
+                                        backgroundColor: 'rgba(0,0,0,0.8)',
+                                        titleColor: '#fff',
+                                        bodyColor: '#fff',
+                                        borderColor: 'rgba(255,255,255,0.1)',
+                                        borderWidth: 1,
+                                        cornerRadius: 6,
+                                        callbacks: {
+                                            label: function(context) {
+                                                // Filter out items with value 0
+                                                if (context.parsed.y === 0) {
+                                                    return null;
+                                                }
+                                                return context.dataset.label + ': ' + context.parsed.y;
+                                            },
+                                            filter: function(tooltipItem) {
+                                                // Additional filter to exclude zero values
+                                                return tooltipItem.parsed.y > 0;
+                                            }
+                                        }
+                                    }
+                                },
+                                scales: { 
+                                    x: { 
+                                        stacked: true, 
+                                        grid: { display: false },
+                                        categoryPercentage: 0.8,
+                                        barPercentage: 0.6,
+                                        title: {
+                                            display: true,
+                                            text: 'Blocks',
+                                            font: { weight: 'bold', size: 12 },
+                                            color: '#374151'
+                                        }
+                                    }, 
+                                    y: { 
+                                        stacked: true, 
+                                        beginAtZero: true, 
+                                        title: {
+                                            display: true,
+                                            text: 'Severity Count',
+                                            font: { weight: 'bold', size: 12 },
+                                            color: '#374151'
+                                        }
+                                    } 
+                                },
+                                elements: {
+                                    bar: {
+                                        borderRadius: { topLeft: 3, topRight: 3 },
+                                        borderSkipped: false
+                                    }
+                                }
+                            }
+                        });
                     });
-                }
-
-                severityCtx.chart = new Chart(severityCtx, {
-                    type: 'bar',
-                    data: severityChartData,
-                    options: {
-                        responsive: true, 
-                        maintainAspectRatio: false,
-                        plugins: { 
-                            legend: { display: false }, 
-                            tooltip: { 
-                                mode: 'index', 
-                                intersect: false
-                            }
-                        },
-                        scales: { 
-                            x: { 
-                                stacked: true, 
-                                grid: { display: false },
-                                categoryPercentage: 0.8,
-                                barPercentage: 0.6,
-                                title: {
-                                    display: true,
-                                    text: 'Blocks',
-                                    font: { weight: 'bold', size: 12 },
-                                    color: '#374151'
-                                }
-                            }, 
-                            y: { 
-                                stacked: true, 
-                                beginAtZero: true, 
-                                title: {
-                                    display: true,
-                                    text: 'Severity Count',
-                                    font: { weight: 'bold', size: 12 },
-                                    color: '#374151'
-                                }
-                            } 
-                        },
-                        elements: {
-                            bar: {
-                                borderRadius: { topLeft: 3, topRight: 3 },
-                                borderSkipped: false
-                            }
-                        }
-                    }
-                });
             }
         }
 
